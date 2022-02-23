@@ -36,3 +36,6 @@ bin
 intermediates
 *.sln
 /sandbox/*.vcxproj
+/Renaissance/*.vcxproj
+/Renaissance/Renaissance.vcxproj.filters
+/Sandbox/*.user
