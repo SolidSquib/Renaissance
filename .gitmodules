@@ -1,0 +1,3 @@
+[submodule "renaissance/externals/spdlog"]
+	path = renaissance/externals/spdlog
+	url = https://github.com/gabime/spdlog
