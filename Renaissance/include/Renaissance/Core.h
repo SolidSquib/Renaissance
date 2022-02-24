@@ -9,3 +9,5 @@
 #else
 	#error Renaissance engine is only compatible with Windows at this moment.
 #endif
+
+#define BIT(x) (1 << x)

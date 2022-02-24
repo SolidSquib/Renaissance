@@ -11,6 +11,10 @@ workspace "Renaissance"
 	startproject "Sandbox"
 
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+	IncludeDir = {}
+	IncludeDir["GLFW"] = "Renaissance/externals/GLFW/include"
+
+	include "Renaissance/externals/GLFW"
 
 	project "Renaissance"
 		location "Renaissance"
@@ -29,13 +33,24 @@ workspace "Renaissance"
 		includedirs
 		{
 			"%{prj.name}/include",
-			"%{prj.name}/externals/spdlog/include"
+			"%{prj.name}/externals/spdlog/include",
+			"%{IncludeDir.GLFW}"
+		}
+		
+		links
+		{
+			"GLFW"
 		}
 
 		filter "system:windows"
 			cppdialect "C++17"
 			staticruntime "On"
 			systemversion "latest"
+
+			links 
+			{
+				"opengl32.lib"
+			}
 
 			defines
 			{
