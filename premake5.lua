@@ -20,6 +20,10 @@ workspace "Renaissance"
 		location "Renaissance"
 		kind "SharedLib"
 		language "C++"
+		
+		sourcedir = "%{prj.name}/src"
+		pchheader "RenaissancePCH.h"
+		pchsource(sourcedir.."/RenaissancePCH.cpp")
 
 		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 		objdir ("intermediates/" .. outputdir .. "/%{prj.name}")

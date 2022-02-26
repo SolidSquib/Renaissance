@@ -1,7 +1,5 @@
 #pragma once
 
-#include "renaissance/Application.h"
-#include "renaissance/Log.h"
-
-/// Entry point
-#include "renaissance/EntryPoint.h"
+#include "Renaissance/Core/Core.h"
+#include "Renaissance/Core/Application.h"
+#include "Renaissance/Core/Log.h"

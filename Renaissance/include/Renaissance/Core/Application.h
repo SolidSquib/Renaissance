@@ -1,6 +1,6 @@
 #pragma once
 
-#include "renaissance/Core.h"
+#include "Renaissance/Core/Core.h"
 
 namespace Renaissance 
 {
@@ -17,5 +17,3 @@ namespace Renaissance
 	// Define this function in the client app:
 	Application* CreateApplication();
 }
-
-

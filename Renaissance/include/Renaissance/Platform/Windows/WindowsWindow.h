@@ -1,5 +1,14 @@
 #pragma once
-class WindowsWindow
+
+#include "Renaissance/Core/Window.h"
+
+namespace Renaissance
 {
-};
+	class REN_API WindowsWindow : public Window
+	{
+
+	};
+}
+
+
 

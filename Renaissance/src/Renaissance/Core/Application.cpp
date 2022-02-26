@@ -1,5 +1,5 @@
-#include "renaissance/Application.h"
-#include "renaissance/Log.h"
+#include "RenaissancePCH.h"
+#include "Renaissance/Core/Application.h"
 
 namespace Renaissance
 {

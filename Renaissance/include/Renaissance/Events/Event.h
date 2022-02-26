@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Renaissance/Core.h"
+#include "Renaissance/Core/Core.h"
 
-#include <string>
 #include <functional>
 
 namespace Renaissance::Events

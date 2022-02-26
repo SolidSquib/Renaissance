@@ -1,4 +1,5 @@
-#include "renaissance/Log.h"
+#include "RenaissancePCH.h"
+#include "Renaissance/Core/Log.h"
 
 namespace Renaissance
 {
@@ -18,7 +19,7 @@ namespace Renaissance
 	void Log::Init()
 	{
 		spdlog::set_pattern("%^[%T] %n: %v%$");
-
+		
 		sCoreLogger = spdlog::stdout_color_mt("RENAISSANCE");
 		sCoreLogger->set_level(spdlog::level::trace);
 
