@@ -3,21 +3,28 @@
 #include <memory>
 #include "Renaissance/Core/PlatformDetection.h"
 
-#if defined(REN_PLATFORM_WINDOWS)
-	#ifdef REN_BUILD_DLL
-		#define REN_API __declspec(dllexport)
-	#else 
-		#define REN_API __declspec(dllimport)
+#if REN_DEBUG
+	#if defined (REN_PLATFORM_WINDOWS)
+		#define REN_DEBUGBREAK() __debugbreak()
+	#elif defined (REN_PLATFORM_LINUX)
+		#include <signal.h>
+		#define REN_DEBUGBREAK() raise(SIGTRAP)
+	#elif defined (REN_PLATFORM_OSX)
+		#define REN_DEBUGBREAK() __debugbreak()
+	#else
+		#error "Debugbreak not supported on current platform."
 	#endif
-#elif defined(REN_PLATFORM_OSX)
-
-#elif defined(REN_PLATFORM_LINUX)
-
+	#define REN_ENABLE_ASSERTS
 #else
-	#error Renaissance engine is only compatible with Windows at this moment.
+	#define REN_DEBUGBREAK()
 #endif
 
+#define REN_STRINGIFY_MACRO(x) #x
+#define REN_EXPAND_MACRO(x) x
+
 #define BIT(x) (1 << x)
+
+#define REN_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 namespace Renaissance
 {
@@ -26,7 +33,7 @@ namespace Renaissance
 	template<typename T, typename ... Args>
 	constexpr UniquePtr<T> MakeUnique(Args&& ... args)
 	{
-		return std::make_unique<T>(std::forward<Args>(args));
+		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
 	
 	template<typename T>
@@ -34,8 +41,9 @@ namespace Renaissance
 	template<typename T, typename ... Args>
 	constexpr SharedPtr<T> MakeShared(Args&& ... args)
 	{
-		return std::make_shared<T>(std::forward<Args>(args));
+		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 }
 
 #include "Renaissance/Core/Log.h"
+#include "Renaissance/Core/Assert.h"

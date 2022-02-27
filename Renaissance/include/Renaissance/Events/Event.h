@@ -32,7 +32,7 @@ namespace Renaissance::Events
 
 	#define DEFINE_REN_EVENT_CATEGORY(Categories) virtual unsigned int GetCategoryFlags() const override { return Categories; }
 
-	class REN_API Event
+	class Event
 	{	
 		friend class EventDispatcher;
 

@@ -10,7 +10,7 @@
 
 namespace Renaissance
 {
-	class REN_API Log
+	class Log
 	{
 	public: 
 		Log();

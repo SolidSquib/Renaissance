@@ -41,7 +41,7 @@ namespace Renaissance::Events
 			return ss.str();
 		}
 
-		DEFINE_REN_EVENT_TYPE(WindowResizeEvent)
+		DEFINE_REN_EVENT_TYPE(WindowResize)
 
 	private:
 		int mWidth, mHeight;
@@ -52,7 +52,7 @@ namespace Renaissance::Events
 	public:
 		WindowFocusEvent() : WindowEvent() {}
 
-		DEFINE_REN_EVENT_TYPE(WindowFocusEvent)
+		DEFINE_REN_EVENT_TYPE(WindowFocus)
 	};
 
 	class WindowLostFocusEvent : public WindowEvent
@@ -60,7 +60,7 @@ namespace Renaissance::Events
 	public:
 		WindowLostFocusEvent() : WindowEvent() {}
 
-		DEFINE_REN_EVENT_TYPE(WindowLostFocusEvent)
+		DEFINE_REN_EVENT_TYPE(WindowLostFocus)
 	};
 
 	class WindowMovedEvent: public WindowEvent
@@ -68,6 +68,6 @@ namespace Renaissance::Events
 	public:
 		WindowMovedEvent() : WindowEvent() {}
 
-		DEFINE_REN_EVENT_TYPE(WindowMovedEvent)
+		DEFINE_REN_EVENT_TYPE(WindowMoved)
 	};
 }

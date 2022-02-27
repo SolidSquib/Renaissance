@@ -1,11 +1,21 @@
 #include "RenaissancePCH.h"
 #include "Renaissance/Core/Application.h"
 
+#include <GLFW/glfw3.h>
+
 namespace Renaissance
 {
-	Application::Application()
-	{
+	Application* Application::sInstance = nullptr;
 
+	Application::Application(const std::string& name, ApplicationCommandLineArgs args)
+		: mArgs(args)
+	{
+		REN_CORE_ASSERT(sInstance == nullptr, "An instance of application already exists!");
+		sInstance = this;
+		mWindow = Window::Create(WindowProperties(name));
+		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
+
+		// init renderer
 	}
 
 	Application::~Application()
@@ -13,18 +23,46 @@ namespace Renaissance
 
 	}
 
+	void Application::OnEvent(Event& e)
+	{
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowClosedEvent>(REN_BIND_EVENT(Application::OnWindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(REN_BIND_EVENT(Application::OnWindowResized));
+
+		// propogate events to other layers
+	}
+
+	void Application::Close()
+	{
+		mRunning = false;
+	}
+
 	void Application::Run()
 	{
-		REN_CORE_WARN("Hello warning");
-		REN_TRACE("Hello trace");
-		while (true)
+		while (mRunning)
 		{
-			// run the application
+			float time = glfwGetTime();
+			mWindow->OnUpdate();
 		}
 	}
 
-	void Application::Init()
+	bool Application::OnWindowClosed(WindowClosedEvent& e)
 	{
-		Log::Init();
+		mRunning = false;
+		return true;
+	}
+
+	bool Application::OnWindowResized(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			mMinimized = true;
+			return false;
+		}
+
+		mMinimized = false;
+		// inform renderer
+
+		return false;
 	}
 }

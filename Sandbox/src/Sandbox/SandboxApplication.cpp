@@ -4,17 +4,17 @@
 class SandboxApplication : public Renaissance::Application
 {
 public:
-	SandboxApplication()
+	SandboxApplication(const std::string& name, Renaissance::ApplicationCommandLineArgs args)
+		: Application(name, args)
 	{
 	}
 
 	virtual ~SandboxApplication()
 	{
-
 	}
 };
 
-Renaissance::Application* Renaissance::CreateApplication()
+Renaissance::Application* Renaissance::CreateApplication(Renaissance::ApplicationCommandLineArgs args)
 {
-	return new SandboxApplication();
+	return new SandboxApplication("Renaissance Sandbox", args);
 }

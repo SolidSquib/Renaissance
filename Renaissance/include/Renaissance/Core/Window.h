@@ -21,10 +21,10 @@ namespace Renaissance
 	};
 
 	// Interface to represent a desktop window
-	class REN_API Window
+	class Window
 	{
 	public: 
-		using EventCallbackFunction = std::is_function<void(Event&)>;
+		using EventCallbackFunction = std::function<void(Event&)>;
 
 		virtual ~Window() {}
 
@@ -36,9 +36,9 @@ namespace Renaissance
 		// Window attributes
 		virtual void SetEventCallback(const EventCallbackFunction& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
-		virtual void IsVSync() const = 0;
+		virtual bool IsVSync() const = 0;
 
-		static Window* Create(const WindowProperties& properties = WindowProperties());
+		static UniquePtr<Window> Create(const WindowProperties& properties = WindowProperties());
 	};
 }
 

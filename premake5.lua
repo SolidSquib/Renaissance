@@ -18,8 +18,10 @@ workspace "Renaissance"
 
 	project "Renaissance"
 		location "Renaissance"
-		kind "SharedLib"
+		kind "StaticLib"
 		language "C++"
+		cppdialect "C++17"
+		staticruntime "off"
 		
 		sourcedir = "%{prj.name}/src"
 		pchheader "RenaissancePCH.h"
@@ -46,25 +48,17 @@ workspace "Renaissance"
 			"GLFW"
 		}
 
+		defines
+		{			
+			"_CRT_SECURE_NO_WARNINGS"
+		}
+
 		filter "system:windows"
-			cppdialect "C++17"
-			staticruntime "On"
 			systemversion "latest"
 
 			links 
 			{
 				"opengl32.lib"
-			}
-
-			defines
-			{
-				"REN_PLATFORM_WINDOWS",
-				"REN_BUILD_DLL"
-			}
-
-			postbuildcommands
-			{
-				("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
 			}
 
 		filter "configurations:Debug"
@@ -83,6 +77,8 @@ workspace "Renaissance"
 		location "Sandbox"
 		kind "ConsoleApp"
 		language "C++"
+		cppdialect "C++17"
+		staticruntime "off"
 
 		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 		objdir ("intermediates/" .. outputdir .. "/%{prj.name}")
@@ -106,23 +102,16 @@ workspace "Renaissance"
 		}
 
 		filter "system:windows"
-			cppdialect "C++17"
-			staticruntime "On"
 			systemversion "latest"
-
-			defines
-			{
-				"REN_PLATFORM_WINDOWS"
-			}
 
 		filter "configurations:Debug"
 			defines "REN_DEBUG"
-			symbols "On"
+			symbols "on"
 
 		filter "configurations:Release"
 			defines "REN_RELEASE"
-			optimize "On"
+			optimize "on"
 
 		filter "configurations:Shipping"
 			defines "REN_SHIPPING"
-			optimize "On"
+			optimize "on"
