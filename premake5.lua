@@ -12,9 +12,15 @@ workspace "Renaissance"
 
 	outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 	IncludeDir = {}
+	IncludeDir["spdlog"] = "Renaissance/externals/spdlog/include"
 	IncludeDir["GLFW"] = "Renaissance/externals/GLFW/include"
+	IncludeDir["Glad"] = "Renaissance/externals/Glad/include"
+	IncludeDir["ImGui"] = "Renaissance/externals/ImGui/"
+	IncludeDir["glm"] = "Renaissance/externals/glm"
 
 	include "Renaissance/externals/GLFW"
+	include "Renaissance/externals/Glad"
+	include "Renaissance/externals/ImGui"
 
 	project "Renaissance"
 		location "Renaissance"
@@ -33,19 +39,26 @@ workspace "Renaissance"
 		files 
 		{
 			"%{prj.name}/include/**.h",
-			"%{prj.name}/src/**.cpp"
+			"%{prj.name}/src/RenaissancePCH.cpp",
+			"%{prj.name}/src/Renaissance/Core/**.cpp",
+			"%{prj.name}/src/Renaissance/UserInterface/**.cpp"
 		}
 
 		includedirs
 		{
 			"%{prj.name}/include",
-			"%{prj.name}/externals/spdlog/include",
-			"%{IncludeDir.GLFW}"
+			"%{IncludeDir.spdlog}",
+			"%{IncludeDir.GLFW}",
+			"%{IncludeDir.Glad}",
+			"%{IncludeDir.ImGui}",
+			"%{IncludeDir.glm}"
 		}
 		
 		links
 		{
-			"GLFW"
+			"GLFW",
+			"Glad",
+			"ImGui"
 		}
 
 		defines
@@ -59,6 +72,17 @@ workspace "Renaissance"
 			links 
 			{
 				"opengl32.lib"
+			}
+
+			files 
+			{
+				"%{prj.name}/src/Renaissance/Platform/Windows/**.cpp"
+			}
+
+		filter "system:macosx"
+			files 
+			{
+				"%{prj.name}/src/Renaissance/Platform/OSX/**.cpp"
 			}
 
 		filter "configurations:Debug"
@@ -93,7 +117,8 @@ workspace "Renaissance"
 		{
 			"%{prj.name}/include",
 			"Renaissance/include",
-			"Renaissance/externals/spdlog/include"
+			"Renaissance/externals/spdlog/include",
+			"%{IncludeDir.glm}"
 		}
 
 		links

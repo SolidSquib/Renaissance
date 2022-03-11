@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include "Renaissance/Core/PlatformDetection.h"
 
 #if REN_DEBUG
@@ -37,12 +38,17 @@ namespace Renaissance
 	}
 	
 	template<typename T>
-	using SharedPtr = std::unique_ptr<T>;
+	using SharedPtr = std::shared_ptr<T>;
 	template<typename T, typename ... Args>
 	constexpr SharedPtr<T> MakeShared(Args&& ... args)
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
+
+	template<typename T>
+	using WeakPtr = std::weak_ptr<T>;
+
+	typedef std::string String;
 }
 
 #include "Renaissance/Core/Log.h"

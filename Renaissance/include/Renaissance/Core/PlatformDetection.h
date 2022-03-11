@@ -17,10 +17,10 @@
 	#if TARGET_IPHONE_SIMULATOR == 1
 		#error "IOS simulator is not supported!"
 	#elif TARGET_OS_IPHONE == 1
-		#define HZ_PLATFORM_IOS
+		#define REN_PLATFORM_IOS
 		#error "IOS is not supported!"
 	#elif TARGET_OS_MAC == 1
-		#define HZ_PLATFORM_MACOS
+		#define REN_PLATFORM_MACOS
 		#error "MacOS is not supported!"
 	#else
 		#error "Unknown Apple platform!"
@@ -29,10 +29,10 @@
  * since android is based on the linux kernel
  * it has __linux__ defined */
 #elif defined(__ANDROID__)
-	#define HZ_PLATFORM_ANDROID
+	#define REN_PLATFORM_ANDROID
 	#error "Android is not supported!"
 #elif defined(__linux__)
-	#define HZ_PLATFORM_LINUX
+	#define REN_PLATFORM_LINUX
 	#error "Linux is not supported!"
 #else
 	/* Unknown compiler/platform */

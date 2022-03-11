@@ -72,6 +72,7 @@ namespace Renaissance::Events
 		}
 
 		DEFINE_REN_EVENT_TYPE(MouseMoved)
+		DEFINE_REN_EVENT_CATEGORY(EventCategoryInput | EventCategoryMouse)
 
 	private:
 		float mMouseX, mMouseY;
@@ -95,6 +96,7 @@ namespace Renaissance::Events
 		}
 
 		DEFINE_REN_EVENT_TYPE(MouseScrolled)
+		DEFINE_REN_EVENT_CATEGORY(EventCategoryInput | EventCategoryMouse);
 
 	private:
 		float mOffsetX, mOffsetY;

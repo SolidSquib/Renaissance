@@ -33,10 +33,10 @@ namespace Renaissance::Events
 	#define DEFINE_REN_EVENT_CATEGORY(Categories) virtual unsigned int GetCategoryFlags() const override { return Categories; }
 
 	class Event
-	{	
-		friend class EventDispatcher;
-
+	{
 	public:
+		bool mHandled = false;
+
 		virtual EventType GetEventType() const = 0;
 		virtual const char* GetName() const = 0;
 		virtual unsigned int GetCategoryFlags() const = 0;
@@ -47,8 +47,7 @@ namespace Renaissance::Events
 			return GetCategoryFlags() & cat;
 		}
 
-	protected:
-		bool mHandled = false;
+		inline bool IsHandled() const { return mHandled; }
 	};
 
 	class EventDispatcher
@@ -69,7 +68,7 @@ namespace Renaissance::Events
 		{
 			if (mEvent.GetEventType() == T::GetStaticType())
 			{
-				mEvent.mHandled = function(*(T*)&mEvent);
+				mEvent.mHandled |= function(static_cast<T&>(mEvent));
 				return true;
 			}
 			return false;

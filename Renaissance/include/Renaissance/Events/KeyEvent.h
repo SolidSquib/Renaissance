@@ -38,7 +38,7 @@ namespace Renaissance::Events
 			return ss.str();
 		}
 
-		DEFINE_REN_EVENT_TYPE(KeyPressedEvent);
+		DEFINE_REN_EVENT_TYPE(KeyPressed)
 
 	protected:
 		unsigned int mRepeatCount;
@@ -48,7 +48,7 @@ namespace Renaissance::Events
 	{
 	public:
 		KeyReleasedEvent(int keyCode)
-			: KeyEvent(keyCode))
+			: KeyEvent(keyCode)
 		{}
 
 		std::string ToString() const override
@@ -58,6 +58,6 @@ namespace Renaissance::Events
 			return ss.str();
 		}
 
-		DEFINE_REN_EVENT_TYPE(KeyReleasedEvent);
+		DEFINE_REN_EVENT_TYPE(KeyReleased)
 	};
 }

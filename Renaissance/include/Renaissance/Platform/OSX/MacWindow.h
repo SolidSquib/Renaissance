@@ -6,11 +6,11 @@ struct GLFWwindow;
 
 namespace Renaissance
 {
-	class WindowsWindow : public Window
+	class MacWindow : public Window
 	{
 	public:		
-		WindowsWindow(const WindowProperties& properties);
-		virtual ~WindowsWindow();
+		MacWindow(const WindowProperties& properties);
+		virtual ~MacWindow();
 
 		virtual void OnUpdate() override;
 

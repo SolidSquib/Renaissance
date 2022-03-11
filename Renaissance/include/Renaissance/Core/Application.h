@@ -5,6 +5,8 @@
 #include "Renaissance/Events/Event.h"
 #include "Renaissance/Events/AppEvent.h"
 #include "Renaissance/Events/WindowEvent.h"
+#include "Renaissance/Core/LayerStack.h"
+#include "Renaissance/UserInterface/ImGuiLayer.h"
 
 int main(int argc, char** argv);
 
@@ -34,7 +36,24 @@ namespace Renaissance
 
 		void Close();
 		
+		template <typename T, typename ... Args>
+		WeakPtr<T> CreateNewLayer(Args&& ... args)
+		{
+			return mLayerStack.CreateNewLayer<T>(std::forward<Args>(args)...);
+		}
+
+		template <typename T, typename ... Args>
+		WeakPtr<T> CreateNewOverlay(Args&& ... args)
+		{
+			return mLayerStack.CreateNewOverlay<T>(args...);
+		}
+
+		float DeltaTime() const { return mDeltaTime; }
+
 		static Application& Get() { return *sInstance; }
+
+	protected:
+		WeakPtr<ImGuiLayer> mImGuiLayer;
 
 	private:
 		void Run();
@@ -44,9 +63,11 @@ namespace Renaissance
 	private:
 		ApplicationCommandLineArgs mArgs;
 		UniquePtr<Window> mWindow;
+		LayerStack mLayerStack;
 		bool mRunning = true;
 		bool mMinimized = false;
 		float mLastFrameTime = 0.0f;
+		float mDeltaTime = 0.0f;
 
 		static Application* sInstance;
 		friend int ::main(int argc, char** argv);

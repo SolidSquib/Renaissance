@@ -16,6 +16,8 @@ namespace Renaissance
 		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
 
 		// init renderer
+
+		mImGuiLayer = CreateNewOverlay<ImGuiLayer>();
 	}
 
 	Application::~Application()
@@ -30,6 +32,7 @@ namespace Renaissance
 		dispatcher.Dispatch<WindowResizeEvent>(REN_BIND_EVENT(Application::OnWindowResized));
 
 		// propogate events to other layers
+		mLayerStack.OnEvent(e);
 	}
 
 	void Application::Close()
@@ -41,7 +44,19 @@ namespace Renaissance
 	{
 		while (mRunning)
 		{
-			float time = glfwGetTime();
+			float time = (float)glfwGetTime();
+			mDeltaTime = mLastFrameTime > 0.0f ? time - mLastFrameTime : 1.0f / 60.0f;
+			mLastFrameTime = time;
+
+			if (!mMinimized)
+			{
+				mLayerStack.OnUpdate(mDeltaTime);
+
+				mImGuiLayer.lock()->BeginDraw();
+				mLayerStack.RenderUI();
+				mImGuiLayer.lock()->EndDraw();
+			}
+
 			mWindow->OnUpdate();
 		}
 	}

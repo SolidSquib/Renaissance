@@ -1,5 +1,5 @@
 #include "RenaissancePCH.h"
-#include "Renaissance/Platform/Windows/WindowsWindow.h"
+#include "Renaissance/Platform/OSX/MacWindow.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
@@ -17,23 +17,23 @@ namespace Renaissance
 		REN_CORE_ERROR("GLFW error {0}: {1}", error, desc);
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProperties& properties)
+	MacWindow::MacWindow(const WindowProperties& properties)
 	{
 		Init(properties);
 	}
 
-	WindowsWindow::~WindowsWindow()
+	MacWindow::~MacWindow()
 	{
 		Shutdown();
 	}
 
-	void WindowsWindow::OnUpdate()
+	void MacWindow::OnUpdate()
 	{
 		glfwPollEvents();
 		glfwSwapBuffers(mWindow);		
 	}
 
-	void WindowsWindow::SetVSync(bool enabled)
+	void MacWindow::SetVSync(bool enabled)
 	{
 		if (enabled)
 		{
@@ -47,7 +47,7 @@ namespace Renaissance
 		mData.VSyncEnabled = enabled;
 	}
 
-	void WindowsWindow::Init(const WindowProperties& properties)
+	void MacWindow::Init(const WindowProperties& properties)
 	{
 		mData.Properties = properties;
 
@@ -152,7 +152,7 @@ namespace Renaissance
 		});
 	}
 
-	void WindowsWindow::Shutdown()
+	void MacWindow::Shutdown()
 	{
 
 	}

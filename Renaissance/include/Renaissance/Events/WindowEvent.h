@@ -66,8 +66,23 @@ namespace Renaissance::Events
 	class WindowMovedEvent: public WindowEvent
 	{
 	public:
-		WindowMovedEvent() : WindowEvent() {}
+		WindowMovedEvent(int xpos, int ypos)
+			: WindowEvent(), mX(xpos), mY(ypos)
+		{}
+
+		inline int GetXPos() const { return mX; }
+		inline int GetYPos() const { return mY; }
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+			ss << "WindowMovedEvent: " << mX << ", " << mY;
+			return ss.str();
+		}
 
 		DEFINE_REN_EVENT_TYPE(WindowMoved)
+
+	private:
+		int mX, mY;
 	};
 }

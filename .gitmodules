@@ -4,3 +4,11 @@
 [submodule "Renaissance/externals/GLFW"]
 	path = Renaissance/externals/GLFW
 	url = https://github.com/SolidSquib/glfw
+	branch = master
+[submodule "Renaissance/externals/imgui"]
+	path = Renaissance/externals/imgui
+	url = https://github.com/SolidSquib/imgui
+	branch = docking
+[submodule "Renaissance/externals/glm"]
+	path = Renaissance/externals/glm
+	url = https://github.com/g-truc/glm

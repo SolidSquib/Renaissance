@@ -1,10 +1,12 @@
 #include <Renaissance.h>
 #include "Renaissance/Core/EntryPoint.h"
 
-class SandboxApplication : public Renaissance::Application
+using namespace Renaissance;
+
+class SandboxApplication : public Application
 {
 public:
-	SandboxApplication(const std::string& name, Renaissance::ApplicationCommandLineArgs args)
+	SandboxApplication(const std::string& name, ApplicationCommandLineArgs args)
 		: Application(name, args)
 	{
 	}
@@ -14,7 +16,7 @@ public:
 	}
 };
 
-Renaissance::Application* Renaissance::CreateApplication(Renaissance::ApplicationCommandLineArgs args)
+Application* Renaissance::CreateApplication(Renaissance::ApplicationCommandLineArgs args)
 {
 	return new SandboxApplication("Renaissance Sandbox", args);
 }
