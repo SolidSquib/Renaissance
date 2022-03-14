@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renaissance/Core/Window.h"
+#include "Renaissance/Platform/OpenGL/OpenGLContext.h"
 
 struct GLFWwindow;
 
@@ -29,7 +30,8 @@ namespace Renaissance
 		virtual void Shutdown();
 
 	private:
-		GLFWwindow* mWindow;
+		GLFWwindow* mWindow = nullptr;
+		Graphics::OpenGLContext* mRenderContext = nullptr;
 
 		struct WindowData
 		{

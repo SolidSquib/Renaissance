@@ -1,6 +1,7 @@
 #include "RenaissancePCH.h"
 #include "Renaissance/Core/Application.h"
 
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
 namespace Renaissance
@@ -16,6 +17,47 @@ namespace Renaissance
 		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
 
 		// init renderer
+		mVertexArray.reset(Graphics::VertexArray::Create());
+
+		float vertices[] = {
+			-0.5f, -0.5f, 0.0f,
+			 0.5f, -0.5f, 0.0f,
+			 0.0f,  0.5f, 0.0f
+		};
+		unsigned int indices[] = {
+			0, 1, 2
+		};
+
+		mVertexBuffer.reset(Graphics::VertexBuffer::Create(vertices, sizeof(vertices)));
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);		
+
+		mIndexBuffer.reset(Graphics::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));		
+
+		std::string vertexSource = R"(
+			#version 330 core
+
+			layout(location=0) in vec3 aPosition;
+
+			void main()
+			{
+				gl_Position = vec4(aPosition, 1.0);
+			}
+		)";
+
+		std::string fragmentSource = R"(
+			#version 330 core
+
+			out vec4 color;
+
+			void main()
+			{
+				color = vec4(0.8, 0.0, 0.9, 1.0);
+			}
+		)";
+
+		mShader.reset(Graphics::Shader::CreateFromSource(vertexSource.c_str(), fragmentSource.c_str()));
 
 		mImGuiLayer = CreateNewOverlay<ImGuiLayer>();
 	}
@@ -44,6 +86,14 @@ namespace Renaissance
 	{
 		while (mRunning)
 		{
+			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			
+			mShader->Bind();
+			mVertexArray->Bind();
+			glDrawElements(GL_TRIANGLES, mIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+			mShader->Unbind();
+
 			float time = (float)glfwGetTime();
 			mDeltaTime = mLastFrameTime > 0.0f ? time - mLastFrameTime : 1.0f / 60.0f;
 			mLastFrameTime = time;

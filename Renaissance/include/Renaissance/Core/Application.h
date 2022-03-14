@@ -8,6 +8,10 @@
 #include "Renaissance/Core/LayerStack.h"
 #include "Renaissance/UserInterface/ImGuiLayer.h"
 
+#include "Renaissance/Graphics/Shader.h"
+#include "Renaissance/Graphics/Buffer.h"
+#include "Renaissance/Graphics/VertexArray.h"
+
 int main(int argc, char** argv);
 
 namespace Renaissance 
@@ -68,6 +72,11 @@ namespace Renaissance
 		bool mMinimized = false;
 		float mLastFrameTime = 0.0f;
 		float mDeltaTime = 0.0f;
+
+		UniquePtr<Graphics::Shader> mShader;
+		UniquePtr<Graphics::VertexArray> mVertexArray;
+		UniquePtr<Graphics::VertexBuffer> mVertexBuffer;
+		UniquePtr<Graphics::IndexBuffer> mIndexBuffer;
 
 		static Application* sInstance;
 		friend int ::main(int argc, char** argv);

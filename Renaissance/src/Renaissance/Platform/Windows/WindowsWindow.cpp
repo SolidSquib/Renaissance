@@ -1,12 +1,12 @@
 #include "RenaissancePCH.h"
 #include "Renaissance/Platform/Windows/WindowsWindow.h"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
 
 // Events
 #include "Renaissance/Events/WindowEvent.h"
 #include "Renaissance/Events/KeyEvent.h"
 #include "Renaissance/Events/MouseEvent.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Renaissance
 {
@@ -30,7 +30,7 @@ namespace Renaissance
 	void WindowsWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(mWindow);		
+		mRenderContext->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
@@ -62,9 +62,9 @@ namespace Renaissance
 		mWindow = glfwCreateWindow((int)properties.Width, (int)properties.Height, properties.Title.c_str(), nullptr, nullptr);
 		sGLFWWindowCount++;
 
-		glfwMakeContextCurrent(mWindow);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		REN_ASSERT(status, "Glad loader failed to initialize.");
+		mRenderContext = new Graphics::OpenGLContext(mWindow);
+		mRenderContext->Init();
+
 		SetVSync(true);
 
 		glfwSetWindowUserPointer(mWindow, &mData);
@@ -80,7 +80,7 @@ namespace Renaissance
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Properties.Width = width;
 			data.Properties.Height = height;
-			data.EventCallback(Events::WindowResizeEvent(width, height));
+			data.EventCallback(Events::WindowResizeEvent(width, height));			
 		});
 
 		glfwSetWindowFocusCallback(mWindow, [](GLFWwindow* window, int focused) {
@@ -154,6 +154,6 @@ namespace Renaissance
 
 	void WindowsWindow::Shutdown()
 	{
-
+		
 	}
 }

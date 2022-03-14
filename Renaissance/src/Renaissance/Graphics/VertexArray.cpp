@@ -1,0 +1,17 @@
+#include "RenaissancePCH.h"
+#include "Renaissance/Graphics/Renderer.h"
+
+#include "Renaissance/Platform/OpenGL/OpenGLVertexArray.h"
+
+namespace Renaissance::Graphics
+{
+	VertexArray* VertexArray::Create()
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+		case RendererAPI::OpenGL:	return new OpenGLVertexArray;
+		default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
+		}
+	}
+}
