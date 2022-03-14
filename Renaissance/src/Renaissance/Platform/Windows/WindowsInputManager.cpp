@@ -8,7 +8,6 @@ namespace Renaissance
 {
 	InputManager* InputManager::sInstance = new WindowsInputManager;
 
-
 	bool WindowsInputManager::IsKeyPressedImpl(unsigned int keyCode) const
 	{
 		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
@@ -28,7 +27,6 @@ namespace Renaissance
 		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double mouseX, mouseY;
 		glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
-		return { mouseX, mouseY };
+		return { (float)mouseX, (float)mouseY };
 	}
-
 }

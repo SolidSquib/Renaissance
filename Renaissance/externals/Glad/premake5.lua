@@ -17,3 +17,14 @@ project "Glad"
 	{
 		"include"
 	}
+
+	filter "system:windows"
+		systemversion "latest"
+
+	filter "configurations:Debug"
+		runtime "Debug"
+		symbols "on"
+
+	filter "configurations:release"
+		runtime "Release"
+		optimize "on"

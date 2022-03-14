@@ -49,11 +49,9 @@ namespace Renaissance
 
 	void ImGuiLayer::OnDetached()
 	{
-	#if defined(REN_USE_GLFW)
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
-	#endif
 	}
 
 	void ImGuiLayer::OnUpdate(float deltaTime)

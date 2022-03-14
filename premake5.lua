@@ -118,7 +118,8 @@ workspace "Renaissance"
 			"%{prj.name}/include",
 			"Renaissance/include",
 			"Renaissance/externals/spdlog/include",
-			"%{IncludeDir.glm}"
+			"%{IncludeDir.glm}",
+			"%{IncludeDir.ImGui}"
 		}
 
 		links
