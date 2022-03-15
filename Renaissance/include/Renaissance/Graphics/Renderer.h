@@ -1,21 +1,30 @@
 #pragma once
 
 #include "Renaissance/Core/Core.h"
+#include "Renaissance/Graphics/RendererAPI.h"
+#include "Renaissance/Graphics/RenderCommands.h"
+#include "Renaissance/Math/Math.h"
 
 namespace Renaissance::Graphics
 {
-	enum class RendererAPI
-	{
-		None = 0,
-		OpenGL
-	};
+	class Shader;
+	class VertexArray;
+
+	using namespace Math;
 
 	class Renderer
 	{
 	public:
-		static RendererAPI GetAPI() { return sAPI; }
+		static void Init();
+		static void Shutdown();
 
-	private:
-		static RendererAPI sAPI;
+		static void OnWindowResize(uint32_t width, uint32_t height);
+
+		static void BeginScene();
+		static void EndScene();
+
+		static void Submit(const SharedPtr<Shader>& shader, const SharedPtr<VertexArray>& vertexArray, const Matrix4& transform = Matrix4(1.0f));
+	
+		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	};
 }

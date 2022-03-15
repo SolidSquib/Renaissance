@@ -14,8 +14,8 @@ namespace Renaissance::Graphics
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-			case RendererAPI::OpenGL:	return MakeShared<OpenGLVertexBuffer>(vertices, size);
+			case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:	return MakeShared<OpenGLVertexBuffer>(vertices, size);
 			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}
@@ -28,8 +28,8 @@ namespace Renaissance::Graphics
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-			case RendererAPI::OpenGL:	return MakeShared<OpenGLIndexBuffer>(indices, count);
+			case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:	return MakeShared<OpenGLIndexBuffer>(indices, count);
 			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}

@@ -80,7 +80,7 @@ namespace Renaissance
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Properties.Width = width;
 			data.Properties.Height = height;
-			data.EventCallback(Events::WindowResizeEvent(width, height));			
+			data.EventCallback(Events::WindowResizeEvent(static_cast<uint32_t>(width), static_cast<uint32_t>(height)));
 		});
 
 		glfwSetWindowFocusCallback(mWindow, [](GLFWwindow* window, int focused) {

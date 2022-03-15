@@ -27,12 +27,12 @@ namespace Renaissance::Events
 	class WindowResizeEvent : public WindowEvent
 	{
 	public:
-		WindowResizeEvent(int width, int height)
+		WindowResizeEvent(uint32_t width, uint32_t height)
 			: WindowEvent(), mWidth(width), mHeight(height)
 		{}
 
-		inline int GetWidth() const { return mWidth; }
-		inline int GetHeight() const { return mHeight; }
+		inline uint32_t GetWidth() const { return mWidth; }
+		inline uint32_t GetHeight() const { return mHeight; }
 
 		std::string ToString() const override
 		{
@@ -44,7 +44,7 @@ namespace Renaissance::Events
 		DEFINE_REN_EVENT_TYPE(WindowResize)
 
 	private:
-		int mWidth, mHeight;
+		uint32_t mWidth, mHeight;
 	};
 
 	class WindowFocusEvent : public WindowEvent

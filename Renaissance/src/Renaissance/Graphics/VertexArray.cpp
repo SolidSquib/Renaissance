@@ -9,8 +9,8 @@ namespace Renaissance::Graphics
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-		case RendererAPI::OpenGL:	return MakeShared<OpenGLVertexArray>();
+		case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:	return MakeShared<OpenGLVertexArray>();
 		default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}

@@ -38,8 +38,8 @@ namespace Renaissance::Graphics
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-		case RendererAPI::OpenGL:	return MakeShared<OpenGLShader>(vertexSource, fragmentSource);
+		case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:	return MakeShared<OpenGLShader>(vertexSource, fragmentSource);
 		default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}

@@ -43,16 +43,16 @@ namespace Renaissance
 	#define REN_FATAL(...) 
 #else
 	// core logging macros
-	#define REN_CORE_ERROR(...) ::Renaissance::Log::GetCoreLogger()->error(__VA_ARGS__)
-	#define REN_CORE_WARN(...)	::Renaissance::Log::GetCoreLogger()->warn(__VA_ARGS__)
-	#define REN_CORE_INFO(...)	::Renaissance::Log::GetCoreLogger()->info(__VA_ARGS__)
 	#define REN_CORE_TRACE(...) ::Renaissance::Log::GetCoreLogger()->trace(__VA_ARGS__)
-	#define REN_CORE_FATAL(...) ::Renaissance::Log::GetCoreLogger()->fatal(__VA_ARGS__)
+	#define REN_CORE_INFO(...)	::Renaissance::Log::GetCoreLogger()->info(__VA_ARGS__)
+	#define REN_CORE_WARN(...)	::Renaissance::Log::GetCoreLogger()->warn(__VA_ARGS__)
+	#define REN_CORE_ERROR(...) ::Renaissance::Log::GetCoreLogger()->error(__VA_ARGS__)
+	#define REN_CORE_FATAL(...) ::Renaissance::Log::GetCoreLogger()->critical(__VA_ARGS__)
 	
 	// client logging macros
-	#define REN_ERROR(...) ::Renaissance::Log::GetClientLogger()->error(__VA_ARGS__)
-	#define REN_WARN(...)  ::Renaissance::Log::GetClientLogger()->warn(__VA_ARGS__)
-	#define REN_INFO(...)  ::Renaissance::Log::GetClientLogger()->info(__VA_ARGS__)
 	#define REN_TRACE(...) ::Renaissance::Log::GetClientLogger()->trace(__VA_ARGS__)
-	#define REN_FATAL(...) ::Renaissance::Log::GetClientLogger()->fatal(__VA_ARGS__)
+	#define REN_INFO(...)  ::Renaissance::Log::GetClientLogger()->info(__VA_ARGS__)
+	#define REN_WARN(...)  ::Renaissance::Log::GetClientLogger()->warn(__VA_ARGS__)
+	#define REN_ERROR(...) ::Renaissance::Log::GetClientLogger()->error(__VA_ARGS__)
+	#define REN_FATAL(...) ::Renaissance::Log::GetClientLogger()->critical(__VA_ARGS__)
 #endif

@@ -1,7 +1,7 @@
 #include "RenaissancePCH.h"
 #include "Renaissance/Core/Application.h"
+#include "Renaissance/Graphics/Renderer.h"
 
-#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
 namespace Renaissance
@@ -17,6 +17,10 @@ namespace Renaissance
 		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
 
 		// init renderer
+		Graphics::Renderer::Init();
+
+		mImGuiLayer = CreateNewOverlay<ImGuiLayer>();
+
 		mVertexArray = Graphics::VertexArray::Create();
 		
 		{
@@ -72,13 +76,11 @@ namespace Renaissance
 		)";
 
 		mShader = Graphics::Shader::CreateFromSource(vertexSource.c_str(), fragmentSource.c_str());
-
-		mImGuiLayer = CreateNewOverlay<ImGuiLayer>();
 	}
 
 	Application::~Application()
 	{
-
+		Graphics::Renderer::Shutdown();
 	}
 
 	void Application::OnEvent(Event& e)
@@ -98,15 +100,17 @@ namespace Renaissance
 
 	void Application::Run()
 	{
+		Graphics::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
+
 		while (mRunning)
 		{
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			
-			mShader->Bind();
-			mVertexArray->Bind();
-			glDrawElements(GL_TRIANGLES, mVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-			mShader->Unbind();
+			Graphics::RenderCommand::Clear(0);		
+
+			{
+				Graphics::Renderer::BeginScene(/*camera, lights, environment*/);
+				Graphics::Renderer::Submit(mShader, mVertexArray);
+				Graphics::Renderer::EndScene();
+			}
 
 			float time = (float)glfwGetTime();
 			mDeltaTime = mLastFrameTime > 0.0f ? time - mLastFrameTime : 1.0f / 60.0f;
@@ -140,7 +144,8 @@ namespace Renaissance
 		}
 
 		mMinimized = false;
-		// inform renderer
+		
+		Graphics::Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;
 	}
