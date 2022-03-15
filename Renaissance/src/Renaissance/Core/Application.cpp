@@ -17,47 +17,61 @@ namespace Renaissance
 		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
 
 		// init renderer
-		mVertexArray.reset(Graphics::VertexArray::Create());
+		mVertexArray = Graphics::VertexArray::Create();
+		
+		{
+			float vertices[] = {
+				-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+				 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+				 0.0f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
+			};
+			uint32_t indices[] = {
+				0, 1, 2
+			};
 
-		float vertices[] = {
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.0f,  0.5f, 0.0f
-		};
-		unsigned int indices[] = {
-			0, 1, 2
-		};
+			SharedPtr<Graphics::VertexBuffer> triangleVB = Graphics::VertexBuffer::Create(vertices, sizeof(vertices));
+			triangleVB->SetLayout({
+				{ Graphics::ShaderDataType::Float3, "a_Position" },
+				{ Graphics::ShaderDataType::Float4, "a_Color" }
+				});
 
-		mVertexBuffer.reset(Graphics::VertexBuffer::Create(vertices, sizeof(vertices)));
+			SharedPtr<Graphics::IndexBuffer> triangleIB = Graphics::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
+			
+			mVertexArray->AddVertexBuffer(triangleVB);
+			mVertexArray->SetIndexBuffer(triangleIB);
+		}
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);		
-
-		mIndexBuffer.reset(Graphics::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));		
 
 		std::string vertexSource = R"(
 			#version 330 core
 
-			layout(location=0) in vec3 aPosition;
+			layout(location=0) in vec3 a_Position;
+			layout(location=1) in vec4 a_Color;
+
+			out vec4 v_Color;
 
 			void main()
 			{
-				gl_Position = vec4(aPosition, 1.0);
+				gl_Position = vec4(a_Position, 1.0);
+				v_Color = a_Color;
 			}
 		)";
 
 		std::string fragmentSource = R"(
 			#version 330 core
 
+			in vec4 v_Color;	
+
 			out vec4 color;
 
 			void main()
 			{
 				color = vec4(0.8, 0.0, 0.9, 1.0);
+				color = v_Color;
 			}
 		)";
 
-		mShader.reset(Graphics::Shader::CreateFromSource(vertexSource.c_str(), fragmentSource.c_str()));
+		mShader = Graphics::Shader::CreateFromSource(vertexSource.c_str(), fragmentSource.c_str());
 
 		mImGuiLayer = CreateNewOverlay<ImGuiLayer>();
 	}
@@ -91,7 +105,7 @@ namespace Renaissance
 			
 			mShader->Bind();
 			mVertexArray->Bind();
-			glDrawElements(GL_TRIANGLES, mIndexBuffer->GetCount(), GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, mVertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 			mShader->Unbind();
 
 			float time = (float)glfwGetTime();

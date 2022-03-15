@@ -73,10 +73,8 @@ namespace Renaissance
 		float mLastFrameTime = 0.0f;
 		float mDeltaTime = 0.0f;
 
-		UniquePtr<Graphics::Shader> mShader;
-		UniquePtr<Graphics::VertexArray> mVertexArray;
-		UniquePtr<Graphics::VertexBuffer> mVertexBuffer;
-		UniquePtr<Graphics::IndexBuffer> mIndexBuffer;
+		SharedPtr<Graphics::Shader> mShader;
+		SharedPtr<Graphics::VertexArray> mVertexArray;
 
 		static Application* sInstance;
 		friend int ::main(int argc, char** argv);

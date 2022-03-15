@@ -13,17 +13,17 @@ namespace Renaissance
 		WindowsWindow(const WindowProperties& properties);
 		virtual ~WindowsWindow();
 
-		virtual void OnUpdate() override;
+		virtual void OnUpdate() final;
 
-		virtual unsigned int GetWidth() const override { return mData.Properties.Width; }
-		virtual unsigned int GetHeight() const override { return mData.Properties.Height; }
+		virtual unsigned int GetWidth() const final { return mData.Properties.Width; }
+		virtual unsigned int GetHeight() const final { return mData.Properties.Height; }
 
 		// Window attributes
-		virtual void SetEventCallback(const EventCallbackFunction& callback) override { mData.EventCallback = callback; }
-		virtual void SetVSync(bool enabled) override;
-		virtual bool IsVSync() const override { return mData.VSyncEnabled; }
+		virtual void SetEventCallback(const EventCallbackFunction& callback) final { mData.EventCallback = callback; }
+		virtual void SetVSync(bool enabled) final;
+		virtual bool IsVSync() const final { return mData.VSyncEnabled; }
 
-		virtual void* GetNativeWindow() const override { return (void*)mWindow; }
+		virtual void* GetNativeWindow() const final { return (void*)mWindow; }
 
 	private:
 		virtual void Init(const WindowProperties& properties);

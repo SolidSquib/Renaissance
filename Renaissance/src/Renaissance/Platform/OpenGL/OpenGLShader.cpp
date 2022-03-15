@@ -6,7 +6,6 @@
 
 namespace Renaissance::Graphics
 {
-
 	OpenGLShader::OpenGLShader(const char* vertexSource, const char* fragmentSource)
 	{
 		// Create and compile shaders, link to shader program
@@ -187,5 +186,26 @@ namespace Renaissance::Graphics
 		int success;
 		glGetProgramiv(program, GL_LINK_STATUS, &success);
 		return success;
+	}
+
+	uint32_t OpenGLShader::GetOpenGLDataTypeFromShaderDataType(ShaderDataType type)
+	{
+		switch (type)
+		{
+		case ShaderDataType::Float:	return GL_FLOAT;
+		case ShaderDataType::Float2: return GL_FLOAT;
+		case ShaderDataType::Float3: return GL_FLOAT;
+		case ShaderDataType::Float4: return GL_FLOAT;
+		case ShaderDataType::Int:	return GL_INT;
+		case ShaderDataType::Int2:	return GL_INT;
+		case ShaderDataType::Int3:	return GL_INT;
+		case ShaderDataType::Int4:	return GL_INT;
+		case ShaderDataType::Bool:	return GL_BOOL;
+		case ShaderDataType::Mat3:	return GL_FLOAT;
+		case ShaderDataType::Mat4:	return GL_FLOAT;
+		}
+
+		REN_CORE_ASSERT(false, "Unknown data type!");
+		return 0;
 	}
 }

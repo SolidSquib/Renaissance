@@ -14,11 +14,15 @@ namespace Renaissance::Graphics
 		OpenGLVertexBuffer(float* vertices, size_t size);
 		virtual ~OpenGLVertexBuffer();
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual void Bind() const final;
+		virtual void Unbind() const final;
+
+		virtual BufferLayout GetLayout() const final { return mLayout; }
+		virtual void SetLayout(const BufferLayout& layout) final { mLayout = layout; }
 
 	private:
 		uint32_t mRendererId;
+		BufferLayout mLayout;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -31,10 +35,10 @@ namespace Renaissance::Graphics
 		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
 		virtual ~OpenGLIndexBuffer();
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual void Bind() const final;
+		virtual void Unbind() const final;
 
-		inline virtual uint32_t GetCount() const override { return mCount; }
+		inline virtual uint32_t GetCount() const final { return mCount; }
 
 	private:
 		uint32_t mRendererId;

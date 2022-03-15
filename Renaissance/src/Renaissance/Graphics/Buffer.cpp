@@ -6,22 +6,30 @@
 
 namespace Renaissance::Graphics
 {
-	VertexBuffer* VertexBuffer::Create(float* vertices, size_t size)
+	//////////////////////////////////////////////////////////////////////////
+	// Vertex Buffer /////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+
+	SharedPtr<VertexBuffer> VertexBuffer::Create(float* vertices, size_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-			case RendererAPI::OpenGL:	return new OpenGLVertexBuffer(vertices, size);
+			case RendererAPI::OpenGL:	return MakeShared<OpenGLVertexBuffer>(vertices, size);
 			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}
 
-	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t count)
+	//////////////////////////////////////////////////////////////////////////
+	// Index Buffer //////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+
+	SharedPtr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
 	{
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-			case RendererAPI::OpenGL:	return new OpenGLIndexBuffer(indices, count);
+			case RendererAPI::OpenGL:	return MakeShared<OpenGLIndexBuffer>(indices, count);
 			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}

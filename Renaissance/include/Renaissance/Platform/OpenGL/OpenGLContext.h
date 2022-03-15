@@ -11,9 +11,9 @@ namespace Renaissance::Graphics
 	public:
 		OpenGLContext(GLFWwindow* windowHandle);
 
-		virtual void Init() override;
-		virtual void Resize(float width, float height) override;
-		virtual void SwapBuffers() override;
+		virtual void Init() final;
+		virtual void Resize(float width, float height) final;
+		virtual void SwapBuffers() final;
 
 	private:
 		GLFWwindow* mWindowHandle;

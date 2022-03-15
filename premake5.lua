@@ -41,6 +41,7 @@ workspace "Renaissance"
 			"%{prj.name}/include/**.h",
 			"%{prj.name}/src/RenaissancePCH.cpp",
 			"%{prj.name}/src/Renaissance/Core/**.cpp",
+			"%{prj.name}/src/Renaissance/Graphics/**.cpp",
 			"%{prj.name}/src/Renaissance/UserInterface/**.cpp"
 		}
 
@@ -76,13 +77,15 @@ workspace "Renaissance"
 
 			files 
 			{
-				"%{prj.name}/src/Renaissance/Platform/Windows/**.cpp"
+				"%{prj.name}/src/Renaissance/Platform/Windows/**.cpp",
+				"%{prj.name}/src/Renaissance/Platform/OpenGL/**.cpp"
 			}
 
 		filter "system:macosx"
 			files 
 			{
-				"%{prj.name}/src/Renaissance/Platform/OSX/**.cpp"
+				"%{prj.name}/src/Renaissance/Platform/OSX/**.cpp",
+				"%{prj.name}/src/Renaissance/Platform/OpenGL/**.cpp"
 			}
 
 		filter "configurations:Debug"

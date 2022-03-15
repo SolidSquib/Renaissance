@@ -5,12 +5,12 @@
 
 namespace Renaissance::Graphics
 {
-	VertexArray* VertexArray::Create()
+	SharedPtr<VertexArray> VertexArray::Create()
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-		case RendererAPI::OpenGL:	return new OpenGLVertexArray;
+		case RendererAPI::OpenGL:	return MakeShared<OpenGLVertexArray>();
 		default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}

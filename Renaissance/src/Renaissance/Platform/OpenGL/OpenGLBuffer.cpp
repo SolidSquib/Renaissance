@@ -12,9 +12,9 @@ namespace Renaissance::Graphics
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, size_t size)
 	{
 		glCreateBuffers(1, &mRendererId);
-		Bind();
-
+		glBindBuffer(GL_ARRAY_BUFFER, mRendererId);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
@@ -40,9 +40,9 @@ namespace Renaissance::Graphics
 		: mCount(count)
 	{
 		glCreateBuffers(1, &mRendererId);
-		Bind();
-
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mRendererId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	OpenGLIndexBuffer::~OpenGLIndexBuffer()

@@ -4,7 +4,7 @@
 
 namespace Renaissance::Graphics
 {
-	Shader* Shader::CreateFromFile(const char* vertexPath, const char* fragmentPath)
+	SharedPtr<Shader> Shader::CreateFromFile(const char* vertexPath, const char* fragmentPath)
 	{
 		std::string vertexCode, fragmentCode;
 		std::ifstream vertexFile, fragmentFile;
@@ -34,12 +34,12 @@ namespace Renaissance::Graphics
 		}
 	}
 
-	Shader* Shader::CreateFromSource(const char* vertexSource, const char* fragmentSource)
+	SharedPtr<Shader> Shader::CreateFromSource(const char* vertexSource, const char* fragmentSource)
 	{
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-		case RendererAPI::OpenGL:	return new OpenGLShader(vertexSource, fragmentSource);
+		case RendererAPI::OpenGL:	return MakeShared<OpenGLShader>(vertexSource, fragmentSource);
 		default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}
