@@ -7,7 +7,7 @@ namespace Renaissance::Graphics
 {
 	SharedPtr<VertexArray> VertexArray::Create()
 	{
-		switch (Renderer::GetAPI())
+		switch (Renderer::Get().GetAPI())
 		{
 		case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
 		case RendererAPI::API::OpenGL:	return MakeShared<OpenGLVertexArray>();

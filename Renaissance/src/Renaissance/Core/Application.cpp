@@ -16,11 +16,12 @@ namespace Renaissance
 		mWindow = Window::Create(WindowProperties(name));
 		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
 
-		// init renderer
-		Graphics::Renderer::Init();
+		Graphics::Renderer::Get().Init();
 
 		mImGuiLayer = CreateNewOverlay<ImGuiLayer>();
 
+		// Temporary graphics setup 
+		mSceneCamera = Graphics::Camera::MakePerspective(mWindow->GetWidth(), mWindow->GetHeight());
 		mVertexArray = Graphics::VertexArray::Create();
 		
 		{
@@ -80,7 +81,7 @@ namespace Renaissance
 
 	Application::~Application()
 	{
-		Graphics::Renderer::Shutdown();
+		Graphics::Renderer::Get().Shutdown();
 	}
 
 	void Application::OnEvent(Event& e)
@@ -107,9 +108,9 @@ namespace Renaissance
 			Graphics::RenderCommand::Clear(0);		
 
 			{
-				Graphics::Renderer::BeginScene(/*camera, lights, environment*/);
-				Graphics::Renderer::Submit(mShader, mVertexArray);
-				Graphics::Renderer::EndScene();
+				Graphics::Renderer::Get().BeginScene(mSceneCamera);
+				Graphics::Renderer::Get().Submit(mShader, mVertexArray);
+				Graphics::Renderer::Get().EndScene();
 			}
 
 			float time = (float)glfwGetTime();
@@ -145,7 +146,7 @@ namespace Renaissance
 
 		mMinimized = false;
 		
-		Graphics::Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+		Graphics::Renderer::Get().OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;
 	}

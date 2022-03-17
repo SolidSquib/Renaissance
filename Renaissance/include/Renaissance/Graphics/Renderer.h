@@ -7,6 +7,7 @@
 
 namespace Renaissance::Graphics
 {
+	class Camera;
 	class Shader;
 	class VertexArray;
 
@@ -15,16 +16,35 @@ namespace Renaissance::Graphics
 	class Renderer
 	{
 	public:
-		static void Init();
-		static void Shutdown();
+		void Init();
+		void Shutdown();
 
-		static void OnWindowResize(uint32_t width, uint32_t height);
+		void OnWindowResize(uint32_t width, uint32_t height);
 
-		static void BeginScene();
-		static void EndScene();
+		void BeginScene(const SharedPtr<Camera>& camera);
+		void EndScene();
 
-		static void Submit(const SharedPtr<Shader>& shader, const SharedPtr<VertexArray>& vertexArray, const Matrix4& transform = Matrix4(1.0f));
+		void Submit(const SharedPtr<Shader>& shader, const SharedPtr<VertexArray>& vertexArray, const Matrix4& transform = Matrix4(1.0f));
 	
-		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+		RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+
+		static inline Renderer& Get()
+		{
+			if (!sInstance)
+			{
+				REN_CORE_INFO("Renderer instantiated.");
+				sInstance = new Renderer;
+			}
+
+			return *sInstance;
+		}
+
+	private:
+		Renderer() = default;
+
+	private:
+		Matrix4 mCachedViewProjection = IdentityMatrix;
+
+		static Renderer* sInstance;
 	};
 }

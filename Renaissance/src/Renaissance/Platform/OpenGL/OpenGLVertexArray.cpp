@@ -43,7 +43,7 @@ namespace Renaissance::Graphics
 				OpenGLShader::GetOpenGLDataTypeFromShaderDataType(element.Type),
 				element.Normalized,
 				vertexBuffer->GetLayout().GetStride(),
-				(const void*)element.Offset);
+				(const void*)(uint64_t)element.Offset);
 		}
 
 		mVertexBuffers.push_back(vertexBuffer);

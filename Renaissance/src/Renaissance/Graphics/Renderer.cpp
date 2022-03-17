@@ -1,4 +1,5 @@
 #include "RenaissancePCH.h"
+#include "Renaissance/Graphics/Camera.h"
 #include "Renaissance/Graphics/Shader.h"
 #include "Renaissance/Graphics/Renderer.h"
 #include "Renaissance/Graphics/RenderCommands.h"
@@ -6,6 +7,8 @@
 
 namespace Renaissance::Graphics
 {
+	Renderer* Renderer::sInstance = nullptr;
+
 	void Renderer::Init()
 	{
 		RenderCommand::Init();
@@ -21,19 +24,23 @@ namespace Renaissance::Graphics
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginScene()
+	void Renderer::BeginScene(const SharedPtr<Camera>& camera)
 	{
-
+		REN_CORE_ASSERT(camera, "Cannot render a scene without a valid camera!");
+		mCachedViewProjection = camera->GetViewProjectionMatrix();
 	}
 
 	void Renderer::EndScene()
 	{
-
+		
 	}
 
 	void Renderer::Submit(const SharedPtr<Shader>& shader, const SharedPtr<VertexArray>& vertexArray, const Matrix4& transform /*= Matrix4(1.0f)*/)
 	{
 		shader->Bind();
+		shader->SetMatrix4("u_ViewProjection", mCachedViewProjection);
+		shader->SetMatrix4("u_Transform", transform);
+
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
 	}

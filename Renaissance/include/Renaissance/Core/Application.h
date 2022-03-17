@@ -11,6 +11,7 @@
 #include "Renaissance/Graphics/Shader.h"
 #include "Renaissance/Graphics/Buffer.h"
 #include "Renaissance/Graphics/VertexArray.h"
+#include "Renaissance/Graphics/Camera.h"
 
 int main(int argc, char** argv);
 
@@ -75,6 +76,7 @@ namespace Renaissance
 
 		SharedPtr<Graphics::Shader> mShader;
 		SharedPtr<Graphics::VertexArray> mVertexArray;
+		SharedPtr<Graphics::Camera> mSceneCamera;
 
 		static Application* sInstance;
 		friend int ::main(int argc, char** argv);

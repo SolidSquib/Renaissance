@@ -12,7 +12,7 @@ namespace Renaissance::Graphics
 
 	SharedPtr<VertexBuffer> VertexBuffer::Create(float* vertices, size_t size)
 	{
-		switch (Renderer::GetAPI())
+		switch (Renderer::Get().GetAPI())
 		{
 			case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return MakeShared<OpenGLVertexBuffer>(vertices, size);
@@ -26,7 +26,7 @@ namespace Renaissance::Graphics
 
 	SharedPtr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
 	{
-		switch (Renderer::GetAPI())
+		switch (Renderer::Get().GetAPI())
 		{
 			case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:	return MakeShared<OpenGLIndexBuffer>(indices, count);
