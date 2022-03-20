@@ -29,4 +29,17 @@ namespace Renaissance
 		glfwGetCursorPos(glfwWindow, &mouseX, &mouseY);
 		return { (float)mouseX, (float)mouseY };
 	}
+
+	void WindowsInputManager::EnableMouseCursorImpl() const
+	{
+		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+
+	void WindowsInputManager::DisableMouseCursorImpl() const
+	{
+		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+
 }

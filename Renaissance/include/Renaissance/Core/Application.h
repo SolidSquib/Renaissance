@@ -5,16 +5,17 @@
 #include "Renaissance/Core/LayerStack.h"
 #include "Renaissance/Core/Window.h"
 
+#include "Renaissance/Editor/CameraController.h"
+
 #include "Renaissance/Events/AppEvent.h"
 #include "Renaissance/Events/Event.h"
 #include "Renaissance/Events/WindowEvent.h"
 
 #include "Renaissance/UserInterface/ImGuiLayer.h"
 
-#include "Renaissance/Graphics/Shader.h"
 #include "Renaissance/Graphics/Buffer.h"
+#include "Renaissance/Graphics/Shader.h"
 #include "Renaissance/Graphics/VertexArray.h"
-#include "Renaissance/Graphics/Camera.h"
 
 int main(int argc, char** argv);
 
@@ -76,10 +77,6 @@ namespace Renaissance
 		bool mMinimized = false;
 		float mLastFrameTime = 0.0f;
 		float mDeltaTime = 0.0f;
-
-		SharedPtr<Graphics::Shader> mShader;
-		SharedPtr<Graphics::VertexArray> mVertexArray;
-		SharedPtr<Graphics::Camera> mSceneCamera;
 
 		static Application* sInstance;
 		friend int ::main(int argc, char** argv);

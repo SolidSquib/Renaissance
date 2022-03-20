@@ -87,8 +87,8 @@ namespace Renaissance::Events
 			: mOffsetX(x), mOffsetY(y)
 		{}
 
-		inline float GetMouseX() const { return mOffsetX; }
-		inline float GetMouseY() const { return mOffsetY; }
+		inline float GetOffsetX() const { return mOffsetX; }
+		inline float GetOffsetY() const { return mOffsetY; }
 
 		std::string ToString() const override
 		{

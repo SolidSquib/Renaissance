@@ -1,18 +1,27 @@
 #pragma once
 
-#include "Renaissance/Core/Core.h"
 #include "Renaissance/Core/Layer.h"
-#include "Renaissance/Events/KeyEvent.h"
+#include "Renaissance/Editor/CameraController.h"
+#include "Renaissance/Graphics/Camera.h"
+#include "Renaissance/Graphics/Shader.h"
+#include "Renaissance/Graphics/VertexArray.h"
 
 namespace Sandbox
 {
-	class ExampleLayer : public Renaissance::Layer
+	using namespace Renaissance;
+
+	class ExampleLayer : public Layer
 	{
 	public:
 		virtual void OnAttached() override;
 		virtual void OnDetached() override;
-		virtual void OnEvent(Renaissance::Events::Event& e) override { }
+		virtual void OnUpdate(float deltaTime) override;
+		virtual void OnEvent(Events::Event& e) override { }
 
-		bool OnTabKeyPressed(Renaissance::Events::KeyPressedEvent& e);
+	private:
+		SharedPtr<Graphics::Shader> mShader;
+		SharedPtr<Graphics::VertexArray> mVertexArray;
+		SharedPtr<Graphics::Camera> mSceneCamera;
+		SharedPtr<CameraController> mCameraController;
 	};
 }

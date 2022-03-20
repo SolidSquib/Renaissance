@@ -41,6 +41,7 @@ workspace "Renaissance"
 			"%{prj.name}/include/**.h",
 			"%{prj.name}/src/RenaissancePCH.cpp",
 			"%{prj.name}/src/Renaissance/Core/**.cpp",
+			"%{prj.name}/src/Renaissance/Editor/**.cpp",
 			"%{prj.name}/src/Renaissance/Graphics/**.cpp",
 			"%{prj.name}/src/Renaissance/UserInterface/**.cpp"
 		}
@@ -106,6 +107,10 @@ workspace "Renaissance"
 		language "C++"
 		cppdialect "C++17"
 		staticruntime "off"
+
+		sourcedir = "%{prj.name}/src"
+		pchheader "SandboxPCH.h"
+		pchsource(sourcedir.."/SandboxPCH.cpp")
 
 		targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 		objdir ("intermediates/" .. outputdir .. "/%{prj.name}")
