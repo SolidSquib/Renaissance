@@ -1,11 +1,14 @@
 #pragma once
 
 #include "Renaissance/Core/Core.h"
-#include "Renaissance/Core/Window.h"
-#include "Renaissance/Events/Event.h"
-#include "Renaissance/Events/AppEvent.h"
-#include "Renaissance/Events/WindowEvent.h"
+#include "Renaissance/Core/InputLayer.h"
 #include "Renaissance/Core/LayerStack.h"
+#include "Renaissance/Core/Window.h"
+
+#include "Renaissance/Events/AppEvent.h"
+#include "Renaissance/Events/Event.h"
+#include "Renaissance/Events/WindowEvent.h"
+
 #include "Renaissance/UserInterface/ImGuiLayer.h"
 
 #include "Renaissance/Graphics/Shader.h"

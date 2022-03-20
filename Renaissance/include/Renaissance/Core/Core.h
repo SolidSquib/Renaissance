@@ -28,6 +28,7 @@
 #define REN_BIND_EVENT_OBJ(obj, fn) [obj](auto&&... args) -> decltype(auto) { return obj->fn(std::forward<decltype(args)>(args)...); }
 #define REN_BIND_EVENT(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
+
 namespace Renaissance
 {
 	template<typename T>

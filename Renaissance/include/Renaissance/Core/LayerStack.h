@@ -15,7 +15,7 @@ namespace Renaissance
 		WeakPtr<T> CreateNewLayer(Args&& ... args)
 		{
 			SharedPtr<T> newLayer = MakeShared<T>(std::forward<Args>(args)...);
-			mActiveLayers.emplace(Begin() + mActiveLayerInsertOffset++, newLayer);
+			mActiveLayers.emplace(mActiveLayers.begin() + mActiveLayerInsertOffset++, newLayer);
 			newLayer->OnAttached();
 			return newLayer;
 		}

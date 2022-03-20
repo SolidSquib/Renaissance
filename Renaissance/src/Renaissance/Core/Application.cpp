@@ -3,6 +3,7 @@
 #include "Renaissance/Graphics/Renderer.h"
 
 #include <GLFW/glfw3.h>
+#include "Renaissance/Core/InputManager.h"
 
 namespace Renaissance
 {
@@ -17,11 +18,12 @@ namespace Renaissance
 		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
 
 		Graphics::Renderer::Get().Init();
+		InputManager::Get().Init();
 
 		mImGuiLayer = CreateNewOverlay<ImGuiLayer>();
 
 		// Temporary graphics setup 
-		mSceneCamera = Graphics::Camera::MakePerspective(mWindow->GetWidth(), mWindow->GetHeight());
+		mSceneCamera = Graphics::Camera::MakePerspective((float)mWindow->GetWidth(), (float)mWindow->GetHeight());
 		mVertexArray = Graphics::VertexArray::Create();
 		
 		{
@@ -82,6 +84,7 @@ namespace Renaissance
 	Application::~Application()
 	{
 		Graphics::Renderer::Get().Shutdown();
+		InputManager::Get().Shutdown();
 	}
 
 	void Application::OnEvent(Event& e)

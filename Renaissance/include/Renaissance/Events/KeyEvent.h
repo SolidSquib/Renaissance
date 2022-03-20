@@ -9,22 +9,22 @@ namespace Renaissance::Events
 	class KeyEvent : public Event
 	{
 	public:
-		inline int GetKeyCode() const { return mKeyCode; }
+		inline uint32_t GetKeyCode() const { return mKeyCode; }
 
 		DEFINE_REN_EVENT_CATEGORY(EventCategoryInput | EventCategoryKeyboard);
 
 	protected:
-		KeyEvent(int keyCode)
+		KeyEvent(uint32_t keyCode)
 			: mKeyCode(keyCode)
 		{}
 
-		int mKeyCode;
+		uint32_t mKeyCode;
 	};
 
 	class KeyPressedEvent : public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keyCode, unsigned int repeatCount)
+		KeyPressedEvent(uint32_t keyCode, unsigned int repeatCount)
 			: KeyEvent(keyCode), mRepeatCount(repeatCount)
 		{}
 
@@ -47,7 +47,7 @@ namespace Renaissance::Events
 	class KeyReleasedEvent : public KeyEvent
 	{
 	public:
-		KeyReleasedEvent(int keyCode)
+		KeyReleasedEvent(uint32_t keyCode)
 			: KeyEvent(keyCode)
 		{}
 

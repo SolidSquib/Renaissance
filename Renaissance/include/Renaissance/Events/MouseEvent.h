@@ -12,18 +12,20 @@ namespace Renaissance::Events
 	public:
 		DEFINE_REN_EVENT_CATEGORY(EventCategoryInput | EventCategoryMouse | EventCategoryMouseButton)
 
+		inline uint32_t GetButtonCode() const { return mButtonCode; }
+
 	protected:
-		MouseButtonEvent(int buttonCode)
+		MouseButtonEvent(uint32_t buttonCode)
 			: mButtonCode(buttonCode)
 		{}
 
-		int mButtonCode;
+		uint32_t mButtonCode;
 	};
 
 	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonPressedEvent(int buttonCode)
+		MouseButtonPressedEvent(uint32_t buttonCode)
 			: MouseButtonEvent(buttonCode)
 		{}
 
@@ -40,7 +42,7 @@ namespace Renaissance::Events
 	class MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
-		MouseButtonReleasedEvent(int buttonCode)
+		MouseButtonReleasedEvent(uint32_t buttonCode)
 			: MouseButtonEvent(buttonCode)
 		{}
 

@@ -54,7 +54,7 @@ namespace Renaissance::Events
 	{
 		/* Currently implements blocking events, but should refactor this to use a buffer at
 		* some point so we can throw events in a more controlled/ordered way */
-
+	public:
 		template<typename T>
 		using EventFunction = std::function<bool(T&)>;
 

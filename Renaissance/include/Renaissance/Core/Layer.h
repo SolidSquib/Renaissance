@@ -9,7 +9,7 @@ namespace Renaissance
 	{
 	public:
 		Layer(const String& name = "Layer") : mDebugName(name) {}
-		virtual ~Layer() {}
+		virtual ~Layer() = default;
 
 		virtual void OnAttached() = 0;
 		virtual void OnDetached() = 0;
