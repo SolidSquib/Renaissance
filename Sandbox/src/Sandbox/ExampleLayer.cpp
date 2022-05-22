@@ -35,7 +35,7 @@ namespace Sandbox
 			mVertexArray->SetIndexBuffer(triangleIB);
 		}
 
-		mShader = Graphics::Shader::CreateFromFile("../Renaissance/shaders/glsl/VColorUnlit.glsl", "../Renaissance/shaders/glsl/FColorUnlit.glsl");
+		mShader = Graphics::Shader::CreateFromFile("../Renaissance/assets/shaders/ColorUnlit.glsl");
 	}
 
 	void ExampleLayer::OnDetached()

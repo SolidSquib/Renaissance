@@ -4,7 +4,6 @@
 #include "Renaissance/Math/Math.h"
 
 #include <glm/glm.hpp>
-#include <string.h>
 
 namespace Renaissance::Graphics
 {
@@ -57,7 +56,7 @@ namespace Renaissance::Graphics
 	class Shader
 	{
 	public:
-		virtual ~Shader() {}
+		virtual ~Shader() = default;
 
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
@@ -79,7 +78,7 @@ namespace Renaissance::Graphics
 		virtual Vector4 GetVector4(const std::string& name) const = 0;
 		virtual Vector4 GetColor(const std::string& name) const = 0;
 
-		static SharedPtr<Shader> CreateFromFile(const char* vertexPath, const char* fragmentPath);
+		static SharedPtr<Shader> CreateFromFile(const char* sourcePath);
 		static SharedPtr<Shader> CreateFromSource(const char* vertexSource, const char* fragmentSource);
 	};
 }

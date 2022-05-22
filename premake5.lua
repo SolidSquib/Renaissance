@@ -17,6 +17,7 @@ workspace "Renaissance"
 	IncludeDir["Glad"] = "Renaissance/externals/Glad/include"
 	IncludeDir["ImGui"] = "Renaissance/externals/ImGui/"
 	IncludeDir["glm"] = "Renaissance/externals/glm"
+	IncludeDir["stb_image"] = "Renaissance/externals/stb_image"
 
 	include "Renaissance/externals/GLFW"
 	include "Renaissance/externals/Glad"
@@ -43,7 +44,8 @@ workspace "Renaissance"
 			"%{prj.name}/src/Renaissance/Core/**.cpp",
 			"%{prj.name}/src/Renaissance/Editor/**.cpp",
 			"%{prj.name}/src/Renaissance/Graphics/**.cpp",
-			"%{prj.name}/src/Renaissance/UserInterface/**.cpp"
+			"%{prj.name}/src/Renaissance/UserInterface/**.cpp",
+			"%{prj.name}/externals/stb_image/stb_image.cpp"
 		}
 
 		includedirs
@@ -53,7 +55,8 @@ workspace "Renaissance"
 			"%{IncludeDir.GLFW}",
 			"%{IncludeDir.Glad}",
 			"%{IncludeDir.ImGui}",
-			"%{IncludeDir.glm}"
+			"%{IncludeDir.glm}",
+			"%{IncludeDir.stb_image}"
 		}
 		
 		links

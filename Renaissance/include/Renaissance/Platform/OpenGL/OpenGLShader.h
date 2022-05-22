@@ -3,11 +3,14 @@
 #include "Renaissance/Core/Core.h"
 #include "Renaissance/Graphics/Shader.h"
 
+#include <glad/glad.h>
+
 namespace Renaissance::Graphics
 {
 	class OpenGLShader : public Shader
 	{
 	public:
+		OpenGLShader(const char* filePath);
 		OpenGLShader(const char* vertexSource, const char* fragmentSource);
 		virtual ~OpenGLShader();	
 
@@ -38,5 +41,9 @@ namespace Renaissance::Graphics
 
 		static bool CheckShaderCompilation(uint32_t shader);
 		static bool CheckProgramLinkage(uint32_t program);
+
+		std::string ReadFromFile(const char* filePath);
+		std::unordered_map<GLenum, std::string> PreProcess(const std::string& fileSource);
+		void Compile(const std::unordered_map<GLenum, std::string>& sources);
 	};
 }

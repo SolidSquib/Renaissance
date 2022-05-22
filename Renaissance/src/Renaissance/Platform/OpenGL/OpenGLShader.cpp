@@ -1,75 +1,54 @@
 #include "RenaissancePCH.h"
 #include "Renaissance/Platform/OpenGL/OpenGLShader.h"
 
-#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <string.h>
 
 namespace Renaissance::Graphics
 {
+	static GLenum GetShaderTypeFromString(const std::string& string)
+	{
+		if (string == "vertex")
+			return GL_VERTEX_SHADER;
+		else if (string == "fragment" || string == "pixel")
+			return GL_FRAGMENT_SHADER;
+		else if (string == "geometry")
+			return GL_GEOMETRY_SHADER;
+		else if (string == "compute")
+			return GL_COMPUTE_SHADER;
+
+		REN_CORE_ASSERT(false, "Invalid shader type specified");
+		return 0;
+	}
+
+	static std::string GetStringFromShaderType(const GLenum& shaderType)
+	{
+		if (shaderType == GL_VERTEX_SHADER)
+			return "vertex";
+		else if (shaderType == GL_FRAGMENT_SHADER)
+			return "fragment";
+		else if (shaderType == GL_GEOMETRY_SHADER)
+			return "geometry";
+		else if (shaderType == GL_COMPUTE_SHADER)
+			return "compute";
+
+		REN_CORE_ASSERT(false, "Invalid shader type specified");
+		return 0;
+	}
+
+	OpenGLShader::OpenGLShader(const char* filePath)
+	{
+		std::string sourceCode = ReadFromFile(filePath);
+		Compile(PreProcess(sourceCode));
+	}
+
 	OpenGLShader::OpenGLShader(const char* vertexSource, const char* fragmentSource)
 	{
-		// Create and compile shaders, link to shader program
-		unsigned int vertex, fragment;
-		vertex = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertex, 1, &vertexSource, NULL);
-		glCompileShader(vertex);
-
-		fragment = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragment, 1, &fragmentSource, NULL);
-		glCompileShader(fragment);
-
-		int maxLogLength;
-		const bool vertexShaderCompiled = CheckShaderCompilation(vertex);
-		const bool fragmentShaderCompiled = CheckShaderCompilation(fragment);
-
-		if (!vertexShaderCompiled)
-		{
-			glGetShaderiv(vertex, GL_INFO_LOG_LENGTH, &maxLogLength);
-			std::vector<char> infoLog(maxLogLength);
-			glGetShaderInfoLog(vertex, maxLogLength, &maxLogLength, &infoLog[0]);
-
-			glGetShaderiv(vertex, GL_SHADER_SOURCE_LENGTH, &maxLogLength);
-			std::vector<char> source(maxLogLength);
-			glGetShaderSource(vertex, maxLogLength, &maxLogLength, &source[0]);
-
-			REN_CORE_ERROR("Vertex shader compilation failed:");
-			REN_CORE_ERROR("  {0}", infoLog.data());
-			REN_CORE_ERROR("  Vertex source: \n {0}", source.data());
-		}
-
-		if (!fragmentShaderCompiled)
-		{
-			glGetShaderiv(vertex, GL_INFO_LOG_LENGTH, &maxLogLength);
-			std::vector<char> infoLog(maxLogLength);
-			glGetShaderInfoLog(vertex, maxLogLength, &maxLogLength, &infoLog[0]);
-
-			glGetShaderiv(vertex, GL_SHADER_SOURCE_LENGTH, &maxLogLength);
-			std::vector<char> source(maxLogLength);
-			glGetShaderSource(vertex, maxLogLength, &maxLogLength, &source[0]);
-
-			REN_CORE_ERROR("Fragment shader compilation failed:");
-			REN_CORE_ERROR("  {0}", infoLog.data());
-			REN_CORE_ERROR("  Fragment source: \n {0}", source.data());
-		}
-
-		if (vertexShaderCompiled && fragmentShaderCompiled)
-		{
-			mRendererId = glCreateProgram();
-			glAttachShader(mRendererId, vertex);
-			glAttachShader(mRendererId, fragment);
-			glLinkProgram(mRendererId);
-
-			glDeleteShader(vertex);
-			glDeleteShader(fragment);
-
-			if (!CheckProgramLinkage(mRendererId))
-			{
-				glGetProgramiv(mRendererId, GL_INFO_LOG_LENGTH, &maxLogLength);
-				std::vector<char> infoLog(maxLogLength);
-				glGetProgramInfoLog(mRendererId, maxLogLength, &maxLogLength, &infoLog[0]);
-				REN_CORE_ERROR("Shader linkage failed: {0}", infoLog.data());
-			}
-		}
+		std::unordered_map<GLenum, std::string> sources;
+		sources[GL_VERTEX_SHADER] = vertexSource;
+		sources[GL_FRAGMENT_SHADER] = fragmentSource;
+		Compile(sources);
 	}
 
 	OpenGLShader::~OpenGLShader()
@@ -77,7 +56,7 @@ namespace Renaissance::Graphics
 		glDeleteProgram(mRendererId);
 	}
 
-	void OpenGLShader::Bind() const 
+	void OpenGLShader::Bind() const
 	{
 		glUseProgram(mRendererId);
 	}
@@ -186,6 +165,112 @@ namespace Renaissance::Graphics
 		int success;
 		glGetProgramiv(program, GL_LINK_STATUS, &success);
 		return success;
+	}
+
+	std::string OpenGLShader::ReadFromFile(const char* filePath)
+	{
+		std::ifstream in;
+		std::stringstream stream;
+
+		in.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+		// Read the contents of the shader files and save them to strings
+		try
+		{
+			in.open(filePath);
+			stream << in.rdbuf();
+			in.close();
+		}
+		catch (std::ifstream::failure error)
+		{
+			REN_CORE_ERROR("Shader file read failed: {0}", error.what());
+		}
+
+		return stream.str();
+	}
+
+	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& fileSource)
+	{
+		std::unordered_map<GLenum, std::string> shaderSources;
+
+		const char* typeToken = "#type";
+		size_t typeTokenLength = strlen(typeToken);
+		size_t pos = fileSource.find(typeToken, 0);
+
+		while (pos != std::string::npos)
+		{
+			size_t eol = fileSource.find_first_of("\r\n", pos);
+			REN_CORE_ASSERT(eol != std::string::npos, "Syntax error");
+			size_t sectionBegin = pos + typeTokenLength + 1; // Assumes only a single char (space/tab) between #type and the type name.
+			std::string type = fileSource.substr(sectionBegin, eol - sectionBegin);
+
+			size_t nextLinePos = fileSource.find_first_not_of("\r\n", eol);
+			pos = fileSource.find(typeToken, nextLinePos);
+
+			shaderSources[GetShaderTypeFromString(type)] = fileSource.substr(nextLinePos, pos - (nextLinePos == std::string::npos ? fileSource.size() - 1 : nextLinePos));
+		}
+
+		return shaderSources;
+	}
+
+	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& sources)
+	{
+		std::vector<unsigned int> shaders(sources.size());
+		int maxLogLength;
+
+		unsigned int program = glCreateProgram();
+
+		for (const auto& source : sources)
+		{
+			const char* shaderSource = source.second.c_str();
+
+			unsigned int shader;
+			shader = glCreateShader(source.first);
+			glShaderSource(shader, 1, &shaderSource, NULL);
+			glCompileShader(shader);
+
+			if (!CheckShaderCompilation(shader))
+			{
+				glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLogLength);
+				std::vector<char> infoLog(maxLogLength);
+				glGetShaderInfoLog(shader, maxLogLength, &maxLogLength, infoLog.data());
+
+				REN_CORE_ERROR("Shader ({0}) compilation failed:");
+				REN_CORE_ERROR("  {0}", infoLog.data());
+				REN_CORE_ERROR("  Source ({0}): \n {1}", GetStringFromShaderType(source.first), shaderSource);
+				
+				glDeleteShader(shader);
+				continue; // early-out if one component of this shader program fails to compile.
+			}
+
+			glAttachShader(program, shader);
+			shaders.push_back(shader);
+		}
+
+		glLinkProgram(program);
+		if (!CheckProgramLinkage(program))
+		{
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLogLength);
+			std::vector<char> infoLog(maxLogLength);
+			glGetProgramInfoLog(program, maxLogLength, &maxLogLength, infoLog.data());
+			REN_CORE_ERROR("Shader linkage failed: {0}", infoLog.data());
+
+			glDeleteProgram(program);
+			for (auto& id : shaders)
+			{
+				glDeleteShader(id);
+			}
+		}
+		else // Success!
+		{
+			for (auto& id : shaders)
+			{
+				glDetachShader(program, id);
+				glDeleteShader(id);
+			}
+
+			mRendererId = program;
+		}
 	}
 
 	uint32_t OpenGLShader::GetOpenGLDataTypeFromShaderDataType(ShaderDataType type)

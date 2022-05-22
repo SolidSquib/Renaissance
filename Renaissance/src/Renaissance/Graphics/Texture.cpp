@@ -1,0 +1,29 @@
+#include "RenaissancePCH.h"
+#include "Renaissance/Graphics/Texture.h"
+#include "Renaissance/Graphics/Renderer.h"
+
+#include "Renaissance/Platform/OpenGL/OpenGLTexture.h"
+
+namespace Renaissance::Graphics
+{
+	SharedPtr<Texture2D> Texture2D::Create(const String& path)
+	{
+		switch (Renderer::Get().GetAPI())
+		{
+			case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:	return MakeShared<OpenGLTexture2D>(path);
+			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
+		}
+	}
+
+	SharedPtr<Texture3D> Texture3D::Create(const String& path)
+	{
+
+		switch (Renderer::Get().GetAPI())
+		{
+			case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:	return MakeShared<OpenGLTexture3D>(path);
+			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
+		}
+	}
+}

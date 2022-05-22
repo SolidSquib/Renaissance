@@ -95,6 +95,10 @@ namespace Renaissance
 			}			
 		});
 
+		glfwSetJoystickCallback([](int joystickId, int event) {
+
+		});
+
 		glfwSetWindowPosCallback(mWindow, [](GLFWwindow* window, int xpos, int ypos) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Xpos = xpos;
