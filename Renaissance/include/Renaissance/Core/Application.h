@@ -16,6 +16,7 @@
 #include "Renaissance/Graphics/Buffer.h"
 #include "Renaissance/Graphics/Shader.h"
 #include "Renaissance/Graphics/VertexArray.h"
+#include "Renaissance/Graphics/Shader.h"
 
 int main(int argc, char** argv);
 
@@ -40,7 +41,7 @@ namespace Renaissance
 		virtual ~Application();
 
 		void OnEvent(Event& e);
-		
+
 		Window& GetWindow() const { return *mWindow; }
 
 		void Close();
@@ -71,8 +72,8 @@ namespace Renaissance
 
 	private:
 		ApplicationCommandLineArgs mArgs;
-		UniquePtr<Window> mWindow;
 		LayerStack mLayerStack;
+		UniquePtr<Window> mWindow;
 		bool mRunning = true;
 		bool mMinimized = false;
 		float mLastFrameTime = 0.0f;

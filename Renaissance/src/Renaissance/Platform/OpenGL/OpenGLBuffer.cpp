@@ -9,7 +9,17 @@ namespace Renaissance::Graphics
 	// Vertex Buffer /////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, size_t size)
+	OpenGLVertexBuffer::OpenGLVertexBuffer(size_t size)
+		: mSize(size)
+	{
+		glCreateBuffers(1, &mRendererId);
+		glBindBuffer(GL_ARRAY_BUFFER, mRendererId);
+		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	OpenGLVertexBuffer::OpenGLVertexBuffer(void* vertices, size_t size)
+		: mSize(size)
 	{
 		glCreateBuffers(1, &mRendererId);
 		glBindBuffer(GL_ARRAY_BUFFER, mRendererId);
@@ -32,9 +42,25 @@ namespace Renaissance::Graphics
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
+	void OpenGLVertexBuffer::SetData(void* data, size_t size, size_t offset)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, mRendererId);
+		glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	// Index Buffer //////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
+
+	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t count)
+		: mCount(count)
+	{
+		glCreateBuffers(1, &mRendererId);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mRendererId);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
 
 	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count)
 		: mCount(count)
@@ -57,6 +83,13 @@ namespace Renaissance::Graphics
 
 	void OpenGLIndexBuffer::Unbind() const
 	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+	void OpenGLIndexBuffer::SetData(uint32_t* data, uint32_t count, size_t offset)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mRendererId);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, count * sizeof(uint32_t), data);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 }

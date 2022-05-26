@@ -29,7 +29,6 @@ namespace Renaissance::Graphics
 	void OpenGLVertexArray::AddVertexBuffer(const SharedPtr<VertexBuffer>& vertexBuffer)
 	{
 		REN_CORE_ASSERT(vertexBuffer.get(), "Vertex buffer is invalid!");
-		REN_CORE_ASSERT(vertexBuffer->GetLayout().GetCount() > 0, "Vertex buffer has 0 elements!");
 
 		glBindVertexArray(mRendererId);
 		vertexBuffer->Bind();
@@ -52,7 +51,6 @@ namespace Renaissance::Graphics
 	void OpenGLVertexArray::SetIndexBuffer(const SharedPtr<IndexBuffer>& indexBuffer)
 	{
 		REN_CORE_ASSERT(indexBuffer.get(), "Index buffer is invalid!");
-		REN_CORE_ASSERT(indexBuffer->GetCount() > 0, "Index buffer has 0 elements!");
 
 		glBindVertexArray(mRendererId);
 		indexBuffer->Bind();

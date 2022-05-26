@@ -3,6 +3,7 @@
 #include "Renaissance/Core/Core.h"
 #include "Renaissance/Graphics/RendererAPI.h"
 #include "Renaissance/Graphics/RenderCommands.h"
+#include "Renaissance/Graphics/Shader.h"
 #include "Renaissance/Math/Math.h"
 
 namespace Renaissance::Graphics
@@ -27,6 +28,7 @@ namespace Renaissance::Graphics
 		void Submit(const SharedPtr<Shader>& shader, const SharedPtr<VertexArray>& vertexArray, const Matrix4& transform = Matrix4(1.0f));
 	
 		RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+		const Matrix4& GetCachedViewProjection() const { return mCachedViewProjection; }
 
 		static inline Renderer& Get()
 		{

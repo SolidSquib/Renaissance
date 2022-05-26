@@ -6,6 +6,26 @@
 
 namespace Renaissance::Graphics
 {
+	SharedPtr<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
+	{
+		switch (Renderer::Get().GetAPI())
+		{
+		case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:	return MakeShared<OpenGLTexture2D>(width, height);
+		default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
+		}
+	}
+
+	SharedPtr<Texture2D> Texture2D::Create(uint32_t width, uint32_t height, void* data)
+	{
+		switch (Renderer::Get().GetAPI())
+		{
+		case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:	return MakeShared<OpenGLTexture2D>(width, height, data);
+		default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
+		}
+	}
+
 	SharedPtr<Texture2D> Texture2D::Create(const String& path)
 	{
 		switch (Renderer::Get().GetAPI())

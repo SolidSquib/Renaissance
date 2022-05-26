@@ -71,12 +71,16 @@ namespace Renaissance::Graphics
 		virtual ~VertexBuffer() {}
 
 		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
-		
+		virtual void Unbind() const = 0;		
+
+		virtual void SetData(void* data, size_t size, size_t offset) = 0;
+
+		virtual size_t GetSize() const = 0;
 		virtual BufferLayout GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
-		static SharedPtr<VertexBuffer> Create(float* vertices, size_t size);
+		static SharedPtr<VertexBuffer> Create(size_t size);
+		static SharedPtr<VertexBuffer> Create(void* vertices, size_t size);
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -91,8 +95,11 @@ namespace Renaissance::Graphics
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		virtual void SetData(uint32_t* indices, uint32_t count, size_t offset) = 0;
+
 		virtual uint32_t GetCount() const = 0;
 
+		static SharedPtr<IndexBuffer> Create(uint32_t count);
 		static SharedPtr<IndexBuffer> Create(uint32_t* indices, uint32_t count);
 	};
 }

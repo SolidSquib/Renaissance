@@ -17,6 +17,7 @@ namespace Renaissance::Graphics
 		inline static void Clear(uint32_t flags) { sRendererAPI->Clear(flags); }
 
 		inline static void DrawIndexed(const SharedPtr<VertexArray>& vertexArray) { sRendererAPI->DrawIndexed(vertexArray); }
+		inline static void DrawIndexed(const SharedPtr<VertexArray>& vertexArray, uint32_t count) { sRendererAPI->DrawIndexed(vertexArray, count); }
 
 	private:
 		static UniquePtr<RendererAPI> sRendererAPI;

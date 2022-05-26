@@ -5,6 +5,8 @@
 
 #include <string.h>
 
+#define OGL_SHADERS_MAX 2 // only supporting use of vertex/fragment shaders for now.
+
 namespace Renaissance::Graphics
 {
 	static GLenum GetShaderTypeFromString(const std::string& string)
@@ -37,14 +39,23 @@ namespace Renaissance::Graphics
 		return 0;
 	}
 
-	OpenGLShader::OpenGLShader(const char* filePath)
+	OpenGLShader::OpenGLShader(const std::string& filePath)
 	{
+		size_t lastSlash = filePath.find_last_of("\\/");
+		size_t lastDot = filePath.rfind('.');
+		size_t start = lastSlash == std::string::npos ? 0 : lastSlash+1;
+		size_t end = lastDot == std::string::npos ? filePath.size() - 1 : lastDot;
+
+		mName = filePath.substr(start, end - start);
+
 		std::string sourceCode = ReadFromFile(filePath);
 		Compile(PreProcess(sourceCode));
 	}
 
-	OpenGLShader::OpenGLShader(const char* vertexSource, const char* fragmentSource)
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource)
 	{
+		mName = name;
+
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSource;
 		sources[GL_FRAGMENT_SHADER] = fragmentSource;
@@ -167,11 +178,12 @@ namespace Renaissance::Graphics
 		return success;
 	}
 
-	std::string OpenGLShader::ReadFromFile(const char* filePath)
+	std::string OpenGLShader::ReadFromFile(const std::string& filePath)
 	{
 		std::ifstream in;
 		std::stringstream stream;
 
+		in.flags(std::ios::in | std::ios::binary);
 		in.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
 		// Read the contents of the shader files and save them to strings
@@ -215,16 +227,19 @@ namespace Renaissance::Graphics
 
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& sources)
 	{
-		std::vector<unsigned int> shaders(sources.size());
+		REN_CORE_ASSERT(sources.size() <= OGL_SHADERS_MAX);
+
+		std::array<uint32_t, OGL_SHADERS_MAX> shaders;
+		uint32_t shaderIndex = 0;
 		int maxLogLength;
 
-		unsigned int program = glCreateProgram();
+		uint32_t program = glCreateProgram();
 
 		for (const auto& source : sources)
 		{
 			const char* shaderSource = source.second.c_str();
 
-			unsigned int shader;
+			uint32_t shader;
 			shader = glCreateShader(source.first);
 			glShaderSource(shader, 1, &shaderSource, NULL);
 			glCompileShader(shader);
@@ -240,11 +255,14 @@ namespace Renaissance::Graphics
 				REN_CORE_ERROR("  Source ({0}): \n {1}", GetStringFromShaderType(source.first), shaderSource);
 				
 				glDeleteShader(shader);
+
+				REN_CORE_ASSERT(false);
+
 				continue; // early-out if one component of this shader program fails to compile.
 			}
 
 			glAttachShader(program, shader);
-			shaders.push_back(shader);
+			shaders[shaderIndex++] = shader;
 		}
 
 		glLinkProgram(program);
@@ -254,6 +272,8 @@ namespace Renaissance::Graphics
 			std::vector<char> infoLog(maxLogLength);
 			glGetProgramInfoLog(program, maxLogLength, &maxLogLength, infoLog.data());
 			REN_CORE_ERROR("Shader linkage failed: {0}", infoLog.data());
+
+			REN_CORE_ASSERT(false);
 
 			glDeleteProgram(program);
 			for (auto& id : shaders)
@@ -285,6 +305,10 @@ namespace Renaissance::Graphics
 		case ShaderDataType::Int2:	return GL_INT;
 		case ShaderDataType::Int3:	return GL_INT;
 		case ShaderDataType::Int4:	return GL_INT;
+		case ShaderDataType::Uint:	return GL_UNSIGNED_INT;
+		case ShaderDataType::Uint2:	return GL_UNSIGNED_INT;
+		case ShaderDataType::Uint3:	return GL_UNSIGNED_INT;
+		case ShaderDataType::Uint4:	return GL_UNSIGNED_INT;
 		case ShaderDataType::Bool:	return GL_BOOL;
 		case ShaderDataType::Mat3:	return GL_FLOAT;
 		case ShaderDataType::Mat4:	return GL_FLOAT;

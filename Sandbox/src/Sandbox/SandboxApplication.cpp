@@ -1,6 +1,6 @@
 #include "SandboxPCH.h"
 #include "Renaissance/Core/EntryPoint.h"
-#include "Sandbox/ExampleLayer.h"
+#include "Sandbox/Sandbox2D.h"
 
 using namespace Renaissance;
 using namespace Sandbox;
@@ -11,7 +11,7 @@ public:
 	SandboxApplication(const std::string& name, ApplicationCommandLineArgs args)
 		: Application(name, args)
 	{
-		mExampleLayer = CreateNewLayer<ExampleLayer>();
+		mSandbox2D = CreateNewLayer<Sandbox2D>();
 	}
 
 	virtual ~SandboxApplication()
@@ -19,7 +19,7 @@ public:
 	}
 
 private:
-	WeakPtr<ExampleLayer> mExampleLayer;
+	WeakPtr<Sandbox2D> mSandbox2D;
 };
 
 Application* Renaissance::CreateApplication(Renaissance::ApplicationCommandLineArgs args)

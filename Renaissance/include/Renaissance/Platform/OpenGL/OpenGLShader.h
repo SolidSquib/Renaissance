@@ -10,8 +10,8 @@ namespace Renaissance::Graphics
 	class OpenGLShader : public Shader
 	{
 	public:
-		OpenGLShader(const char* filePath);
-		OpenGLShader(const char* vertexSource, const char* fragmentSource);
+		OpenGLShader(const std::string& filePath);
+		OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
 		virtual ~OpenGLShader();	
 
 		virtual void Bind() const final;
@@ -34,15 +34,18 @@ namespace Renaissance::Graphics
 		virtual Vector4 GetVector4(const std::string& name) const final;
 		virtual Vector4 GetColor(const std::string& name) const final;
 
+		virtual std::string GetName() const final { return mName; }
+
 		static uint32_t GetOpenGLDataTypeFromShaderDataType(ShaderDataType type);
 
 	private:
 		uint32_t mRendererId = 0;
+		std::string mName;
 
 		static bool CheckShaderCompilation(uint32_t shader);
 		static bool CheckProgramLinkage(uint32_t program);
 
-		std::string ReadFromFile(const char* filePath);
+		std::string ReadFromFile(const std::string& filePath);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& fileSource);
 		void Compile(const std::unordered_map<GLenum, std::string>& sources);
 	};

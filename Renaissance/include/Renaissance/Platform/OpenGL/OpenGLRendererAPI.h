@@ -17,5 +17,6 @@ namespace Renaissance::Graphics
 		virtual void Clear(uint32_t flags) final;
 
 		virtual void DrawIndexed(const SharedPtr<VertexArray>& vertexArray) final;
+		virtual void DrawIndexed(const SharedPtr<VertexArray>& vertexArray, uint32_t count) final;
 	};
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // One day we can try to make our own math library maybe, or at least wrap this stuff so we don't need to include glm in all child projects.
 namespace Renaissance

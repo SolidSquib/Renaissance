@@ -2,6 +2,7 @@
 #include "Renaissance/Core/Application.h"
 #include "Renaissance/Core/InputManager.h"
 #include "Renaissance/Graphics/Renderer.h"
+#include "Renaissance/Graphics/SpriteBatch.h"
 #include "Renaissance/Platform/Platform.h"
 
 namespace Renaissance
@@ -17,6 +18,7 @@ namespace Renaissance
 		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
 
 		Graphics::Renderer::Get().Init();
+		Graphics::SpriteBatch::Init();
 		InputManager::Get().Init();
 
 		mImGuiLayer = CreateNewOverlay<ImGuiLayer>();
@@ -25,6 +27,7 @@ namespace Renaissance
 	Application::~Application()
 	{
 		Graphics::Renderer::Get().Shutdown();
+		Graphics::SpriteBatch::Shutdown();
 		InputManager::Get().Shutdown();
 	}
 

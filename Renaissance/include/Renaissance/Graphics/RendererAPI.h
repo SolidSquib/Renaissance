@@ -23,6 +23,7 @@ namespace Renaissance::Graphics
 		virtual void Clear(uint32_t flags) = 0;
 
 		virtual void DrawIndexed(const SharedPtr<VertexArray>& vertexArray) = 0;
+		virtual void DrawIndexed(const SharedPtr<VertexArray>& vertexArray, uint32_t count) = 0;
 
 		static API GetAPI() { return sAPI; }
 		static UniquePtr<RendererAPI> Create();
