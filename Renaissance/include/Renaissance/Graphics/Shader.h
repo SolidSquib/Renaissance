@@ -19,10 +19,10 @@ namespace Renaissance::Graphics
 		case ShaderDataType::Float2: return sizeof(float) * 2;		// 8
 		case ShaderDataType::Float3: return sizeof(float) * 3;		// 12
 		case ShaderDataType::Float4: return sizeof(float) * 4;		// 16
-		case ShaderDataType::Int:	return sizeof(int);				// 4
-		case ShaderDataType::Int2:	return sizeof(int) * 2;			// 8
-		case ShaderDataType::Int3:	return sizeof(int) * 3;			// 12
-		case ShaderDataType::Int4:	return sizeof(int) * 4;			// 16
+		case ShaderDataType::Int:	return sizeof(int32_t);			// 4
+		case ShaderDataType::Int2:	return sizeof(int32_t) * 2;		// 8
+		case ShaderDataType::Int3:	return sizeof(int32_t) * 3;		// 12
+		case ShaderDataType::Int4:	return sizeof(int32_t) * 4;		// 16
 		case ShaderDataType::Uint:	return sizeof(uint32_t);		// 4
 		case ShaderDataType::Uint2:	return sizeof(uint32_t) * 2;	// 8
 		case ShaderDataType::Uint3:	return sizeof(uint32_t) * 3;	// 12

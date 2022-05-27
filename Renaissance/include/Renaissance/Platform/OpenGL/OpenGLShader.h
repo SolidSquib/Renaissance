@@ -36,6 +36,7 @@ namespace Renaissance::Graphics
 
 		virtual std::string GetName() const final { return mName; }
 
+		static bool SendDataAsInteger(ShaderDataType type);
 		static uint32_t GetOpenGLDataTypeFromShaderDataType(ShaderDataType type);
 
 	private:

@@ -293,6 +293,33 @@ namespace Renaissance::Graphics
 		}
 	}
 
+	bool OpenGLShader::SendDataAsInteger(ShaderDataType type)
+	{
+		switch (type)
+		{
+		case ShaderDataType::Float:	
+		case ShaderDataType::Float2:
+		case ShaderDataType::Float3:
+		case ShaderDataType::Float4:
+		case ShaderDataType::Bool:	
+		case ShaderDataType::Mat3:	
+		case ShaderDataType::Mat4:	
+			return false;
+		case ShaderDataType::Int:	
+		case ShaderDataType::Int2:	
+		case ShaderDataType::Int3:	
+		case ShaderDataType::Int4:	
+		case ShaderDataType::Uint:	
+		case ShaderDataType::Uint2:	
+		case ShaderDataType::Uint3:	
+		case ShaderDataType::Uint4:	
+			return true;
+		}
+
+		REN_CORE_ASSERT(false, "Unknown data type!");
+		return 0;
+	}
+
 	uint32_t OpenGLShader::GetOpenGLDataTypeFromShaderDataType(ShaderDataType type)
 	{
 		switch (type)

@@ -36,13 +36,25 @@ namespace Renaissance::Graphics
 		for (uint32_t i = 0; i < vertexBuffer->GetLayout().GetCount(); ++i)
 		{
 			BufferElement element = vertexBuffer->GetLayout()[i];
-			glEnableVertexAttribArray(i);
-			glVertexAttribPointer(i,
-				GetComponentCount(element.Type),
-				OpenGLShader::GetOpenGLDataTypeFromShaderDataType(element.Type),
-				element.Normalized,
-				vertexBuffer->GetLayout().GetStride(),
-				(const void*)(uint64_t)element.Offset);
+
+			glEnableVertexAttribArray(i);	
+			if (OpenGLShader::SendDataAsInteger(element.Type))
+			{
+				glVertexAttribIPointer(i,
+					GetComponentCount(element.Type),
+					OpenGLShader::GetOpenGLDataTypeFromShaderDataType(element.Type),
+					vertexBuffer->GetLayout().GetStride(),
+					(const void*)(uint64_t)element.Offset);
+			}
+			else
+			{
+				glVertexAttribPointer(i,
+					GetComponentCount(element.Type),
+					OpenGLShader::GetOpenGLDataTypeFromShaderDataType(element.Type),
+					element.Normalized,
+					vertexBuffer->GetLayout().GetStride(),
+					(const void*)(uint64_t)element.Offset);
+			}
 		}
 
 		mVertexBuffers.push_back(vertexBuffer);
