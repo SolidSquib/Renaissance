@@ -21,5 +21,8 @@ namespace Sandbox
 		SharedPtr<Graphics::Texture2D> mAwesomeFace;
 		SharedPtr<Graphics::Texture2D> mGrass;
 		SharedPtr<Graphics::Texture2D> mContainer;
+		SharedPtr<Graphics::FrameBuffer> mSceneBuffer;
+
+		bool mShowEditor = true;
 	};
 }

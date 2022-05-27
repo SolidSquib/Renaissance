@@ -11,6 +11,7 @@
 // Graphics
 #include "Renaissance/Graphics/Buffer.h"
 #include "Renaissance/Graphics/Camera.h"
+#include "Renaissance/Graphics/FrameBuffer.h"
 #include "Renaissance/Graphics/Renderer.h"
 #include "Renaissance/Graphics/SpriteBatch.h"
 #include "Renaissance/Graphics/RenderCommands.h"

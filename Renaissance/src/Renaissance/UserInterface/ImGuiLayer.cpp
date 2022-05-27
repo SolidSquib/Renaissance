@@ -61,7 +61,7 @@ namespace Renaissance
 
 	void ImGuiLayer::OnUIRender()
 	{
-		ImGui::ShowDemoWindow();
+		
 	}
 
 	void ImGuiLayer::OnEvent(Events::Event& e)
