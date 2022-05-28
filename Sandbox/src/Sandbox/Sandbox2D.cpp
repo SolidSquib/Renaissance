@@ -22,7 +22,11 @@ namespace Sandbox
 		Graphics::FrameBuffer::Specification spec;
 		spec.Width = Application::Get().GetWindow().GetWidth();
 		spec.Height = Application::Get().GetWindow().GetHeight();
-		mSceneBuffer = Graphics::FrameBuffer::Create(spec);
+
+		Graphics::FrameBufferLayout sceneBufferLayout = { 
+			{ Graphics::FrameBufferAttachmentType::Color, true }
+		};
+		mSceneBuffer = Graphics::FrameBuffer::Create(spec, sceneBufferLayout);
 	}
 
 	void Sandbox2D::OnDetached()
@@ -107,7 +111,7 @@ namespace Sandbox
 			}
 
 			ImGui::Begin("Viewport");
-			uint32_t sceneBufferColorId = mSceneBuffer->GetColorAttachmentRendererId();
+			uint32_t sceneBufferColorId = mSceneBuffer->GetAttachmentRendererId(Graphics::FrameBufferAttachmentType::Color);
 			ImGui::Image((void*)sceneBufferColorId, ImGui::GetWindowSize());
 			ImGui::End();
 		}

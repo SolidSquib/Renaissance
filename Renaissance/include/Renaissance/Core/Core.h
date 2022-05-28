@@ -55,3 +55,4 @@ namespace Renaissance
 
 #include "Renaissance/Core/Log.h"
 #include "Renaissance/Core/Assert.h"
+#include "Renaissance/Development/Instrumentor.h"
