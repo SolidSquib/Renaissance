@@ -106,8 +106,7 @@ namespace Renaissance::Graphics
 	
 	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const Vector4& tint)
 	{
-		Matrix4 transform = glm::translate(IdentityMatrix, Vector3(location, 0.0f));
-		Draw(transform, size, WhiteTexture, Vector2(0.0f), Vector2(1.0f), Vector2(1.0), tint);
+		Draw(Vector3(location, 0.0f), size, WhiteTexture, Vector2(0.0f), Vector2(1.0f), Vector2(1.0), tint);
 	}
 
 	void SpriteBatch::Draw(const Vector3& location, const Vector2& size, const Vector4& tint)
@@ -121,36 +120,35 @@ namespace Renaissance::Graphics
 		Draw(transform, size, WhiteTexture, Vector2(0.0f), Vector2(1.0f), Vector2(1.0), tint);
 	}
 
-	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor)
+	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
-		Matrix4 transform = glm::translate(IdentityMatrix, Vector3(location, 0.0f));
-		Draw(transform, size, texture, textureCoordMin, textureCoordMax, tilingFactor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+		Draw(Vector3(location, 1.0f), size, texture, tilingFactor, tint);
 	}
 
-	void SpriteBatch::Draw(const Vector3& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor)
+	void SpriteBatch::Draw(const Vector3& location, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
 		Matrix4 transform = glm::translate(IdentityMatrix, location);
-		Draw(transform, size, texture, textureCoordMin, textureCoordMax, tilingFactor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+		Draw(transform, size, texture, tilingFactor, tint);
 	}
 
-	void SpriteBatch::Draw(const Matrix4& transform, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor)
+	void SpriteBatch::Draw(const Matrix4& transform, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
-		Draw(transform, size, texture, textureCoordMin, textureCoordMax, tilingFactor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+		Draw(transform, size, texture->GetTexture(), texture->GetMinCoord(), texture->GetMaxCoord(), tilingFactor, tint);
 	}
 
-	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint)
+	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
 		Matrix4 transform = glm::translate(IdentityMatrix, Vector3(location, 0.0f));
 		Draw(transform, size, texture, textureCoordMin, textureCoordMax, tilingFactor, tint);
 	}
 
-	void SpriteBatch::Draw(const Vector3& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint)
+	void SpriteBatch::Draw(const Vector3& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
 		Matrix4 transform = glm::translate(IdentityMatrix, location);
 		Draw(transform, size, texture, textureCoordMin, textureCoordMax, tilingFactor, tint);
 	}
 
-	void SpriteBatch::Draw(const Matrix4& transform, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint)
+	void SpriteBatch::Draw(const Matrix4& transform, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
 		SharedPtr<Texture2D> useTexture = texture ? texture : WhiteTexture;
 

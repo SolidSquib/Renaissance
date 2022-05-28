@@ -2,11 +2,9 @@
 
 #include "Renaissance.h"
 
-namespace Sandbox
+namespace Renaissance
 {
-	using namespace Renaissance;
-
-	class Sandbox2D : public Layer
+	class EditorLayer : public Layer
 	{
 	public:
 		virtual void OnAttached() override;
@@ -21,6 +19,7 @@ namespace Sandbox
 		SharedPtr<Graphics::Texture2D> mAwesomeFace;
 		SharedPtr<Graphics::Texture2D> mGrass;
 		SharedPtr<Graphics::Texture2D> mContainer;
+		SharedPtr<Graphics::FrameBuffer> mSceneBuffer;
 
 		bool mShowEditor = true;
 	};

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Renaissance/Graphics/Texture.h"
+
 namespace Renaissance::Graphics
 {
 	enum class FrameBufferAttachmentType { Color, Depth, Stencil, DepthStencil };

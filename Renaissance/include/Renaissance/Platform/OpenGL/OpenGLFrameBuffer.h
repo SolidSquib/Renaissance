@@ -33,5 +33,6 @@ namespace Renaissance::Graphics
 		Specification mSpecification;
 		FrameBufferLayout mLayout;
 		std::unordered_map<FrameBufferAttachmentType, uint32_t> mComponentCount;
+		std::vector<SharedPtr<Texture2D>> mTextures;
 	};
 }
