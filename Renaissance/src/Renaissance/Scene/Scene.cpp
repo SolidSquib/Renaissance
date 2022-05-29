@@ -33,7 +33,7 @@ namespace Renaissance
 
 		{			
 			SpriteBatch spriteBatch;
-			mRegistry.group<TransformComponent>(entt::get<SpriteRendererComponent>).each([this, &spriteBatch](auto handle, TransformComponent& transform, SpriteRendererComponent& spriteRenderer) {
+			mRegistry.group<TransformComponent, SpriteRendererComponent>().each([this, &spriteBatch](auto handle, TransformComponent& transform, SpriteRendererComponent& spriteRenderer) {
 
 				spriteBatch.Draw(transform, spriteRenderer);
 			});

@@ -48,4 +48,8 @@ namespace Renaissance
 		Math::Vector2 TilingFactor{ 1.0f };
 		SharedPtr<Graphics::SubTexture2D> Texture;
 	};
+
+	struct CameraComponent
+	{
+	};
 }

@@ -38,26 +38,51 @@ namespace Renaissance
 				mViewportCameraController->GetCamera().lock()->SetViewportSize(mCachedViewportSize.x, mCachedViewportSize.y);
 			}
 
-			bool showBuffer = true;
+			static bool showBuffer = true;
 			ImGui::BeginChild("Viewport FrameBuffer", viewportPanelSize);
 			{
-				mUpdateCameraController = (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && ImGui::IsWindowHovered()) || mViewportCameraController->WantsConsumeMouseInput();
+				bool acceptMouseInput = ImGui::IsWindowHovered();
+				ImVec2 currentMousePos = ImGui::GetMousePos();
+
 				uint32_t sceneBufferColorId = mViewportFrameBuffer->GetAttachmentRendererId(Graphics::FrameBufferAttachmentType::Color);
 				ImGui::Image((void*)(uint64_t)sceneBufferColorId, { mCachedViewportSize.x, mCachedViewportSize.y }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+								
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && acceptMouseInput)
+				{
+					ImGui::SetWindowFocus();
+					mLastMousePosition = { currentMousePos.x, currentMousePos.y };
+					mFocused = true;
+					InputManager::DisableMouseCursor();
+				}
+				else if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && mFocused)
+				{
+					Vector2 mouseDelta = Vector2(currentMousePos.x, currentMousePos.y) - mLastMousePosition;
+					mLastMousePosition = { currentMousePos.x, currentMousePos.y };
+					mViewportCameraController->UpdateFirstPerson(mouseDelta);
+				}
+				else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+				{
+					mFocused = false;
+					InputManager::EnableMouseCursor();
+				}
+
+				if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
+				{
+					if (ImGui::IsKeyPressed(KeyCode::PageDown, false))
+					{
+						mViewportCameraController->DecreaseFoV();
+					}
+					else if (ImGui::IsKeyPressed(KeyCode::PageUp, false))
+					{
+						mViewportCameraController->IncreaseFoV();
+					}
+				}
 			}
 			ImGui::EndChild();
 
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();
-	}
-
-	void EditorViewportWindow::OnUpdate(float deltaTime)
-	{
-		if (mUpdateCameraController)
-		{
-			mViewportCameraController->OnUpdate(Application::Get().DeltaTime());
-		}
 
 		Graphics::Renderer::Get().BeginScene(mViewportCameraController->GetCamera().lock());
 
@@ -67,13 +92,5 @@ namespace Renaissance
 		mViewportFrameBuffer->Unbind();
 
 		Graphics::Renderer::Get().EndScene();
-	}
-
-	void EditorViewportWindow::OnEvent(Events::Event& e)
-	{
-		if (mUpdateCameraController)
-		{
-			mViewportCameraController->OnEvent(e);
-		}
 	}
 }

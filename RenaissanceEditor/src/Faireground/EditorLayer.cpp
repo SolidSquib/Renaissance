@@ -131,11 +131,11 @@ namespace Renaissance
 
 	void EditorLayer::OnUpdate(float deltaTime)
 	{
-		mWindowStack.OnUpdate(deltaTime);
+		
 	}
 	
 	void EditorLayer::OnEvent(Events::Event& e)
 	{
-		mWindowStack.OnEvent(e);
+		
 	}
 }

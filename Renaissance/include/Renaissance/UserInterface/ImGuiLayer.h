@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renaissance/Core/Layer.h"
+#include "Renaissance/Events/KeyEvent.h"
 
 namespace Renaissance
 {
@@ -22,6 +23,10 @@ namespace Renaissance
 		void EndDraw();
 
 		void SetBlockEvents(bool block) { mBlockEvents = block; }
+
+	private:
+		bool OnKeyPressed(Events::KeyPressedEvent& e);
+		bool OnKeyReleased(Events::KeyReleasedEvent& e);
 
 	private:
 		bool mBlockEvents = true;

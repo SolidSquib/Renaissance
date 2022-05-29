@@ -14,12 +14,10 @@ namespace Renaissance
 		EditorViewportWindow(const String& name, const SharedPtr<Graphics::Camera>& camera);
 
 		virtual void OnDraw() override;
-		virtual void OnUpdate(float deltaTime) override;
-		virtual void OnEvent(Events::Event& e) override;
 
 		virtual void Close() override { mClose = true; }
 
-		virtual bool WantsInputFocus() const override { return mUpdateCameraController; }
+		virtual bool WantsInputFocus() const override { return mFocused; }
 		virtual bool WantsToClose() const override { return mClose; }
 		virtual const String& GetName() const override { return mName; }
 
@@ -27,9 +25,11 @@ namespace Renaissance
 
 	private:
 		bool mClose = false;
-		bool mUpdateCameraController = false;
+		bool mFocused = false;
+
 		String mName;
 		Vector2 mCachedViewportSize{ 1280.0f, 720.0f };
+		Vector2 mLastMousePosition{ 0.0f, 0.0f };
 
 		SharedPtr<Graphics::FrameBuffer> mViewportFrameBuffer;
 		SharedPtr<EditorCameraController> mViewportCameraController;

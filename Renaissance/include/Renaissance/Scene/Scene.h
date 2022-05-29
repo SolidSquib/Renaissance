@@ -12,7 +12,7 @@ namespace Renaissance
 	{
 	public:
 		Scene();
-		~Scene();
+		virtual ~Scene();
 
 		Entity CreateEntity();
 		void DestroyEntity(const Entity& entity);

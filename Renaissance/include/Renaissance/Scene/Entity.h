@@ -12,7 +12,7 @@ namespace Renaissance
 	{
 	public:
 		Entity(const entt::entity& entityId, Scene* scene);
-		~Entity();
+		virtual ~Entity();
 
 		void SetLocation(const Math::Vector3& location);
 		Math::Vector3 GetLocation() const;
@@ -22,6 +22,13 @@ namespace Renaissance
 		{
 			REN_CORE_ASSERT(!HasComponent<T>(), "Entity already has a component of this type.");
 			return mScene->mRegistry.emplace<T>(mHandle, std::forward<Args>(args)...);
+		}
+
+		template<typename T>
+		void RemoveComponent()
+		{
+			REN_CORE_ASSERT(HasComponent<T>(), "Component does not exist");
+			mScene->mRegistry.remove<T>(mHandle);
 		}
 
 		template<typename T>

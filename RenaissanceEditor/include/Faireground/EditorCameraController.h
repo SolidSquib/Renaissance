@@ -17,13 +17,15 @@ namespace Renaissance
 	public:
 		EditorCameraController(SharedPtr<Graphics::Camera> camera);
 
-		void OnUpdate(float deltaTime);
 		void OnEvent(Events::Event& e);
 
+		void UpdateFirstPerson(Vector2 mouseDelta);
+		void UpdateDrag(Vector2 mouseDelta);
+
+		void IncreaseFoV();
+		void DecreaseFoV();
+
 		bool OnMouseScrolled(Events::MouseScrolledEvent& e);
-		bool OnMouseButtonDown(Events::MouseButtonPressedEvent& e);
-		bool OnMouseButtonUp(Events::MouseButtonReleasedEvent& e);
-		bool OnKeyPressed(Events::KeyPressedEvent& e);
 
 		bool WantsConsumeMouseInput() const { return mConsumeMouseMoveInput; }
 

@@ -69,9 +69,12 @@ namespace Renaissance
 		if (mBlockEvents)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			e.mHandled |= e.HasCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
 			e.mHandled |= e.HasCategory(EventCategoryMouse) & io.WantCaptureMouse;
 		}
+
+		EventDispatcher dispatch(e);
+		dispatch.Dispatch<KeyPressedEvent>(REN_BIND_EVENT(ImGuiLayer::OnKeyPressed));
+		dispatch.Dispatch<KeyReleasedEvent>(REN_BIND_EVENT(ImGuiLayer::OnKeyReleased));
 	}
 
 	void ImGuiLayer::BeginDraw()
@@ -97,6 +100,20 @@ namespace Renaissance
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(currentContext);
 		}
+	}
+
+	bool ImGuiLayer::OnKeyPressed(Events::KeyPressedEvent& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.KeysDown[e.GetKeyCode()] = true;
+		return io.WantCaptureKeyboard;		
+	}
+
+	bool ImGuiLayer::OnKeyReleased(Events::KeyReleasedEvent& e)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		io.KeysDown[e.GetKeyCode()] = false;
+		return io.WantCaptureKeyboard;
 	}
 }
 

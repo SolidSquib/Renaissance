@@ -127,6 +127,8 @@ namespace Renaissance
 		const extern uint32_t RightAlt;
 		const extern uint32_t RightSuper;
 		const extern uint32_t Menu;
+
+		const uint32_t Last = Menu;
 	}
 
 	namespace MouseCode

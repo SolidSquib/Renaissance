@@ -12,13 +12,13 @@ namespace Renaissance
 		mWindows.clear();
 	}
 
-	void EditorWindowStack::OnUpdate(float deltaTime)
+	void EditorWindowStack::OnDraw()
 	{
 		bool wantsInput = false;
 
 		for (auto it = mWindows.begin(); it != mWindows.end();)
 		{
-			(*it)->OnUpdate(deltaTime);
+			(*it)->OnDraw();
 
 			wantsInput |= (*it)->WantsInputFocus();
 
@@ -33,21 +33,5 @@ namespace Renaissance
 		}
 
 		Application::Get().GetImGuiLayer().lock()->SetBlockEvents(!wantsInput);
-	}
-
-	void EditorWindowStack::OnDraw()
-	{
-		for (auto it = mWindows.begin(); it != mWindows.end(); ++it)
-		{
-			(*it)->OnDraw();
-		}
-	}
-
-	void EditorWindowStack::OnEvent(Events::Event& e)
-	{
-		for (auto it = mWindows.begin(); it != mWindows.end(); ++it)
-		{
-			(*it)->OnEvent(e);
-		}
 	}
 }
