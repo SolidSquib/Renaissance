@@ -30,6 +30,12 @@ namespace Renaissance
 		return { (float)mouseX, (float)mouseY };
 	}
 
+	void WindowsInputManager::SetMousePositionImpl(float x, float y)
+	{
+		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		glfwSetCursorPos(glfwWindow, x, y);
+	}
+
 	void WindowsInputManager::EnableMouseCursorImpl() const
 	{
 		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());

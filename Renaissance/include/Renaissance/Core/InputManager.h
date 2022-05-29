@@ -24,6 +24,7 @@ namespace Renaissance
 		static std::pair<float, float> GetMousePosition() { return sInstance->GetMousePositionImpl(); }
 		static float GetMouseX() { return sInstance->GetMouseXImpl(); }
 		static float GetMouseY() { return sInstance->GetMouseYImpl(); }
+		static void SetMousePosition(float x, float y) { sInstance->SetMousePositionImpl(x, y); }
 		static void EnableMouseCursor() { sInstance->EnableMouseCursorImpl(); }
 		static void DisableMouseCursor() { sInstance->DisableMouseCursorImpl(); }
 
@@ -43,6 +44,7 @@ namespace Renaissance
 		virtual std::pair<float, float> GetMousePositionImpl() const = 0;
 		virtual float GetMouseXImpl() const;
 		virtual float GetMouseYImpl() const;
+		virtual void SetMousePositionImpl(float x, float y) = 0;
 		virtual void EnableMouseCursorImpl() const = 0;
 		virtual void DisableMouseCursorImpl() const = 0;
 

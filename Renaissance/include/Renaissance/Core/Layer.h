@@ -15,7 +15,7 @@ namespace Renaissance
 		virtual void OnDetached() = 0;
 		virtual void OnUpdate(float deltaTime) {}
 		virtual void OnUIRender() {}
-		virtual void OnEvent(Events::Event& e) = 0;
+		virtual void OnEvent(Events::Event& e) {};
 
 		const String& GetName() const { return mDebugName; }
 

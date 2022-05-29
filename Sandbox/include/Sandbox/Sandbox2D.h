@@ -2,6 +2,8 @@
 
 #include "Renaissance.h"
 
+#include "Renaissance/Editor/EditorCameraController.h"
+
 namespace Sandbox
 {
 	using namespace Renaissance;
@@ -17,7 +19,7 @@ namespace Sandbox
 
 	private:
 		SharedPtr<Graphics::Camera> mSceneCamera;
-		SharedPtr<CameraController> mCameraController;
+		SharedPtr<EditorCameraController> mCameraController;
 		SharedPtr<Graphics::Texture2D> mAwesomeFace;
 		SharedPtr<Graphics::Texture2D> mGrass;
 		SharedPtr<Graphics::Texture2D> mContainer;

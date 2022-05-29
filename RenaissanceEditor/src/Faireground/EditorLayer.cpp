@@ -3,30 +3,16 @@
 
 #include "Renaissance/Graphics/Texture.h"
 
-#include "imgui.h"
-
 namespace Renaissance
 {
 	void EditorLayer::OnAttached()
 	{
 		Window& window = Application::Get().GetWindow();
 
-		mSceneCamera = Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 1.0f, 0.1f, 500.0f);
-		mSceneCamera->SetLocation(Math::Vector3(0.0f, 0.0f, 0.5f));
-		mCameraController = MakeShared<CameraController>(mSceneCamera);
+		SharedPtr<Graphics::Camera> viewportCamera = Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 1.0f, 0.1f, 500.0f);
+		viewportCamera->SetLocation(Math::Vector3(0.0f, 0.0f, 0.5f));
 
-		mAwesomeFace = Graphics::Texture2D::Create("../Renaissance/assets/textures/awesomeface.png");
-		mGrass = Graphics::Texture2D::Create("../Renaissance/assets/textures/grass.png");
-		mContainer = Graphics::Texture2D::Create("../Renaissance/assets/textures/container.jpg");
-
-		Graphics::FrameBuffer::Specification spec;
-		spec.Width = Application::Get().GetWindow().GetWidth();
-		spec.Height = Application::Get().GetWindow().GetHeight();
-
-		Graphics::FrameBufferLayout sceneBufferLayout = { 
-			{ Graphics::FrameBufferAttachmentType::Color, true }
-		};
-		mSceneBuffer = Graphics::FrameBuffer::Create(spec, sceneBufferLayout);
+		mViewports[0] = mWindowStack.CreateNewWindow<EditorViewportWindow>("Viewport", viewportCamera);
 	}
 
 	void EditorLayer::OnDetached()
@@ -36,7 +22,6 @@ namespace Renaissance
 
 	void EditorLayer::OnUIRender()
 	{
-		static bool fullscreenViewport = true;
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
 		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
@@ -80,63 +65,52 @@ namespace Renaissance
 			REN_CORE_WARN("Dear ImGui docking disabled.");
 		}
 
-		if (ImGui::BeginMenuBar())
+		ImGui::BeginMenuBar();
+		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::BeginMenu("File"))
+			ImGui::Separator();
+			if (ImGui::MenuItem("Exit", nullptr, false, true))
 			{
-				if (ImGui::MenuItem("Fullscreen Viewport", nullptr, fullscreenViewport))
-				{
-					fullscreenViewport = !fullscreenViewport;
-				}
-
-				ImGui::Separator();
-
-				if (ImGui::MenuItem("Exit", nullptr, false, true))
-				{
-					Renaissance::Application::Get().Close();
-				}
-
-				ImGui::EndMenu();
+				Renaissance::Application::Get().Close();
 			}
-
-			ImGui::EndMenuBar();
+			ImGui::EndMenu();
 		}
 
-		if (!fullscreenViewport)
+		if (ImGui::BeginMenu("Windows"))
 		{
-			ImGui::Begin("Viewport");
-			uint32_t sceneBufferColorId = mSceneBuffer->GetAttachmentRendererId(Graphics::FrameBufferAttachmentType::Color);
-			ImGui::Image((void*)(uint64_t)sceneBufferColorId, ImGui::GetWindowSize(), ImVec2(0.0f ,1.0f), ImVec2(1.0f, 0.0f));
-			ImGui::End();
+			String itemName = "";
+			for (uint32_t i = 0; i < MaxViewports; ++i)
+			{
+				itemName = i == 0 ? "Viewport" : "Viewport " + std::to_string(i+1);
+				bool viewportEnabled = !mViewports[i].expired();
+				if (ImGui::MenuItem(itemName.c_str(), nullptr, viewportEnabled))
+				{
+					if (viewportEnabled)
+					{
+						mViewports[i].lock()->Close();
+					}
+					else
+					{
+						mViewports[i] = mWindowStack.CreateNewWindow<EditorViewportWindow>(itemName);
+					}
+				}
+			}
+			ImGui::EndMenu();
 		}
+		ImGui::EndMenuBar();
+
+		mWindowStack.OnDraw();
 
 		ImGui::End();
 	}
 
 	void EditorLayer::OnUpdate(float deltaTime)
 	{
-		mCameraController->OnUpdate(deltaTime);
-
-		{
-			Graphics::Renderer::Get().BeginScene(mSceneCamera);
-			
-			mSceneBuffer->Bind();
-			{
-				Graphics::SpriteBatch spriteBatch;
-				spriteBatch.Draw(Vector2(0.0f, 0.0f), Vector2(1.0f), mAwesomeFace, Vector2(0.0f), Vector2(1.0f), Vector2(1.0f));
-				spriteBatch.Draw(Vector2(-0.2f, 0.4f), Vector2(0.5f), mGrass, Vector2(0.0f), Vector2(1.0f), Vector2(1.0f));
-				spriteBatch.Draw(Vector2(-0.5f, -0.2f), Vector2(0.2f), mAwesomeFace, Vector2(0.0f), Vector2(1.0f), Vector2(1.0f));
-				spriteBatch.Draw(Vector2(0.6f, 0.1f), Vector2(0.2f), mContainer, Vector2(0.0f), Vector2(1.0f), Vector2(1.0f));
-				spriteBatch.Draw(Vector2(0.6f, 0.1f), Vector2(0.2f), Vector4(1.0f, 0.2f, 0.4f, 1.0f));
-			}
-			mSceneBuffer->Unbind();
-
-			Graphics::Renderer::Get().EndScene();
-		}
+		mWindowStack.OnUpdate(deltaTime);
 	}
-
+	
 	void EditorLayer::OnEvent(Events::Event& e)
 	{
-
+		mWindowStack.OnEvent(e);
 	}
 }

@@ -22,11 +22,11 @@ namespace Renaissance::Graphics
 	{
 		uint32_t RendererId;
 		FrameBufferAttachmentType Type;
-		bool Readable;
+		bool Writeable;
 	
 		FrameBufferAttachment() = default;
 		FrameBufferAttachment(FrameBufferAttachmentType type, bool readable)
-			: Type(type), Readable(readable)
+			: Type(type), Writeable(readable)
 		{ }
 	};
 
@@ -64,7 +64,7 @@ namespace Renaissance::Graphics
 		};
 
 	public:
-		~FrameBuffer() = default;
+		virtual ~FrameBuffer() = default;
 
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 		virtual void Invalidate() = 0;

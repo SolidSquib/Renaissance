@@ -24,6 +24,6 @@ namespace Renaissance
 
 	Application* Renaissance::CreateApplication(Renaissance::ApplicationCommandLineArgs args)
 	{
-		return new EditorApplication("Renaissance Sandbox", args);
+		return new EditorApplication("Faireground", args);
 	}
 }

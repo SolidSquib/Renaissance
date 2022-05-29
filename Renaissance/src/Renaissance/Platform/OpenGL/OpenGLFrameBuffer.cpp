@@ -11,7 +11,22 @@ namespace Renaissance::Graphics
 
 	OpenGLFrameBuffer::~OpenGLFrameBuffer()
 	{
-		Destroy();
+		glDeleteFramebuffers(1, &mRendererId);
+
+		for (auto iter = mLayout.begin(); iter != mLayout.end(); ++iter)
+		{
+			if (iter->RendererId)
+			{
+				if (iter->Writeable)
+				{
+					glDeleteTextures(1, &iter->RendererId);
+				}
+				else
+				{
+					glDeleteRenderbuffers(1, &iter->RendererId);
+				}
+			}
+		}
 	}
 
 	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
@@ -25,7 +40,25 @@ namespace Renaissance::Graphics
 	{
 		REN_PROFILE_FUNCTION()
 					
-		Destroy();
+		if (mRendererId != 0)
+		{
+			glDeleteFramebuffers(1, &mRendererId);
+		}
+
+		for (auto iter = mLayout.begin(); iter != mLayout.end(); ++iter)
+		{
+			if (iter->RendererId)
+			{
+				if (iter->Writeable)
+				{
+					glDeleteTextures(1, &iter->RendererId);
+				}
+				else
+				{
+					glDeleteRenderbuffers(1, &iter->RendererId);
+				}
+			}
+		}
 
 		mComponentCount[FrameBufferAttachmentType::Color] = 0;
 		mComponentCount[FrameBufferAttachmentType::Depth] = 0;
@@ -45,7 +78,7 @@ namespace Renaissance::Graphics
 				continue;
 			}
 
-			if (iter->Readable)
+			if (iter->Writeable)
 			{
 				glCreateTextures(GL_TEXTURE_2D, 1, &iter->RendererId);
 				glTextureStorage2D(iter->RendererId, 1, GetGLAttachmentFormatEnum(iter->Type), mSpecification.Width, mSpecification.Height);
@@ -74,6 +107,7 @@ namespace Renaissance::Graphics
 		REN_PROFILE_FUNCTION()
 
 		glBindFramebuffer(GL_FRAMEBUFFER, mRendererId);
+		glViewport(0, 0, mSpecification.Width, mSpecification.Height);
 	}
 
 	void OpenGLFrameBuffer::Unbind() const
@@ -82,29 +116,7 @@ namespace Renaissance::Graphics
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-
-	void OpenGLFrameBuffer::Destroy()
-	{
-		REN_PROFILE_FUNCTION()
-
-		if (mRendererId != 0)
-		{
-			glDeleteFramebuffers(1, &mRendererId);
-		}
-
-		for (auto iter = mLayout.begin(); iter != mLayout.end(); ++iter)
-		{
-			if (iter->Readable)
-			{
-				glDeleteTextures(1, &iter->RendererId);
-			}
-			else
-			{
-				glDeleteRenderbuffers(1, &iter->RendererId);
-			}
-		}
-	}
-
+	
 	uint32_t OpenGLFrameBuffer::GetAttachmentRendererId(FrameBufferAttachmentType type, uint32_t index) const
 	{
 		uint32_t foundIndex = 0;

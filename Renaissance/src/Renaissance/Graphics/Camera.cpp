@@ -45,6 +45,7 @@ namespace Renaissance::Graphics
 	void Camera::UpdateProjection()
 	{
 		float aspectRatio = mViewWidth / mViewHeight;
+		REN_CORE_WARN("New aspect ratio {0}", aspectRatio);
 
 		if (mIsOrthographic)
 		{

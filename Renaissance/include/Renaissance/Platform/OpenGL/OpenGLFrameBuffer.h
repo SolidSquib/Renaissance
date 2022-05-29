@@ -23,8 +23,6 @@ namespace Renaissance::Graphics
 		virtual uint32_t GetAttachmentRendererId(FrameBufferAttachmentType type, uint32_t index) const final;
 
 	private:
-		void Destroy();
-
 		bool ValidateAttachmentOfType(FrameBufferAttachmentType type);
 		GLenum GetGLAttachmentFormatEnum(FrameBufferAttachmentType type);
 		GLenum GetGLAttachmentTypeEnum(FrameBufferAttachmentType type);

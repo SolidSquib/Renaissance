@@ -13,7 +13,7 @@ namespace Sandbox
 
 		mSceneCamera = Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 1.0f, 0.1f, 500.0f);
 		mSceneCamera->SetLocation(Math::Vector3(0.0f, 0.0f, 0.5f));
-		mCameraController = MakeShared<CameraController>(mSceneCamera);
+		mCameraController = MakeShared<EditorCameraController>(mSceneCamera);
 
 		mAwesomeFace = Graphics::Texture2D::Create("../Renaissance/assets/textures/awesomeface.png");
 		mGrass = Graphics::Texture2D::Create("../Renaissance/assets/textures/grass.png");
