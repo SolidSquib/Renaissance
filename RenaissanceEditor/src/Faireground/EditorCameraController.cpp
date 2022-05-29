@@ -1,5 +1,5 @@
-#include "RenaissancePCH.h"
-#include "Renaissance/Editor/EditorCameraController.h"
+#include "FairegroundPCH.h"
+#include "Faireground/EditorCameraController.h"
 
 #include "Renaissance/Core/Application.h"
 #include "Renaissance/Core/InputManager.h"

@@ -15,8 +15,7 @@ project "Renaissance"
 	{
 		"include/**.h",
 		"src/RenaissancePCH.cpp",
-		"src/Renaissance/Core/**.cpp",
-		"src/Renaissance/Editor/**.cpp",
+		"src/Renaissance/Core/**.cpp",		
 		"src/Renaissance/Graphics/**.cpp",
 		"src/Renaissance/UserInterface/**.cpp",
 		"externals/stb_image/stb_image.cpp"

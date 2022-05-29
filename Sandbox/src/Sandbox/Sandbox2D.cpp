@@ -13,7 +13,6 @@ namespace Sandbox
 
 		mSceneCamera = Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 1.0f, 0.1f, 500.0f);
 		mSceneCamera->SetLocation(Math::Vector3(0.0f, 0.0f, 0.5f));
-		mCameraController = MakeShared<EditorCameraController>(mSceneCamera);
 
 		mAwesomeFace = Graphics::Texture2D::Create("../Renaissance/assets/textures/awesomeface.png");
 		mGrass = Graphics::Texture2D::Create("../Renaissance/assets/textures/grass.png");
@@ -51,12 +50,11 @@ namespace Sandbox
 
 	void Sandbox2D::OnUpdate(float deltaTime)
 	{
-		mCameraController->OnUpdate(deltaTime);
-
 		{
 			Graphics::Renderer::Get().BeginScene(mSceneCamera);
 			
 			{
+				using namespace Math;
 				Graphics::SpriteBatch spriteBatch;
 				spriteBatch.Draw(Vector2(0.0f, 0.0f), Vector2(1.0f), mAwesomeFace, Vector2(0.0f), Vector2(1.0f), Vector2(1.0f));
 				spriteBatch.Draw(Vector2(-0.2f, 0.4f), Vector2(0.5f), mGrass, Vector2(0.0f), Vector2(1.0f), Vector2(1.0f));

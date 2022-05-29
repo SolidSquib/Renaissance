@@ -14,7 +14,8 @@ project "Faireground"
 	files 
 	{
 		"include/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+		"src/Faireground/Windows/**.cpp",
 	}
 	
 	includedirs
