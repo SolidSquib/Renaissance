@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Faireground/Windows/EditorWindow.h"
+#include "Faireground/EditorCameraController.h"
+
+#include "Renaissance/Scene/Scene.h"
 
 namespace Renaissance
 {
@@ -20,6 +23,8 @@ namespace Renaissance
 		virtual bool WantsToClose() const override { return mClose; }
 		virtual const String& GetName() const override { return mName; }
 
+		inline void SetScene(const SharedPtr<Scene>& scene) { mScene = scene; }
+
 	private:
 		bool mClose = false;
 		bool mUpdateCameraController = false;
@@ -28,5 +33,6 @@ namespace Renaissance
 
 		SharedPtr<Graphics::FrameBuffer> mViewportFrameBuffer;
 		SharedPtr<EditorCameraController> mViewportCameraController;
+		SharedPtr<Scene> mScene = nullptr;
 	};
 }

@@ -17,6 +17,11 @@
 #include "Renaissance/Graphics/RenderCommands.h"
 #include "Renaissance/Graphics/VertexArray.h"
 
+// Scene
+#include "Renaissance/Scene/Component.h"
+#include "Renaissance/Scene/Entity.h"
+#include "Renaissance/Scene/Scene.h"
+
 // Math
 #include "Renaissance/Math/Math.h"
 

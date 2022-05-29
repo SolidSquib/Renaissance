@@ -23,7 +23,8 @@ project "Sandbox"
 		"%{wks.location}/Renaissance/include",
 		"%{wks.location}/Renaissance/externals/spdlog/include",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.entt}"
 	}
 	
 	links

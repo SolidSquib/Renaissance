@@ -63,14 +63,7 @@ namespace Renaissance
 
 		mViewportFrameBuffer->Bind();
 		Graphics::RenderCommand::Clear(0);
-		{
-			Graphics::SpriteBatch spriteBatch;
-			spriteBatch.Draw(Vector2(0.0f, 0.0f), Vector2(1.0f), Vector4(0.3f, 1.0f, 0.4f, 1.0f));
-			spriteBatch.Draw(Vector2(-0.2f, 0.4f), Vector2(0.5f), Vector4(0.1f, 0.4f, 0.9f, 1.0f));
-			spriteBatch.Draw(Vector2(-0.5f, -0.2f), Vector2(0.2f), Vector4(0.2f, 0.8f, 0.4f, 1.0f));
-			spriteBatch.Draw(Vector2(0.6f, 0.1f), Vector2(0.2f), Vector4(0.5f, 0.2f, 0.4f, 1.0f));
-			spriteBatch.Draw(Vector2(0.6f, 0.1f), Vector2(0.2f), Vector4(1.0f, 0.2f, 0.4f, 1.0f));
-		}
+		mScene->Draw();
 		mViewportFrameBuffer->Unbind();
 
 		Graphics::Renderer::Get().EndScene();

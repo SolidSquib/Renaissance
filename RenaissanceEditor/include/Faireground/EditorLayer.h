@@ -22,6 +22,8 @@ namespace Renaissance
 		std::array<WeakPtr<EditorViewportWindow>, MaxViewports> mViewports;
 		EditorWindowStack mWindowStack;
 
+		SharedPtr<Scene> mScene;
+
 		bool mShowEditor = true;
 	};
 }

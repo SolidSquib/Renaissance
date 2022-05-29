@@ -2,6 +2,7 @@
 #include "Faireground/EditorLayer.h"
 
 #include "Renaissance/Graphics/Texture.h"
+#include "Renaissance/Scene/Entity.h"
 
 namespace Renaissance
 {
@@ -9,10 +10,33 @@ namespace Renaissance
 	{
 		Window& window = Application::Get().GetWindow();
 
+		mScene = MakeShared<Scene>();
+
 		SharedPtr<Graphics::Camera> viewportCamera = Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 1.0f, 0.1f, 500.0f);
 		viewportCamera->SetLocation(Math::Vector3(0.0f, 0.0f, 0.5f));
 
 		mViewports[0] = mWindowStack.CreateNewWindow<EditorViewportWindow>("Viewport", viewportCamera);
+		mViewports[0].lock()->SetScene(mScene);
+
+		// Set the scene
+		{
+			using namespace Graphics;
+
+			SharedPtr<Texture2D> awesomeFaceTexture = Texture2D::Create("../Renaissance/assets/textures/awesomeface.png");
+			SharedPtr<Texture2D> grassTexture = Texture2D::Create("../Renaissance/assets/textures/grass.png");
+			SharedPtr<Texture2D> containerTexture = Texture2D::Create("../Renaissance/assets/textures/container.jpg");
+
+			Entity awesomeFace = mScene->CreateEntity();
+			awesomeFace.AddComponent<SpriteRendererComponent>(awesomeFaceTexture);
+
+			Entity container = mScene->CreateEntity();
+			container.AddComponent<SpriteRendererComponent>(containerTexture, Vector2(0.5f));
+			container.SetLocation(Vector3(1.0f, -0.2f, 0.0f));
+
+			Entity grass = mScene->CreateEntity();
+			grass.AddComponent<SpriteRendererComponent>(grassTexture);
+			grass.SetLocation(Vector3(-0.5f, -0.2f, 0.0f));
+		}
 	}
 
 	void EditorLayer::OnDetached()
@@ -92,6 +116,7 @@ namespace Renaissance
 					else
 					{
 						mViewports[i] = mWindowStack.CreateNewWindow<EditorViewportWindow>(itemName);
+						mViewports[i].lock()->SetScene(mScene);
 					}
 				}
 			}

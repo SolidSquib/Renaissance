@@ -104,6 +104,22 @@ namespace Renaissance::Graphics
 		}
 	}
 	
+	void SpriteBatch::Draw(const Vector2& location, const SpriteRendererComponent& spriteComponent)
+	{
+		Draw(Vector3(location, 1.0f), spriteComponent);
+	}
+
+	void SpriteBatch::Draw(const Vector3& location, const SpriteRendererComponent& spriteComponent)
+	{
+		Matrix4 transform = glm::translate(IdentityMatrix, location);
+		Draw(transform, spriteComponent);
+	}
+
+	void SpriteBatch::Draw(const Matrix4& transform, const SpriteRendererComponent& spriteComponent)
+	{
+		Draw(transform, spriteComponent.Size, spriteComponent.Texture, spriteComponent.TilingFactor, spriteComponent.Color);
+	}
+
 	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const Vector4& tint)
 	{
 		Draw(Vector3(location, 0.0f), size, WhiteTexture, Vector2(0.0f), Vector2(1.0f), Vector2(1.0), tint);

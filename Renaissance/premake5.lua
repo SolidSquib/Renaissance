@@ -18,6 +18,7 @@ project "Renaissance"
 		"src/Renaissance/Core/**.cpp",		
 		"src/Renaissance/Graphics/**.cpp",
 		"src/Renaissance/UserInterface/**.cpp",
+		"src/Renaissance/Scene/**.cpp",
 		"externals/stb_image/stb_image.cpp"
 	}
 
@@ -29,7 +30,8 @@ project "Renaissance"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 	
 	links

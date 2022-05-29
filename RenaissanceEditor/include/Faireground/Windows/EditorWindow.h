@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Renaissance/Core/Core.h"
-#include "Renaissance/Editor/EditorCameraController.h"
 #include "Renaissance/Graphics/FrameBuffer.h"
 
 #include "imgui.h"
