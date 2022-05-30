@@ -5,9 +5,12 @@
 
 #include "Renaissance/Graphics/SubTexture.h"
 #include "Renaissance/Graphics/VertexArray.h"
+#include "Renaissance/Graphics/Camera.h"
 
 namespace Renaissance
 {
+	class ScriptableEntity;
+
 	struct TransformComponent
 	{
 		TransformComponent() = default;
@@ -51,5 +54,22 @@ namespace Renaissance
 
 	struct CameraComponent
 	{
+		SharedPtr<Graphics::Camera> mCamera;
+	};
+
+	struct NativeScriptComponent
+	{
+		template<typename T> 
+		void Bind()
+		{
+			InstantiateScript = []() { return (ScriptableEntity*)new T(); };
+			DestroyScript = [](NativeScriptComponent* self) { delete (T*)self->mEntity; self->mEntity = nullptr; };
+		}
+		
+		ScriptableEntity*(*InstantiateScript)();
+		void(*DestroyScript)(NativeScriptComponent*);
+		//void(*UpdateScript)(float);
+
+		ScriptableEntity* mEntity = nullptr;
 	};
 }

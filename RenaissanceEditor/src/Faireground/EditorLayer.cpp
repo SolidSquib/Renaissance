@@ -36,6 +36,25 @@ namespace Renaissance
 			Entity grass = mScene->CreateEntity();
 			grass.AddComponent<SpriteRendererComponent>(grassTexture);
 			grass.SetLocation(Vector3(-0.5f, -0.2f, 0.0f));
+
+			class TestScriptableEntity : public ScriptableEntity
+			{
+			public:
+				virtual void OnCreate() override {
+					REN_CORE_WARN("Test object created");
+				}
+
+				virtual void OnDestroy() override {
+					REN_CORE_WARN("Test object DESTROYED");
+				}
+
+				virtual void OnUpdate(float deltaTime)
+				{
+					REN_CORE_WARN("Tick object");
+				}
+			};
+
+			grass.AddComponent<NativeScriptComponent>().Bind<TestScriptableEntity>();
 		}
 	}
 
