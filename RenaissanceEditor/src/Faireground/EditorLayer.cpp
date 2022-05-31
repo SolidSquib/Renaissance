@@ -40,15 +40,15 @@ namespace Renaissance
 			class TestScriptableEntity : public ScriptableEntity
 			{
 			public:
-				virtual void OnCreate() override {
+				void OnCreate() {
 					REN_CORE_WARN("Test object created");
 				}
 
-				virtual void OnDestroy() override {
+				void OnDestroy() {
 					REN_CORE_WARN("Test object DESTROYED");
 				}
 
-				virtual void OnUpdate(float deltaTime)
+				void OnUpdate(float deltaTime)
 				{
 					REN_CORE_WARN("Tick object");
 				}

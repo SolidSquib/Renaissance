@@ -79,11 +79,6 @@ namespace Renaissance
 		template<typename T>
 		bool HasComponent() const { return mEntity.HasComponent<T>(); }
 
-	protected:
-		virtual void OnCreate() {}
-		virtual void OnUpdate(float deltaTime) {}
-		virtual void OnDestroy() {}
-
 	private:
 		Entity mEntity;
 

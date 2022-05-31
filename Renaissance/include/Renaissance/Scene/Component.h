@@ -57,18 +57,47 @@ namespace Renaissance
 		SharedPtr<Graphics::Camera> mCamera;
 	};
 
+#define DEFINE_HAS_MEMBER(member_name)                                         \
+    template <typename T>                                                      \
+    class has_member_##member_name                                             \
+    {                                                                          \
+        typedef char yes_type;                                                 \
+        typedef long no_type;                                                  \
+        template <typename U> static yes_type test(decltype(&U::member_name)); \
+        template <typename U> static no_type  test(...);                       \
+    public:                                                                    \
+        static constexpr bool value = sizeof(test<T>(0)) == sizeof(yes_type);  \
+    }
+
+#define HAS_MEMBER(class_, member_name, ...)  has_member_##member_name<class_, __VA_ARGS__>::value
+
 	struct NativeScriptComponent
 	{
+		DEFINE_HAS_MEMBER(OnCreate);
+		DEFINE_HAS_MEMBER(OnDestroy);
+		DEFINE_HAS_MEMBER(OnUpdate);
+
 		template<typename T> 
 		void Bind()
 		{
 			InstantiateScript = []() { return (ScriptableEntity*)new T(); };
 			DestroyScript = [](NativeScriptComponent* self) { delete (T*)self->mEntity; self->mEntity = nullptr; };
+
+			if constexpr (HAS_MEMBER(T, OnCreate))
+				ScriptableOnCreate = [](NativeScriptComponent* self) { ((T*)self->mEntity)->OnCreate(); };
+			if constexpr (HAS_MEMBER(T, OnDestroy))
+				ScriptableOnDestroy = [](NativeScriptComponent* self) { ((T*)self->mEntity)->OnDestroy(); };
+			if constexpr (HAS_MEMBER(T, OnUpdate))
+				ScriptableOnUpdate = [](NativeScriptComponent* self, float deltaTime) { ((T*)self->mEntity)->OnUpdate(deltaTime); };
 		}
 		
+		typedef void(*ScriptableFunctionPointer)(NativeScriptComponent*);
+
 		ScriptableEntity*(*InstantiateScript)();
 		void(*DestroyScript)(NativeScriptComponent*);
-		//void(*UpdateScript)(float);
+		void(*ScriptableOnCreate)(NativeScriptComponent*);
+		void(*ScriptableOnDestroy)(NativeScriptComponent*);
+		void(*ScriptableOnUpdate)(NativeScriptComponent*, float);
 
 		ScriptableEntity* mEntity = nullptr;
 	};

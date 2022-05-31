@@ -18,7 +18,9 @@ namespace Renaissance
 
 			if (scriptComponent.mEntity)
 			{
-				scriptComponent.mEntity->OnDestroy();
+				if (scriptComponent.ScriptableOnDestroy)
+					scriptComponent.ScriptableOnDestroy(&scriptComponent);
+
 				scriptComponent.DestroyScript(&scriptComponent);
 			}
 		});
@@ -48,10 +50,13 @@ namespace Renaissance
 			{
 				scriptComponent.mEntity = scriptComponent.InstantiateScript();
 				scriptComponent.mEntity->mEntity = { handle, this };
-				scriptComponent.mEntity->OnCreate();
+
+				if (scriptComponent.ScriptableOnCreate)
+					scriptComponent.ScriptableOnCreate(&scriptComponent);
 			}
 
-			scriptComponent.mEntity->OnUpdate(Application::Get().DeltaTime());
+			if (scriptComponent.ScriptableOnUpdate)
+				scriptComponent.ScriptableOnUpdate(&scriptComponent, Application::Get().DeltaTime());
 		});
 
 		{
