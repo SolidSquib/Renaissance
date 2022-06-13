@@ -16,7 +16,7 @@ namespace Sandbox
 		virtual void OnEvent(Events::Event& e) override;
 
 	private:
-		SharedPtr<Graphics::Camera> mSceneCamera;		
+		Graphics::Camera mSceneCamera;		
 		SharedPtr<Graphics::Texture2D> mAwesomeFace;
 		SharedPtr<Graphics::Texture2D> mGrass;
 		SharedPtr<Graphics::Texture2D> mContainer;

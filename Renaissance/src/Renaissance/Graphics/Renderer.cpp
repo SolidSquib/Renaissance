@@ -24,10 +24,9 @@ namespace Renaissance::Graphics
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginScene(const SharedPtr<Camera>& camera)
+	void Renderer::BeginScene(const Graphics::Camera& camera, const Matrix4& transform)
 	{
-		REN_CORE_ASSERT(camera, "Cannot render a scene without a valid camera!");
-		mCachedViewProjection = camera->GetViewProjectionMatrix();
+		mCachedViewProjection = camera.GetProjectionMatrix() * glm::inverse(transform);
 	}
 
 	void Renderer::EndScene()

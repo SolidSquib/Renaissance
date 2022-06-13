@@ -6,6 +6,7 @@
 #include "Renaissance/Graphics/Texture.h"
 #include "Renaissance/Graphics/VertexArray.h"
 #include "Renaissance/Graphics/Renderer.h"
+#include "Renaissance/Core/Application.h"
 
 namespace Renaissance::Graphics
 {
@@ -255,9 +256,10 @@ namespace Renaissance::Graphics
 		{
 			SharedTextureUnitPtr[i]->Bind(i);
 		}
-
+		
 		mShader->Bind();
 		mShader->SetMatrix4("u_ViewProjection", Renderer::Get().GetCachedViewProjection());
+
 
 		size_t dataSize = sizeof(VertexData) * mVertexCount;
 		SharedVertexBuffer->SetData(SharedVertexPtr, dataSize, 0);

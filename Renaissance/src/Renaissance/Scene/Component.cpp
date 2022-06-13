@@ -5,6 +5,6 @@ namespace Renaissance
 {
 	void TransformComponent::Translate(const Math::Vector3& translation)
 	{
-		Transform = glm::translate(Transform, translation);
+		Location += translation;
 	}
 }

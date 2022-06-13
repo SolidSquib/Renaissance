@@ -4,19 +4,23 @@
 #include "Renaissance/Graphics/Texture.h"
 #include "Renaissance/Scene/Entity.h"
 
+#include "Faireground/Windows/EditorViewportWindow.h"
+#include "Faireground/Windows/PropertyEditorWindow.h"
+#include "Faireground/Windows/SceneHierarchyWindow.h"
+
 namespace Renaissance
 {
+	MulticastDelegate<void(const Entity&)> EditorLayer::OnSelectionChanged;
+
 	void EditorLayer::OnAttached()
 	{
+		mActiveScene = MakeShared<Scene>();
 		Window& window = Application::Get().GetWindow();
 
-		mScene = MakeShared<Scene>();
+		WeakPtr<EditorViewportWindow> viewport = CreateNewWindow<EditorViewportWindow>(0, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
+		viewport.lock()->SetScene(mActiveScene);
 
-		SharedPtr<Graphics::Camera> viewportCamera = Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 1.0f, 0.1f, 500.0f);
-		viewportCamera->SetLocation(Math::Vector3(0.0f, 0.0f, 0.5f));
-
-		mViewports[0] = mWindowStack.CreateNewWindow<EditorViewportWindow>("Viewport", viewportCamera);
-		mViewports[0].lock()->SetScene(mScene);
+		CreateNewWindow<SceneHierarchyWindow>(mActiveScene);
 
 		// Set the scene
 		{
@@ -26,28 +30,20 @@ namespace Renaissance
 			SharedPtr<Texture2D> grassTexture = Texture2D::Create("../Renaissance/assets/textures/grass.png");
 			SharedPtr<Texture2D> containerTexture = Texture2D::Create("../Renaissance/assets/textures/container.jpg");
 
-			Entity awesomeFace = mScene->CreateEntity();
+			Entity awesomeFace = mActiveScene->CreateEntity("Awesome Face");
 			awesomeFace.AddComponent<SpriteRendererComponent>(awesomeFaceTexture);
 
-			Entity container = mScene->CreateEntity();
+			Entity container = mActiveScene->CreateEntity("Container");
 			container.AddComponent<SpriteRendererComponent>(containerTexture, Vector2(0.5f));
-			container.SetLocation(Vector3(1.0f, -0.2f, 0.0f));
+			container.SetLocation(Vector3(1.0f, -0.2f, -2.0f));
 
-			Entity grass = mScene->CreateEntity();
+			Entity grass = mActiveScene->CreateEntity("Grass");
 			grass.AddComponent<SpriteRendererComponent>(grassTexture);
-			grass.SetLocation(Vector3(-0.5f, -0.2f, 0.0f));
+			grass.SetLocation(Vector3(-0.5f, -0.2f, -2.0f));
 
 			class TestScriptableEntity : public ScriptableEntity
 			{
 			public:
-				void OnCreate() {
-					REN_CORE_WARN("Test object created");
-				}
-
-				void OnDestroy() {
-					REN_CORE_WARN("Test object DESTROYED");
-				}
-
 				void OnUpdate(float deltaTime)
 				{
 					REN_CORE_WARN("Tick object");
@@ -60,11 +56,12 @@ namespace Renaissance
 
 	void EditorLayer::OnDetached()
 	{
-
+		mWindows.clear();
 	}
 
 	void EditorLayer::OnUIRender()
 	{
+		static bool showEditor = true;
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
 		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
@@ -91,7 +88,7 @@ namespace Renaissance
 		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 		
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("Renaissance Editor", &mShowEditor, window_flags);
+		ImGui::Begin("Renaissance Editor", &showEditor, window_flags);
 		ImGui::PopStyleVar();
 
 		ImGui::PopStyleVar(2);
@@ -121,36 +118,73 @@ namespace Renaissance
 
 		if (ImGui::BeginMenu("Windows"))
 		{
-			String itemName = "";
-			for (uint32_t i = 0; i < MaxViewports; ++i)
+			if (ImGui::MenuItem("Property Editor", nullptr, false, GetWindowCount<PropertyEditorWindow>() == 0))
 			{
-				itemName = i == 0 ? "Viewport" : "Viewport " + std::to_string(i+1);
-				bool viewportEnabled = !mViewports[i].expired();
-				if (ImGui::MenuItem(itemName.c_str(), nullptr, viewportEnabled))
-				{
-					if (viewportEnabled)
-					{
-						mViewports[i].lock()->Close();
-					}
-					else
-					{
-						mViewports[i] = mWindowStack.CreateNewWindow<EditorViewportWindow>(itemName);
-						mViewports[i].lock()->SetScene(mScene);
-					}
-				}
+				CreateNewWindow<PropertyEditorWindow>();
 			}
+
+			if (ImGui::MenuItem("Scene Hierarchy", nullptr, false, GetWindowCount<SceneHierarchyWindow>() == 0))
+			{
+				CreateNewWindow<SceneHierarchyWindow>(mActiveScene);
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Add Viewport", nullptr))
+			{
+				uint32_t currentViewportCount = GetWindowCount<EditorViewportWindow>();
+				WeakPtr<EditorViewportWindow> viewport = CreateNewWindow<EditorViewportWindow>(currentViewportCount);
+				viewport.lock()->SetScene(mActiveScene);
+			}			
+
+			#if REN_DEBUG
+			ImGui::Separator();
+			if (ImGui::MenuItem("ImGui Demo Window", nullptr, false, !mShowDemoWindow))
+			{
+				mShowDemoWindow = true;
+			}
+			#endif
+
+
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
 
-		mWindowStack.OnDraw();
-
 		ImGui::End();
+
+		#if REN_DEBUG
+		if (mShowDemoWindow)
+			ImGui::ShowDemoWindow(&mShowDemoWindow);
+		#endif
+
+		for (auto it = mWindows.begin(); it != mWindows.end(); ++it)
+		{
+			(*it)->OnUIRender();
+		}
 	}
 
 	void EditorLayer::OnUpdate(float deltaTime)
 	{
-		
+		bool wantsInput = false;
+
+		for (auto it = mWindows.begin(); it != mWindows.end();)
+		{
+			(*it)->OnUpdate(deltaTime);
+
+			wantsInput |= (*it)->WantsInputFocus();
+
+			if ((*it)->WantsToClose())
+			{
+				(*it)->Close();
+				it = mWindows.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+		Application::Get().GetImGuiLayer().lock()->SetBlockEvents(!wantsInput);
 	}
 	
 	void EditorLayer::OnEvent(Events::Event& e)

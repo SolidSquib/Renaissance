@@ -14,21 +14,39 @@ namespace Renaissance
 
 	}
 
-	void Entity::SetLocation(const Math::Vector3& location)
-	{
-		TransformComponent& transformComponent = GetComponent<TransformComponent>();
-		transformComponent.Transform[3][0] = location.x;
-		transformComponent.Transform[3][1] = location.y;
-		transformComponent.Transform[3][2] = location.z;
-	}
-
 	Math::Vector3 Entity::GetLocation() const
 	{
 		const TransformComponent& transformComponent = GetComponent<TransformComponent>();
-		return Math::Vector3(
-			transformComponent.Transform[3][0],
-			transformComponent.Transform[3][1],
-			transformComponent.Transform[3][2]
-		);
+		return transformComponent.Location;
+	}
+
+	Math::Vector3 Entity::GetRotation() const
+	{
+		const TransformComponent& transformComponent = GetComponent<TransformComponent>();
+		return transformComponent.Rotation;
+	}
+
+	Math::Vector3 Entity::GetScale() const
+	{
+		const TransformComponent& transformComponent = GetComponent<TransformComponent>();
+		return transformComponent.Scale;
+	}
+
+	void Entity::SetLocation(const Math::Vector3& location)
+	{
+		TransformComponent& transformComponent = GetComponent<TransformComponent>();
+		transformComponent.Location = location;
+	}
+
+	void Entity::SetRotation(const Math::Vector3& rotation)
+	{
+		TransformComponent& transformComponent = GetComponent<TransformComponent>();
+		transformComponent.Rotation = rotation;
+	}
+
+	void Entity::SetScale(const Math::Vector3& scale)
+	{
+		TransformComponent& transformComponent = GetComponent<TransformComponent>();
+		transformComponent.Scale = scale;
 	}
 }

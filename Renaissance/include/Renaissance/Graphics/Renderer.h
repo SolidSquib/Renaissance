@@ -22,7 +22,7 @@ namespace Renaissance::Graphics
 
 		void OnWindowResize(uint32_t width, uint32_t height);
 
-		void BeginScene(const SharedPtr<Camera>& camera);
+		void BeginScene(const Graphics::Camera& camera, const Matrix4& transform);
 		void EndScene();
 
 		void Submit(const SharedPtr<Shader>& shader, const SharedPtr<VertexArray>& vertexArray, const Matrix4& transform = Matrix4(1.0f));

@@ -3,6 +3,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 // One day we can try to make our own math library maybe, or at least wrap this stuff so we don't need to include glm in all child projects.
 namespace Renaissance
 {

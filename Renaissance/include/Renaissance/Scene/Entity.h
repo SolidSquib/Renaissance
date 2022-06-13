@@ -13,8 +13,14 @@ namespace Renaissance
 		Entity(const entt::entity& entityId, Scene* scene);
 		virtual ~Entity();
 
-		void SetLocation(const Math::Vector3& location);
+		bool IsValid() const { return mHandle != entt::null && mScene != nullptr; }
+
 		Math::Vector3 GetLocation() const;
+		Math::Vector3 GetRotation() const;
+		Math::Vector3 GetScale() const;
+		void SetLocation(const Math::Vector3& location);
+		void SetRotation(const Math::Vector3& rotation);
+		void SetScale(const Math::Vector3& scale);
 
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args)
@@ -47,10 +53,24 @@ namespace Renaissance
 		template<typename T> 
 		bool HasComponent() const
 		{
+			REN_CORE_ASSERT(mScene, "Scene is not valid!");
 			return mScene->mRegistry.all_of<T>(mHandle);
 		}
 
-		operator const entt::entity& () const { return mHandle; }
+		explicit operator const entt::entity& () const { return mHandle; }
+		explicit operator uint32_t () const { return (uint32_t)mHandle; }
+
+		operator const bool() const { return IsValid(); }
+
+		bool operator!=(const Entity& other) const
+		{
+			return mHandle != other.mHandle || mScene != other.mScene;
+		}
+
+		bool operator==(const Entity& other) const
+		{
+			return !(*this != other);
+		}
 
 	private:
 		entt::entity mHandle = entt::null;
@@ -63,7 +83,13 @@ namespace Renaissance
 		ScriptableEntity() = default;
 		virtual ~ScriptableEntity() = default;
 		
-	public:
+		Math::Vector3 GetLocation() const { return mEntity.GetLocation(); }
+		Math::Vector3 GetRotation() const { return mEntity.GetRotation(); }
+		Math::Vector3 GetScale() const { return mEntity.GetScale(); }
+		void SetLocation(const Math::Vector3& location) { mEntity.SetLocation(location); }
+		void SetRotation(const Math::Vector3& rotation) { mEntity.SetRotation(rotation); }
+		void SetScale(const Math::Vector3& scale) { mEntity.SetScale(scale); }
+
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args) { return mEntity.AddComponent<T>(std::forward<Args>(args)...) }
 

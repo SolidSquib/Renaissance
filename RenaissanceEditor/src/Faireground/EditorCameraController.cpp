@@ -8,11 +8,13 @@
 
 namespace Renaissance
 {
-	EditorCameraController::EditorCameraController(SharedPtr<Graphics::Camera> camera)
+	EditorCameraController::EditorCameraController(const Graphics::Camera& camera)
 		: mCamera(camera)
 	{
 		auto [x, y] = InputManager::GetMousePosition();
 		mInitialMousePosition = { x, y };
+
+		mLocation.z = 1.0f;
 	}
 
 	void EditorCameraController::OnEvent(Event& e)
@@ -24,9 +26,9 @@ namespace Renaissance
 	void EditorCameraController::UpdateFirstPerson(Vector2 mouseDelta)
 	{
 		float deltaTime = Application::Get().DeltaTime();
-		mCamera->SetYaw(mCamera->GetYaw() + (mouseDelta.x * deltaTime * mCameraLookSpeed));
-		mCamera->SetPitch(mCamera->GetPitch() + (mouseDelta.y * deltaTime * mCameraLookSpeed));
-
+		mYaw += (mouseDelta.x * deltaTime * mCameraLookSpeed);
+		mPitch += (mouseDelta.y * deltaTime * mCameraLookSpeed);
+		
 		Vector3 inputVector = ZeroVector;
 
 		if (ImGui::IsKeyDown(KeyCode::W))
@@ -58,13 +60,11 @@ namespace Renaissance
 		{
 			Vector3 normalInput = glm::normalize(inputVector);
 
-			Vector3 cameraLocation = mCamera->GetLocation();
-			cameraLocation += (mCamera->GetForwardVector() * normalInput.z * deltaTime * mCameraPanSpeed);
-			cameraLocation += (mCamera->GetRightVector() * normalInput.x * deltaTime * mCameraPanSpeed);
-			cameraLocation += (WorldUp * normalInput.y * deltaTime * mCameraPanSpeed);
-
-			mCamera->SetLocation(cameraLocation);
+			mLocation += (GetForwardVector() * normalInput.z * deltaTime * mCameraPanSpeed);
+			mLocation += (GetRightVector() * normalInput.x * deltaTime * mCameraPanSpeed);
+			mLocation += (WorldUp * normalInput.y * deltaTime * mCameraPanSpeed);
 		}
+
 	}
 	
 	void EditorCameraController::UpdateDrag(Vector2 mouseDelta)
@@ -76,16 +76,16 @@ namespace Renaissance
 	{
 		const float step = 5.0f;
 		const float orthoStep = 0.2f;
-		mCamera->SetFieldOfView(mCamera->GetFieldOfView() + step);
-		mCamera->SetOrthoScale(mCamera->GetOrthoScale() + orthoStep);
+		mCamera.SetFieldOfView(mCamera.GetFieldOfView() + step);
+		mCamera.SetOrthoScale(mCamera.GetOrthoScale() + orthoStep);
 	}
 
 	void EditorCameraController::DecreaseFoV()
 	{
 		const float step = 5.0f;
 		const float orthoStep = 0.2f;
-		mCamera->SetFieldOfView(mCamera->GetFieldOfView() - step);
-		mCamera->SetOrthoScale(mCamera->GetOrthoScale() - orthoStep);
+		mCamera.SetFieldOfView(mCamera.GetFieldOfView() - step);
+		mCamera.SetOrthoScale(mCamera.GetOrthoScale() - orthoStep);
 	}
 
 	bool EditorCameraController::OnMouseScrolled(Events::MouseScrolledEvent& e)

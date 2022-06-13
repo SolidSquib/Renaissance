@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renaissance/Core/Core.h"
+#include "Renaissance/Core/Layer.h"
 #include "Renaissance/Graphics/FrameBuffer.h"
 
 #include "imgui.h"
@@ -12,33 +13,13 @@ namespace Renaissance
 	public:
 		virtual ~EditorWindow() = default;
 
-		virtual void Init() { }
-		virtual void OnDraw() = 0;
-		virtual void Close() = 0;
+		virtual void Open() { }
+		virtual void Close() { }
 
-		virtual bool WantsInputFocus() const = 0;
+		virtual void OnUpdate(float deltaTime) { }
+		virtual void OnUIRender() = 0;
+
+		virtual bool WantsInputFocus() const { return false; }
 		virtual bool WantsToClose() const = 0;
-		virtual const String& GetName() const = 0;
-	};
-
-	class EditorWindowStack
-	{
-	public:
-		EditorWindowStack() {}
-		~EditorWindowStack();
-
-		template <typename T, typename ... Args>
-		WeakPtr<T> CreateNewWindow(const String& name, Args&& ... args)
-		{
-			SharedPtr<T> newWindow = MakeShared<T>(name, std::forward<Args>(args)...);
-			mWindows.emplace_back(newWindow);
-			newWindow->Init();
-			return newWindow;
-		}
-
-		void OnDraw();
-
-	private:
-		std::vector<SharedPtr<EditorWindow>> mWindows;
 	};
 }

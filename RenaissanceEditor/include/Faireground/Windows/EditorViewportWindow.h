@@ -10,29 +10,30 @@ namespace Renaissance
 	class EditorViewportWindow : public EditorWindow
 	{
 	public:
-		EditorViewportWindow(const String& name);
-		EditorViewportWindow(const String& name, const SharedPtr<Graphics::Camera>& camera);
+		EditorViewportWindow(uint32_t viewportIndex);
+		EditorViewportWindow(uint32_t viewportIndex, const Graphics::Camera& camera);
 
-		virtual void OnDraw() override;
+		virtual void OnUpdate(float deltaTime) override;
+		virtual void OnUIRender() override;
 
-		virtual void Close() override { mClose = true; }
+		virtual void Close() override { mOpen = false; }
 
 		virtual bool WantsInputFocus() const override { return mFocused; }
-		virtual bool WantsToClose() const override { return mClose; }
-		virtual const String& GetName() const override { return mName; }
+		virtual bool WantsToClose() const override { return !mOpen; }
 
 		inline void SetScene(const SharedPtr<Scene>& scene) { mScene = scene; }
 
 	private:
-		bool mClose = false;
+		bool mOpen = true;
 		bool mFocused = false;
+		String mViewportName = "Viewport";
 
-		String mName;
 		Vector2 mCachedViewportSize{ 1280.0f, 720.0f };
 		Vector2 mLastMousePosition{ 0.0f, 0.0f };
 
+		EditorCameraController mViewportCameraController;
+
 		SharedPtr<Graphics::FrameBuffer> mViewportFrameBuffer;
-		SharedPtr<EditorCameraController> mViewportCameraController;
 		SharedPtr<Scene> mScene = nullptr;
 	};
 }

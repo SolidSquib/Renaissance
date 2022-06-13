@@ -7,13 +7,15 @@ namespace Renaissance
 	//// EditorViewportWindow ////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////
 
-	EditorViewportWindow::EditorViewportWindow(const String& name)
-		: EditorViewportWindow(name, Graphics::Camera::MakePerspective(mCachedViewportSize.x, mCachedViewportSize.y))
+	EditorViewportWindow::EditorViewportWindow(uint32_t viewportIndex)
+		: EditorViewportWindow(viewportIndex, Graphics::Camera::MakePerspective(mCachedViewportSize.x, mCachedViewportSize.y))
 	{ }
 
-	EditorViewportWindow::EditorViewportWindow(const String& name, const SharedPtr<Graphics::Camera>& camera)
-		: mName(name), mViewportCameraController(MakeShared<EditorCameraController>(camera))
+	EditorViewportWindow::EditorViewportWindow(uint32_t viewportIndex, const Graphics::Camera& camera)
+		: mViewportCameraController(camera)
 	{
+		String itemName = viewportIndex == 0 ? "Viewport" : "Viewport " + std::to_string(viewportIndex + 1);
+
 		Graphics::FrameBuffer::Specification spec;
 		spec.Width = (uint32_t)mCachedViewportSize.x;
 		spec.Height = (uint32_t)mCachedViewportSize.y;
@@ -24,10 +26,20 @@ namespace Renaissance
 		mViewportFrameBuffer = Graphics::FrameBuffer::Create(spec, sceneBufferLayout);
 	}
 
-	void EditorViewportWindow::OnDraw()
+	void EditorViewportWindow::OnUpdate(float deltaTime)
+	{
+		mScene->OnEditorUpdate(deltaTime);
+
+		mViewportFrameBuffer->Bind();
+		Graphics::RenderCommand::Clear(0);
+		mScene->OnRender(mViewportCameraController.GetCamera(), mViewportCameraController.GetTransform());
+		mViewportFrameBuffer->Unbind();
+	}
+
+	void EditorViewportWindow::OnUIRender()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin(GetName().c_str());
+		ImGui::Begin(mViewportName.c_str(), &mOpen);
 		{
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			Vector2 glmPanelSize = { viewportPanelSize.x, viewportPanelSize.y };
@@ -35,7 +47,7 @@ namespace Renaissance
 			{
 				mCachedViewportSize = glmPanelSize;
 				mViewportFrameBuffer->Resize((uint32_t)mCachedViewportSize.x, (uint32_t)mCachedViewportSize.y);
-				mViewportCameraController->GetCamera().lock()->SetViewportSize(mCachedViewportSize.x, mCachedViewportSize.y);
+				mViewportCameraController.SetViewportSize(mCachedViewportSize.x, mCachedViewportSize.y);
 			}
 
 			static bool showBuffer = true;
@@ -46,7 +58,7 @@ namespace Renaissance
 
 				uint32_t sceneBufferColorId = mViewportFrameBuffer->GetAttachmentRendererId(Graphics::FrameBufferAttachmentType::Color);
 				ImGui::Image((void*)(uint64_t)sceneBufferColorId, { mCachedViewportSize.x, mCachedViewportSize.y }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
-								
+
 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && acceptMouseInput)
 				{
 					ImGui::SetWindowFocus();
@@ -58,7 +70,7 @@ namespace Renaissance
 				{
 					Vector2 mouseDelta = Vector2(currentMousePos.x, currentMousePos.y) - mLastMousePosition;
 					mLastMousePosition = { currentMousePos.x, currentMousePos.y };
-					mViewportCameraController->UpdateFirstPerson(mouseDelta);
+					mViewportCameraController.UpdateFirstPerson(mouseDelta);
 				}
 				else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
 				{
@@ -70,11 +82,11 @@ namespace Renaissance
 				{
 					if (ImGui::IsKeyPressed(KeyCode::PageDown, false))
 					{
-						mViewportCameraController->DecreaseFoV();
+						mViewportCameraController.DecreaseFoV();
 					}
 					else if (ImGui::IsKeyPressed(KeyCode::PageUp, false))
 					{
-						mViewportCameraController->IncreaseFoV();
+						mViewportCameraController.IncreaseFoV();
 					}
 				}
 			}
@@ -83,14 +95,5 @@ namespace Renaissance
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();
-
-		Graphics::Renderer::Get().BeginScene(mViewportCameraController->GetCamera().lock());
-
-		mViewportFrameBuffer->Bind();
-		Graphics::RenderCommand::Clear(0);
-		mScene->Draw();
-		mViewportFrameBuffer->Unbind();
-
-		Graphics::Renderer::Get().EndScene();
 	}
 }

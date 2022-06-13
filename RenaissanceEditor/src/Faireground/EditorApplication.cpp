@@ -11,7 +11,7 @@ namespace Renaissance
 		EditorApplication(const std::string& name, ApplicationCommandLineArgs args)
 			: Application(name, args)
 		{
-			mSandbox2D = CreateNewLayer<EditorLayer>();
+			mEditor = CreateNewLayer<EditorLayer>();
 		}
 
 		virtual ~EditorApplication()
@@ -19,7 +19,7 @@ namespace Renaissance
 		}
 
 	private:
-		WeakPtr<EditorLayer> mSandbox2D;
+		WeakPtr<EditorLayer> mEditor;
 	};
 
 	Application* Renaissance::CreateApplication(Renaissance::ApplicationCommandLineArgs args)

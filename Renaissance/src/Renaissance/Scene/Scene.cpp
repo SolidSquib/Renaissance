@@ -30,20 +30,30 @@ namespace Renaissance
 
 	Entity Scene::CreateEntity()
 	{
+		static uint32_t unnamedEntityCount = 0;
+		return CreateEntity("Entity_" + std::to_string(unnamedEntityCount++));
+	}
+
+	Entity Scene::CreateEntity(const String& name)
+	{
 		Entity entity(mRegistry.create(), this);
+		entity.AddComponent<IdentifierComponent>(name);
 		entity.AddComponent<TransformComponent>();
 		return entity;
 	}
 
 	void Scene::DestroyEntity(const Entity& entity)
 	{
-		mRegistry.destroy(entity);
+		mRegistry.destroy((entt::entity)entity);
 	}
 
-	void Scene::Draw()
+	void Scene::OnEditorUpdate(float deltaTime)
 	{
-		using namespace Graphics;
 
+	}
+
+	void Scene::OnUpdate(float deltaTime)
+	{
 		mRegistry.view<NativeScriptComponent>().each([this](auto handle, NativeScriptComponent& scriptComponent) {
 
 			if (!scriptComponent.mEntity)
@@ -57,13 +67,33 @@ namespace Renaissance
 
 			if (scriptComponent.ScriptableOnUpdate)
 				scriptComponent.ScriptableOnUpdate(&scriptComponent, Application::Get().DeltaTime());
-		});
+		});		
+	}
 
+	void Scene::OnRender(const Graphics::Camera& camera, const Math::Matrix4& transform)
+	{
 		{
+			using namespace Graphics;
+
+			Renderer::Get().BeginScene(camera, transform);
+
 			SpriteBatch spriteBatch;
 			mRegistry.group<TransformComponent, SpriteRendererComponent>().each([this, &spriteBatch](auto handle, TransformComponent& transform, SpriteRendererComponent& spriteRenderer) {
 
 				spriteBatch.Draw(transform, spriteRenderer);
+			});
+
+			Renderer::Get().EndScene();
+		}
+	}
+
+	void Scene::IterateEntities(IteratorFunction function, void* data /*= nullptr*/)
+	{
+		if (function)
+		{
+			mRegistry.each([&](entt::entity handle) {
+
+				function(Entity(handle, this), data);
 			});
 		}
 	}

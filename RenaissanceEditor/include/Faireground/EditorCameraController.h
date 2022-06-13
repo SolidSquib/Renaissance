@@ -15,7 +15,7 @@ namespace Renaissance
 	class EditorCameraController
 	{
 	public:
-		EditorCameraController(SharedPtr<Graphics::Camera> camera);
+		EditorCameraController(const Graphics::Camera& camera);
 
 		void OnEvent(Events::Event& e);
 
@@ -29,10 +29,20 @@ namespace Renaissance
 
 		bool WantsConsumeMouseInput() const { return mConsumeMouseMoveInput; }
 
-		WeakPtr<Graphics::Camera> GetCamera() const { return mCamera; }
+		const Graphics::Camera& GetCamera() const { return mCamera; }
+		Matrix4 GetTransform() const { return glm::translate(IdentityMatrix, mLocation) * glm::toMat4(GetOrientation()); }
+		Quat GetOrientation() const { return Quat(Vector3(-mPitch, -mYaw, -mRoll)); }
+		Vector3 GetUpVector() const { return glm::rotate(GetOrientation(), WorldUp); }
+		Vector3 GetRightVector() const { return glm::rotate(GetOrientation(), WorldRight); }
+		Vector3 GetForwardVector() const { return glm::rotate(GetOrientation(), WorldForward); }
+		void SetViewportSize(float width, float height) { mCamera.SetViewportSize(width, height); }
 
 	private:
-		SharedPtr<Graphics::Camera> mCamera = nullptr;
+		Graphics::Camera mCamera;
+
+		Vector3 mLocation = ZeroVector;
+		float mPitch = 0.0f, mYaw = 0.0f, mRoll = 0.0f;
+
 		float mCameraPanSpeed = 5.0f;
 		float mCameraLookSpeed = 0.5f;
 		bool mConsumeMouseMoveInput = false;

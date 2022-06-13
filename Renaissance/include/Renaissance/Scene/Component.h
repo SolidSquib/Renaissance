@@ -11,19 +11,34 @@ namespace Renaissance
 {
 	class ScriptableEntity;
 
+	struct IdentifierComponent
+	{
+		IdentifierComponent(const String& name)
+			: Name(name)
+		{ }
+
+		String Name;
+	};
+
 	struct TransformComponent
 	{
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const Math::Matrix4& transform)
-			: Transform(transform)
+		TransformComponent(const Math::Vector3& location, const Math::Vector3& rotation, const Math::Vector3& scale = Math::Vector3(1.0f))
+			: Location(location), Rotation(rotation), Scale(scale)
 		{}
 
 		void Translate(const Math::Vector3& translation);
+		Math::Matrix4 GetTransform() const
+		{
+			return glm::translate(Math::IdentityMatrix, Location) * glm::toMat4(Math::Quat(Rotation)) * glm::scale(Math::IdentityMatrix, Scale);
+		}
 
-		operator const Math::Matrix4& () const { return Transform; }
+		operator Math::Matrix4() const { return GetTransform(); }
 
-		Math::Matrix4 Transform = Math::IdentityMatrix;
+		Math::Vector3 Location{ 0.0f };
+		Math::Vector3 Rotation{ 0.0f }; // Pitch, Yaw, Roll
+		Math::Vector3 Scale{ 1.0f };
 	};
 
 	struct SpriteRendererComponent 
@@ -54,7 +69,30 @@ namespace Renaissance
 
 	struct CameraComponent
 	{
-		SharedPtr<Graphics::Camera> mCamera;
+		CameraComponent() = default;
+		CameraComponent(const Graphics::Camera& camera) : Cam(camera)
+		{}
+
+		Math::Matrix4 GetProjectionMatrix() const { return Cam.GetProjectionMatrix(); }
+
+		float GetViewportWidth() const { return Cam.GetViewportWidth(); }
+		float GetViewportHeight() const { return Cam.GetViewportHeight(); }
+		float GetFieldOfView() const { return Cam.GetFieldOfView(); }
+		float GetOrthoScale() const { return Cam.GetOrthoScale(); }
+		float GetNearClipping() const { return Cam.GetNearClipping(); }
+		float GetFarClipping() const { return Cam.GetFarClipping(); }
+
+		void SetViewportSize(float width, float height) { Cam.SetViewportSize(width, height); }
+		void SetFieldOfView(float fovDegrees) { Cam.SetFieldOfView(fovDegrees); }
+		void SetOrthoScale(float orthoScale) { Cam.SetOrthoScale(orthoScale); }
+		void SetNearClipping(float nearClip) { Cam.SetNearClipping(nearClip); }
+		void SetFarClipping(float farClip) { Cam.SetFarClipping(farClip); }
+
+		void SetCamera(const Graphics::Camera& camera) { Cam = camera; }
+
+		operator const Graphics::Camera& () const { return Cam; }
+
+		Graphics::Camera Cam;
 	};
 
 #define DEFINE_HAS_MEMBER(member_name)                                         \
