@@ -18,15 +18,21 @@ namespace Renaissance
 
 		virtual void Close() override { mOpen = false; }
 
-		virtual bool WantsInputFocus() const override { return mFocused; }
+		virtual bool WantsInputFocus() const override { return mButtonFocus != ImGuiMouseButton_COUNT; }
 		virtual bool WantsToClose() const override { return !mOpen; }
 
-		inline void SetScene(const SharedPtr<Scene>& scene) { mScene = scene; }
+		void DrawViewportSettings();
 
 	private:
 		bool mOpen = true;
-		bool mFocused = false;
+		ImGuiMouseButton mButtonFocus = ImGuiMouseButton_COUNT;
 		String mViewportName = "Viewport";
+		int mGizmoManipulateOperation = 0;
+		uint32_t mGizmoManipulateSpace = 0;
+		bool mGizmoEnableTranslationSnapping = false;
+		bool mGizmoEnableRotationSnapping = false;
+		float mGizmoTranslationSnapping = 0.5f;
+		float mGizmoRotationSnapping = 45.0f;
 
 		Vector2 mCachedViewportSize{ 1280.0f, 720.0f };
 		Vector2 mLastMousePosition{ 0.0f, 0.0f };
@@ -34,6 +40,5 @@ namespace Renaissance
 		EditorCameraController mViewportCameraController;
 
 		SharedPtr<Graphics::FrameBuffer> mViewportFrameBuffer;
-		SharedPtr<Scene> mScene = nullptr;
 	};
 }

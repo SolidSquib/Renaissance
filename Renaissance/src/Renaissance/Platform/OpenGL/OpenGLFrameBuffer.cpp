@@ -43,6 +43,7 @@ namespace Renaissance::Graphics
 		if (mRendererId != 0)
 		{
 			glDeleteFramebuffers(1, &mRendererId);
+			mRendererId = 0;
 		}
 
 		for (auto iter = mLayout.begin(); iter != mLayout.end(); ++iter)

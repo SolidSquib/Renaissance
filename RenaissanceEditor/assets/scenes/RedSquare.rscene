@@ -1,0 +1,13 @@
+Scene: Sample_Text
+Entities:
+  - ID: goeiurhgoisdf344235409un34
+    IdentifierComponent:
+      Name: RedSquare
+    TransformComponent:
+      Location: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Tint: [1, 0, 0, 1]
+      Size: [1, 1]
+      TilingFactor: [1, 1]

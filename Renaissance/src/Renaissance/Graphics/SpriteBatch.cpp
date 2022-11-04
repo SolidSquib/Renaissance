@@ -118,7 +118,14 @@ namespace Renaissance::Graphics
 
 	void SpriteBatch::Draw(const Matrix4& transform, const SpriteRendererComponent& spriteComponent)
 	{
-		Draw(transform, spriteComponent.Size, spriteComponent.Texture, spriteComponent.TilingFactor, spriteComponent.Color);
+		if (spriteComponent.Texture)
+		{
+			Draw(transform, spriteComponent.Size, spriteComponent.Texture, spriteComponent.TilingFactor, spriteComponent.Color);
+		}
+		else
+		{
+			Draw(transform, spriteComponent.Size, WhiteTexture, Vector2(0.0f), Vector2(1.0f), spriteComponent.TilingFactor, spriteComponent.Color);
+		}		
 	}
 
 	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const Vector4& tint)
@@ -202,9 +209,9 @@ namespace Renaissance::Graphics
 		Vector2 textureCoords[] =
 		{
 			textureCoordMin,
-			Vector2(textureCoordMax.x, textureCoordMin.y),
-			textureCoordMax,
-			Vector2(textureCoordMin.x, textureCoordMax.y)
+			Vector2(textureCoordMax.x * tilingFactor.x, textureCoordMin.y),
+			textureCoordMax * tilingFactor,
+			Vector2(textureCoordMin.x, textureCoordMax.y * tilingFactor.y)
 		};
 
 		Vector4 scale(size, 1.0f, 1.0f);

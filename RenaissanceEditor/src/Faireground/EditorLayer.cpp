@@ -3,24 +3,43 @@
 
 #include "Renaissance/Graphics/Texture.h"
 #include "Renaissance/Scene/Entity.h"
+#include "Renaissance/Scene/SceneSerializer.h"
+#include "Renaissance/Utilities/PlatformUtilities.h"
 
 #include "Faireground/Windows/EditorViewportWindow.h"
 #include "Faireground/Windows/PropertyEditorWindow.h"
 #include "Faireground/Windows/SceneHierarchyWindow.h"
 
+#include "ImGuizmo.h"
+
 namespace Renaissance
 {
-	MulticastDelegate<void(const Entity&)> EditorLayer::OnSelectionChanged;
+	SharedPtr<Scene> EditorLayer::sActiveScene;
+	Entity EditorLayer::sSelectedEntity;
+
+	WeakPtr<Scene> EditorLayer::GetActiveScene()
+	{
+		return sActiveScene;
+	}
+
+	Entity EditorLayer::GetSelectedEntity()
+	{
+		return sSelectedEntity;
+	}
+
+	void EditorLayer::SetSelectedEntity(Entity entity)
+	{
+		sSelectedEntity = entity;
+	}
 
 	void EditorLayer::OnAttached()
 	{
-		mActiveScene = MakeShared<Scene>();
+		sActiveScene = MakeShared<Scene>();
 		Window& window = Application::Get().GetWindow();
 
-		WeakPtr<EditorViewportWindow> viewport = CreateNewWindow<EditorViewportWindow>(0, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
-		viewport.lock()->SetScene(mActiveScene);
-
-		CreateNewWindow<SceneHierarchyWindow>(mActiveScene);
+		CreateNewWindow<EditorViewportWindow>(0, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
+		CreateNewWindow<SceneHierarchyWindow>();
+		CreateNewWindow<PropertyEditorWindow>();
 
 		// Set the scene
 		{
@@ -30,14 +49,15 @@ namespace Renaissance
 			SharedPtr<Texture2D> grassTexture = Texture2D::Create("../Renaissance/assets/textures/grass.png");
 			SharedPtr<Texture2D> containerTexture = Texture2D::Create("../Renaissance/assets/textures/container.jpg");
 
-			Entity awesomeFace = mActiveScene->CreateEntity("Awesome Face");
+			Entity awesomeFace = sActiveScene->CreateEntity("Awesome Face");
 			awesomeFace.AddComponent<SpriteRendererComponent>(awesomeFaceTexture);
 
-			Entity container = mActiveScene->CreateEntity("Container");
+			Entity container = sActiveScene->CreateEntity("Container");
 			container.AddComponent<SpriteRendererComponent>(containerTexture, Vector2(0.5f));
+			container.AddComponent<CameraComponent>();
 			container.SetLocation(Vector3(1.0f, -0.2f, -2.0f));
 
-			Entity grass = mActiveScene->CreateEntity("Grass");
+			Entity grass = sActiveScene->CreateEntity("Grass");
 			grass.AddComponent<SpriteRendererComponent>(grassTexture);
 			grass.SetLocation(Vector3(-0.5f, -0.2f, -2.0f));
 
@@ -61,6 +81,8 @@ namespace Renaissance
 
 	void EditorLayer::OnUIRender()
 	{
+		ImGuizmo::BeginFrame();
+
 		static bool showEditor = true;
 		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
@@ -108,6 +130,21 @@ namespace Renaissance
 		ImGui::BeginMenuBar();
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::MenuItem("New"))
+			{
+				NewScene();
+			}
+
+			if (ImGui::MenuItem("Open...", "Ctrl+O"))
+			{
+				OpenScene();
+			}
+
+			if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+			{
+				SaveSceneAs();
+			}
+
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit", nullptr, false, true))
 			{
@@ -125,7 +162,7 @@ namespace Renaissance
 
 			if (ImGui::MenuItem("Scene Hierarchy", nullptr, false, GetWindowCount<SceneHierarchyWindow>() == 0))
 			{
-				CreateNewWindow<SceneHierarchyWindow>(mActiveScene);
+				CreateNewWindow<SceneHierarchyWindow>();
 			}
 
 			ImGui::Separator();
@@ -134,7 +171,6 @@ namespace Renaissance
 			{
 				uint32_t currentViewportCount = GetWindowCount<EditorViewportWindow>();
 				WeakPtr<EditorViewportWindow> viewport = CreateNewWindow<EditorViewportWindow>(currentViewportCount);
-				viewport.lock()->SetScene(mActiveScene);
 			}			
 
 			#if REN_DEBUG
@@ -189,6 +225,41 @@ namespace Renaissance
 	
 	void EditorLayer::OnEvent(Events::Event& e)
 	{
-		
+		Events::EventDispatcher dispatcher(e);
+
+	}
+
+	void EditorLayer::NewScene()
+	{
+		sActiveScene = MakeShared<Scene>();
+		sSelectedEntity = {};
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		String filePath = FileDialogs::OpenFile("Ren Scene (*.rscene)\0*.rscene\0");
+		if (!filePath.empty())
+		{
+			sActiveScene = MakeShared<Scene>();
+			sSelectedEntity = {};
+			SceneSerializer serializer(sActiveScene);
+			serializer.DeserializeText(filePath);
+		}
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		String filePath = FileDialogs::SaveFile("Ren Scene (*.rscene)\0*.rscene\0");
+		if (!filePath.empty())
+		{
+			size_t fileExtensionString = filePath.rfind(".rscene");
+			if (fileExtensionString == String::npos)
+			{
+				filePath.append(".rscene");
+			}
+
+			SceneSerializer serializer(sActiveScene);
+			serializer.SerializeText(filePath);
+		}
 	}
 }

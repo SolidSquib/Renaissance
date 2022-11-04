@@ -31,7 +31,7 @@ namespace Renaissance
 		void Translate(const Math::Vector3& translation);
 		Math::Matrix4 GetTransform() const
 		{
-			return glm::translate(Math::IdentityMatrix, Location) * glm::toMat4(Math::Quat(Rotation)) * glm::scale(Math::IdentityMatrix, Scale);
+			return glm::translate(Math::IdentityMatrix, Location) * glm::toMat4(Math::Quat(glm::radians(Rotation))) * glm::scale(Math::IdentityMatrix, Scale);
 		}
 
 		operator Math::Matrix4() const { return GetTransform(); }
@@ -81,16 +81,21 @@ namespace Renaissance
 		float GetOrthoScale() const { return Cam.GetOrthoScale(); }
 		float GetNearClipping() const { return Cam.GetNearClipping(); }
 		float GetFarClipping() const { return Cam.GetFarClipping(); }
+		bool IsOrthographic() const { return Cam.IsOrthographic(); }
 
 		void SetViewportSize(float width, float height) { Cam.SetViewportSize(width, height); }
 		void SetFieldOfView(float fovDegrees) { Cam.SetFieldOfView(fovDegrees); }
 		void SetOrthoScale(float orthoScale) { Cam.SetOrthoScale(orthoScale); }
 		void SetNearClipping(float nearClip) { Cam.SetNearClipping(nearClip); }
 		void SetFarClipping(float farClip) { Cam.SetFarClipping(farClip); }
+		void SetOrthographic() { Cam.SetOrthographic(); }
+		void SetPerspective() { Cam.SetPerspective(); }
 
+		Graphics::Camera& GetCameraMutable() { return Cam; }
+		const Graphics::Camera& GetCamera() const { return Cam; }
 		void SetCamera(const Graphics::Camera& camera) { Cam = camera; }
-
-		operator const Graphics::Camera& () const { return Cam; }
+		
+		operator const Graphics::Camera& () const { return GetCamera(); }
 
 		Graphics::Camera Cam;
 	};

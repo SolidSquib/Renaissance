@@ -109,5 +109,6 @@ namespace Renaissance
 		Entity mEntity;
 
 		friend class Scene;
+		friend class SceneSerializer;
 	};
 }

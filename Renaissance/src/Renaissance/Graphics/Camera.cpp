@@ -19,20 +19,22 @@ namespace Renaissance::Graphics
 
 	Camera::Camera(const Camera& other)
 		: mProjection(other.mProjection), mViewWidth(other.mViewWidth), mViewHeight(other.mViewHeight), 
-		mFov(other.mFov), mOrthoScale(other.mOrthoScale), mNear(other.mNear), mFar(other.mFar), mIsOrthographic(other.mIsOrthographic)
+		mFov(other.mFov), mOrthoScale(other.mOrthoScale), mNear(other.mNear), mFar(other.mFar), mProjectionMode(other.mProjectionMode)
 	{ }
 
 	void Camera::UpdateProjection()
 	{
 		float aspectRatio = mViewWidth / mViewHeight;
 
-		if (mIsOrthographic)
+		switch (mProjectionMode)
 		{
-			mProjection = glm::ortho(-aspectRatio * mOrthoScale, aspectRatio * mOrthoScale, -mOrthoScale, mOrthoScale, mNear, mFar);
-		}
-		else
-		{
+		case ProjectionMode::Perspective:
 			mProjection = glm::perspective(glm::radians(mFov), aspectRatio, mNear, mFar);
+			break;
+
+		case ProjectionMode::Orthographic:
+			mProjection = glm::ortho(-aspectRatio * mOrthoScale, aspectRatio * mOrthoScale, -mOrthoScale, mOrthoScale, mNear, mFar);
+			break;
 		}
 	}
 

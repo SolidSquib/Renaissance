@@ -87,13 +87,13 @@ namespace Renaissance
 		}
 	}
 
-	void Scene::IterateEntities(IteratorFunction function, void* data /*= nullptr*/)
+	void Scene::IterateEntities(IteratorFunction function, Entity selectionContext)
 	{
 		if (function)
 		{
 			mRegistry.each([&](entt::entity handle) {
 
-				function(Entity(handle, this), data);
+				function(*this, Entity(handle, this), selectionContext);
 			});
 		}
 	}

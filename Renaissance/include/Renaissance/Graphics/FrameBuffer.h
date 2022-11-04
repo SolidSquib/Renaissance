@@ -20,7 +20,7 @@ namespace Renaissance::Graphics
 
 	struct FrameBufferAttachment
 	{
-		uint32_t RendererId;
+		uint32_t RendererId = 0;
 		FrameBufferAttachmentType Type;
 		bool Writeable;
 	

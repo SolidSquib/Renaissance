@@ -12,3 +12,9 @@
 [submodule "Renaissance/externals/glm"]
 	path = Renaissance/externals/glm
 	url = https://github.com/g-truc/glm
+[submodule "Renaissance/externals/yaml-cpp"]
+	path = Renaissance/externals/yaml-cpp
+	url = https://github.com/SolidSquib/yaml-cpp.git
+[submodule "RenaissanceEditor/externals/ImGuizmo"]
+	path = RenaissanceEditor/externals/ImGuizmo
+	url = https://github.com/SolidSquib/ImGuizmo.git

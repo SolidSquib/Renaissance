@@ -27,7 +27,7 @@ namespace Renaissance::Graphics
 		GLenum GetGLAttachmentFormatEnum(FrameBufferAttachmentType type);
 		GLenum GetGLAttachmentTypeEnum(FrameBufferAttachmentType type);
 
-		uint32_t mRendererId;
+		uint32_t mRendererId = 0;
 		Specification mSpecification;
 		FrameBufferLayout mLayout;
 		std::unordered_map<FrameBufferAttachmentType, uint32_t> mComponentCount;

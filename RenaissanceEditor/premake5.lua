@@ -16,6 +16,8 @@ project "Faireground"
 		"include/**.h",
 		"src/**.cpp",
 		"src/Faireground/Windows/**.cpp",
+		"externals/ImGuizmo/ImGuizmo.h",
+		"externals/ImGuizmo/ImGuizmo.cpp"
 	}
 	
 	includedirs
@@ -25,14 +27,24 @@ project "Faireground"
 		"%{wks.location}/Renaissance/externals/spdlog/include",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.yamlcpp}",
+		"%{IncludeDir.ImGuizmo}"
 	}
 	
 	links
 	{
 		"Renaissance"
 	}
+
+	defines
+	{
+		"YAML_CPP_STATIC_DEFINE"
+	}
 	
+	filter "files:externals/ImGuizmo/**.cpp"
+		flags { "NoPCH" }
+
 	filter "system:windows"
 		systemversion "latest"
 	

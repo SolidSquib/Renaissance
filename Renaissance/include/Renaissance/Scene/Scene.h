@@ -23,12 +23,16 @@ namespace Renaissance
 		void OnUpdate(float deltaTime);
 		void OnRender(const Graphics::Camera& camera, const Math::Matrix4& transform);
 
-		typedef void(*IteratorFunction)(const Entity&, void*);
-		void IterateEntities(IteratorFunction function, void* data = nullptr);
+		/// <summary>
+		/// Iterator function takes a pointer to this scene, the current entity, and the currently selection context.
+		/// </summary>
+		typedef void(*IteratorFunction)(Scene&, Entity, Entity);
+		void IterateEntities(IteratorFunction function, Entity selectionContext);
 
 	private:
 		entt::registry mRegistry;
 
 		friend class Entity;
+		friend class SceneSerializer;
 	};
 }

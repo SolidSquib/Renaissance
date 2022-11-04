@@ -69,29 +69,51 @@ namespace Renaissance
 	
 	void EditorCameraController::UpdateDrag(Vector2 mouseDelta)
 	{
+		float deltaTime = Application::Get().DeltaTime();
 
+		Vector3 inputVector = { mouseDelta, 0.0f };
+
+		if (inputVector != ZeroVector)
+		{
+			Vector3 normalInput = glm::normalize(inputVector);
+
+			mLocation += (GetRightVector() * normalInput.x * deltaTime);
+			mLocation += (WorldUp * normalInput.y * deltaTime);
+		}
 	}
 
 	void EditorCameraController::IncreaseFoV()
 	{
-		const float step = 5.0f;
-		const float orthoStep = 0.2f;
-		mCamera.SetFieldOfView(mCamera.GetFieldOfView() + step);
-		mCamera.SetOrthoScale(mCamera.GetOrthoScale() + orthoStep);
+		if (mCamera.IsOrthographic())
+		{
+			const float step = 0.2f;
+			mCamera.SetOrthoScale(mCamera.GetOrthoScale() + step);
+		}
+		else
+		{
+			const float step = 5.0f;
+			mCamera.SetFieldOfView(glm::min(360.f, mCamera.GetFieldOfView() + step));
+		}
 	}
 
 	void EditorCameraController::DecreaseFoV()
 	{
-		const float step = 5.0f;
-		const float orthoStep = 0.2f;
-		mCamera.SetFieldOfView(mCamera.GetFieldOfView() - step);
-		mCamera.SetOrthoScale(mCamera.GetOrthoScale() - orthoStep);
+		if (mCamera.IsOrthographic())
+		{
+			const float step = 0.2f;
+			mCamera.SetOrthoScale(glm::max(step, mCamera.GetOrthoScale() - step));
+		}
+		else
+		{
+			const float step = 5.0f;
+			mCamera.SetFieldOfView(glm::max(step, mCamera.GetFieldOfView() - step));
+		}
 	}
 
 	bool EditorCameraController::OnMouseScrolled(Events::MouseScrolledEvent& e)
 	{
 		// #TODO: gotta find a way to pass on scrolling input.
-
+		REN_CORE_ASSERT(!"This wasn't working last I checked, what changed?");
 		const float step = 2.0f;
 		const float minSpeed = 1.0f;
 		const float maxSpeed = 100.0f;

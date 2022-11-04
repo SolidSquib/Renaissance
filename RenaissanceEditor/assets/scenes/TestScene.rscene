@@ -1,0 +1,42 @@
+Scene: Sample_Text
+Entities:
+  - ID: 12837192831273
+    IdentifierComponent:
+      Name: Grass
+    TransformComponent:
+      Location: [-0.5, -0.200000003, -2]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Tint: [1, 1, 1, 1]
+      Size: [1, 1]
+      TilingFactor: [1, 1]
+  - ID: 12837192831273
+    IdentifierComponent:
+      Name: Container
+    TransformComponent:
+      Location: [1, -0.200000003, -2]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Tint: [1, 1, 1, 1]
+      Size: [0.5, 0.5]
+      TilingFactor: [1, 1]
+    CameraComponent:
+      ViewportSize: [1280, 720]
+      NearClipping: 0.100000001
+      FarClipping: 100
+      IsOrthographic: false
+      OrthoScale: 1
+      FieldOfView: 60
+  - ID: 12837192831273
+    IdentifierComponent:
+      Name: Awesome Face
+    TransformComponent:
+      Location: [0, 0, 0]
+      Rotation: [0, 0, 3.1415925]
+      Scale: [1.00000012, 1.00000012, 1]
+    SpriteRendererComponent:
+      Tint: [1, 1, 1, 1]
+      Size: [1, 1]
+      TilingFactor: [1, 1]

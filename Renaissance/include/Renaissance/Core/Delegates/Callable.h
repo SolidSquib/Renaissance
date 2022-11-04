@@ -64,7 +64,7 @@ namespace Renaissance
 	class CallableLambda<T, Return(Args...)> : public Callable<Return(Args...)>
 	{
 	public:
-		CallableLambda(T& function) : mFunction(function), mAllocated(false) {}						// lvalue can be copied with no issues
+		CallableLambda(T& function) : mFunction(&function), mAllocated(false) {}						// lvalue can be copied with no issues
 		CallableLambda(T&& function) : mFunction(new T(std::move(function))), mAllocated(true) {}	// rvalue must be copied and have memory allocated on the heap
 		~CallableLambda() { Destroy(); }
 

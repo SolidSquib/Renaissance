@@ -10,7 +10,9 @@ namespace Renaissance
 	class EditorLayer : public Layer
 	{
 	public:
-		static MulticastDelegate<void(const Entity&)> OnSelectionChanged;
+		static WeakPtr<Scene> GetActiveScene();
+		static Entity GetSelectedEntity();
+		static void SetSelectedEntity(Entity entity);
 
 	public:
 		template <typename T, typename ... Args>
@@ -56,11 +58,18 @@ namespace Renaissance
 		virtual void OnEvent(Events::Event& e) override;
 
 	private:
-		SharedPtr<Scene> mActiveScene;
+		void NewScene();
+		void OpenScene();
+		void SaveSceneAs();
+
+	private:
+		static SharedPtr<Scene> sActiveScene;
+		static Entity sSelectedEntity;
+
 		std::vector<SharedPtr<EditorWindow>> mWindows;
 		
 #if REN_DEBUG
-		bool mShowDemoWindow = false;
+		bool mShowDemoWindow = true;
 #endif
 	};
 }

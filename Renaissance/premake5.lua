@@ -17,6 +17,7 @@ project "Renaissance"
 		"src/RenaissancePCH.cpp",
 		"src/Renaissance/Core/**.cpp",		
 		"src/Renaissance/Graphics/**.cpp",
+		"src/Renaissance/Math/**.cpp",
 		"src/Renaissance/UserInterface/**.cpp",
 		"src/Renaissance/Scene/**.cpp",
 		"externals/stb_image/stb_image.cpp"
@@ -31,19 +32,22 @@ project "Renaissance"
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.yamlcpp}"
 	}
 	
 	links
 	{
 		"GLFW",
 		"Glad",
-		"ImGui"
+		"ImGui",
+		"yaml-cpp"
 	}
 
 	defines
 	{			
-		"_CRT_SECURE_NO_WARNINGS"
+		"_CRT_SECURE_NO_WARNINGS",
+		"YAML_CPP_STATIC_DEFINE"
 	}
 
 	filter "system:windows"

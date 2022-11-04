@@ -8,20 +8,35 @@ namespace Renaissance
 	
 	void SceneHierarchyWindow::OnUIRender()
 	{
+		Entity deferredEntityToDelete;
+
 		ImGui::Begin("Scene Hierarchy", &mOpen);
-		{
-			if (SharedPtr<Scene> scene = mScene.lock())
+		{			
+			if (SharedPtr<Scene> sceneLock = EditorLayer::GetActiveScene().lock())
 			{
-				scene->IterateEntities([](const Entity& entity, void* data) {
-
-					Entity* selectedEntity = static_cast<Entity*>(data);
-
+				sceneLock->IterateEntities([](Scene& scene, Entity entity, Entity selectedEntity) {
+										
 					const IdentifierComponent& id = entity.GetComponent<IdentifierComponent>();
 					
-					bool isOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, (*selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick, id.Name.c_str());
+					bool isOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, (selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick, id.Name.c_str());
 					if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 					{
-						EditorLayer::OnSelectionChanged.Invoke(entity);
+						EditorLayer::SetSelectedEntity(entity);
+					}
+
+					if (ImGui::BeginPopupContextItem())
+					{
+						if (ImGui::MenuItem("Delete Entity"))
+						{
+							if (selectedEntity == entity)
+							{
+								EditorLayer::SetSelectedEntity({});
+							}
+
+							scene.DestroyEntity(entity);
+						}
+
+						ImGui::EndPopup();
 					}
 
 					if (isOpen)
@@ -31,24 +46,47 @@ namespace Renaissance
 						ImGui::TreePop();
 					}
 
-				}, &mSelectedEntity);
+				}, EditorLayer::GetSelectedEntity());
+			}
+
+			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+			{
+				EditorLayer::SetSelectedEntity({});
+			}
+
+			// Right click in blank space
+			if (ImGui::BeginPopupContextWindow(0, 1, false))
+			{
+				if (ImGui::MenuItem("Create Empty"))
+				{
+					if (SharedPtr<Scene> scene = EditorLayer::GetActiveScene().lock())
+					{
+						scene->CreateEntity("Empty");
+					}
+				}
+
+				ImGui::EndPopup();
 			}
 		}
 		ImGui::End();
-	}
 
-	void SceneHierarchyWindow::OnEntitySelectionChanged(const Entity& newSelection)
-	{
-		mSelectedEntity = newSelection;
+		if (deferredEntityToDelete.IsValid())
+		{
+			if (SharedPtr<Scene> scene = EditorLayer::GetActiveScene().lock())
+			{
+				scene->DestroyEntity(deferredEntityToDelete);
+				EditorLayer::SetSelectedEntity({});
+			}
+		}
 	}
 
 	void SceneHierarchyWindow::Open()
 	{
-		mOnSelectedEntityChangedDelegate = EditorLayer::OnSelectionChanged.Bind(*this, &SceneHierarchyWindow::OnEntitySelectionChanged);
+		
 	}
 
 	void SceneHierarchyWindow::Close()
 	{
-		EditorLayer::OnSelectionChanged.Unbind(mOnSelectedEntityChangedDelegate);
+		
 	}
 }
