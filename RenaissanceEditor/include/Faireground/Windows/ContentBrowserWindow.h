@@ -36,10 +36,6 @@ namespace Renaissance
 		std::vector<std::filesystem::path> mActivePathDirectories;
 		std::vector<std::filesystem::path> mActivePathFiles;
 
-		SharedPtr<Graphics::Texture2D> mFolderIcon;
-		SharedPtr<Graphics::Texture2D> mFileIcon;
-		SharedPtr<Graphics::Texture2D> mImageIcon;
-
 		static ImFont* IconFontLarge;
 	};
 }

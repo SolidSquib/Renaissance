@@ -13,10 +13,6 @@ namespace Renaissance
 		: mContentBrowserIndex(index), mActivePath(sAssetsDirectory)
 	{
 		mContentBrowserName = index == 0 ? "Content Browser" : "Content Browser " + std::to_string(mContentBrowserIndex + 1);
-
-		mFolderIcon = Graphics::TextureLibrary::GetGlobal().Get<Graphics::Texture2D>("FolderOpenIcon");
-		mImageIcon= Graphics::TextureLibrary::GetGlobal().Get<Graphics::Texture2D>("ImageIcon");
-		mFileIcon = Graphics::TextureLibrary::GetGlobal().Get<Graphics::Texture2D>("FileIcon");
 	}
 
 	void ContentBrowserWindow::OnUIRender()
