@@ -1,56 +1,63 @@
 #pragma once
 
 #include "Renaissance/Graphics/Texture.h"
+#include "Renaissance/Math/Math.h"
 
 namespace Renaissance::Graphics
 {
-	enum class FrameBufferAttachmentType { Color, Depth, Stencil, DepthStencil };
-
-	static inline const char* GetFrameBufferAttachmentTypeName(FrameBufferAttachmentType type)
+	enum class FrameBufferTextureFormat
 	{
-		switch (type)
+		None = 0,
+
+		// Color
+		RGBA8,
+		RGBA16F,
+		RGBA32F,
+		RG32F,
+		RED_INTEGER,
+		RED_INTEGER_UNSIGNED,
+
+		// Depth/Stencil
+		DEPTH32F,
+		DEPTH24STENCIL8,
+
+		// Defaults
+		Depth = DEPTH24STENCIL8
+	};
+
+	namespace Utils
+	{
+		static bool IsDepthFormat(FrameBufferTextureFormat format)
 		{
-		case FrameBufferAttachmentType::Color: return "Color";
-		case FrameBufferAttachmentType::Depth: return "Depth";
-		case FrameBufferAttachmentType::Stencil: return "Stencil";
-		case FrameBufferAttachmentType::DepthStencil: return "Depth/Stencil";
-		default: REN_CORE_ASSERT(false, "Unknown attachment type!"); return "Attachment unknown";
+			switch (format)
+			{
+			case FrameBufferTextureFormat::DEPTH32F:
+			case FrameBufferTextureFormat::DEPTH24STENCIL8:
+				return true;
+			}
+
+			return false;
 		}
 	}
 
-	struct FrameBufferAttachment
+	struct FrameBufferTextureSpecification
 	{
-		uint32_t RendererId = 0;
-		FrameBufferAttachmentType Type;
-		bool Writeable;
-	
-		FrameBufferAttachment() = default;
-		FrameBufferAttachment(FrameBufferAttachmentType type, bool readable)
-			: Type(type), Writeable(readable)
-		{ }
+		FrameBufferTextureSpecification() = default;
+		FrameBufferTextureSpecification(FrameBufferTextureFormat format, bool isWritable = true)
+			: TextureFormat(format), IsRenderBuffer(!isWritable) {}
+
+		FrameBufferTextureFormat TextureFormat = FrameBufferTextureFormat::None;
+		Math::Vector4 ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+		bool IsRenderBuffer;
 	};
 
-	class FrameBufferLayout
+	struct FrameBufferAttachmentSpecification
 	{
-	public:
-		FrameBufferLayout() = default;
-		FrameBufferLayout(const std::initializer_list<FrameBufferAttachment>& initializer)
-			: mAttachments(initializer)
-		{
-		}
+		FrameBufferAttachmentSpecification() = default;
+		FrameBufferAttachmentSpecification(const std::initializer_list<FrameBufferTextureSpecification>& attachments)
+			: Attachments(attachments) {}
 
-		inline const std::vector<FrameBufferAttachment>& GetAttachments() const { return mAttachments; }
-		inline uint32_t GetCount() const { return (uint32_t)mAttachments.size(); }
-
-		inline void SetAttachments(const std::vector<FrameBufferAttachment>& attachments) { mAttachments = attachments; }
-
-		inline std::vector<FrameBufferAttachment>::iterator begin() { return mAttachments.begin(); }
-		inline std::vector<FrameBufferAttachment>::const_iterator begin() const { return mAttachments.begin(); }
-		inline std::vector<FrameBufferAttachment>::iterator end() { return mAttachments.end(); }
-		inline std::vector<FrameBufferAttachment>::const_iterator end() const { return mAttachments.end(); }
-
-	private:
-		std::vector<FrameBufferAttachment> mAttachments;
+		std::vector<FrameBufferTextureSpecification> Attachments;
 	};
 
 	class FrameBuffer
@@ -58,8 +65,9 @@ namespace Renaissance::Graphics
 	public:
 		struct Specification
 		{
-			uint32_t Width, Height;
+			uint32_t Width = 0, Height = 0;
 			uint32_t Samples = 1;
+			FrameBufferAttachmentSpecification Attachments;
 			bool SwapChainTarget = false;
 		};
 
@@ -73,9 +81,14 @@ namespace Renaissance::Graphics
 		virtual void Unbind() const = 0;
 
 		virtual const Specification& GetSpecification() const = 0;
-		virtual uint32_t GetNumAttachmentsOfType(FrameBufferAttachmentType type) const = 0;
-		virtual uint32_t GetAttachmentRendererId(FrameBufferAttachmentType type, uint32_t index = 0) const = 0;
+		virtual uint32_t GetNumColorAttachments() const = 0;
+		virtual bool HasDepthAttachment() const = 0;
+		virtual uint32_t GetColorAttachmentRendererId(uint32_t index = 0) const = 0;
+		virtual uint32_t GetDepthAttachmentRendererId() const = 0;
 
-		static SharedPtr<FrameBuffer> Create(const Specification& specification, const FrameBufferLayout& layout);
+		virtual int ReadPixel(uint32_t index, uint32_t x, uint32_t y) const = 0;
+		virtual void ClearAttachment(uint32_t index, const Math::Vector4& clearColor) = 0;
+
+		static SharedPtr<FrameBuffer> Create(const Specification& specification);
 	};
 }

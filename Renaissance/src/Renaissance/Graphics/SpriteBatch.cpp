@@ -60,10 +60,11 @@ namespace Renaissance::Graphics
 
 		SharedVertexBuffer = VertexBuffer::Create(MaxVertices * sizeof(VertexData));
 		BufferLayout vertexLayout = {
-				{ ShaderDataType::Float3, "a_Position" },
-				{ ShaderDataType::Float4, "a_Color" },
-				{ ShaderDataType::Float2, "a_TexCoord" },
-				{ ShaderDataType::Uint, "a_TexIndex" }
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float4, "a_Color" },
+			{ ShaderDataType::Float2, "a_TexCoord" },
+			{ ShaderDataType::Uint, "a_TexIndex" },
+			{ ShaderDataType::Uint, "a_EntityId" }
 		};
 		SharedVertexBuffer->SetLayout(vertexLayout);
 
@@ -105,19 +106,21 @@ namespace Renaissance::Graphics
 		}
 	}
 	
-	void SpriteBatch::Draw(const Vector2& location, const SpriteRendererComponent& spriteComponent)
+	void SpriteBatch::Draw(const Vector2& location, const SpriteRendererComponent& spriteComponent, uint32_t entityId /*= 0*/)
 	{
-		Draw(Vector3(location, 1.0f), spriteComponent);
+		Draw(Vector3(location, 1.0f), spriteComponent, entityId);
 	}
 
-	void SpriteBatch::Draw(const Vector3& location, const SpriteRendererComponent& spriteComponent)
+	void SpriteBatch::Draw(const Vector3& location, const SpriteRendererComponent& spriteComponent, uint32_t entityId /*= 0*/)
 	{
 		Matrix4 transform = glm::translate(IdentityMatrix, location);
-		Draw(transform, spriteComponent);
+		Draw(transform, spriteComponent, entityId);
 	}
 
-	void SpriteBatch::Draw(const Matrix4& transform, const SpriteRendererComponent& spriteComponent)
+	void SpriteBatch::Draw(const Matrix4& transform, const SpriteRendererComponent& spriteComponent, uint32_t entityId /*= 0*/)
 	{
+		mActiveEntityId = entityId + 1;
+
 		if (spriteComponent.Texture)
 		{
 			Draw(transform, spriteComponent.Size, spriteComponent.Texture, spriteComponent.TilingFactor, spriteComponent.Color);
@@ -125,7 +128,9 @@ namespace Renaissance::Graphics
 		else
 		{
 			Draw(transform, spriteComponent.Size, WhiteTexture, Vector2(0.0f), Vector2(1.0f), spriteComponent.TilingFactor, spriteComponent.Color);
-		}		
+		}
+
+		mActiveEntityId = 0;
 	}
 
 	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const Vector4& tint)
@@ -222,6 +227,7 @@ namespace Renaissance::Graphics
 			SharedVertexPtr[i + mVertexCount].Color = tint;
 			SharedVertexPtr[i + mVertexCount].TexCoord = textureCoords[i];
 			SharedVertexPtr[i + mVertexCount].TexIndex = textureIndex;
+			SharedVertexPtr[i + mVertexCount].EntityId = mActiveEntityId;
 		}
 
 		mVertexCount += numVerticesPerQuad;

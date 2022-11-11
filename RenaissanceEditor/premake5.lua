@@ -29,7 +29,8 @@ project "Faireground"
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yamlcpp}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.IconFonts}"
 	}
 	
 	links

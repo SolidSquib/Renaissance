@@ -64,12 +64,12 @@ namespace Renaissance
 
 	private:
 		static SharedPtr<Scene> sActiveScene;
-		static Entity sSelectedEntity;
+		static Entity sSelectedEntity;		
 
 		std::vector<SharedPtr<EditorWindow>> mWindows;
 		
 #if REN_DEBUG
-		bool mShowDemoWindow = true;
+		bool mShowDemoWindow = false;
 #endif
 	};
 }

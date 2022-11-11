@@ -24,11 +24,10 @@ namespace Renaissance
 		Graphics::FrameBuffer::Specification spec;
 		spec.Width = (uint32_t)mCachedViewportSize.x;
 		spec.Height = (uint32_t)mCachedViewportSize.y;
+		spec.Samples = 1;
+		spec.Attachments = { Graphics::FrameBufferTextureFormat::RGBA8, Graphics::FrameBufferTextureFormat::RED_INTEGER_UNSIGNED, Graphics::FrameBufferTextureFormat::Depth };
 
-		Graphics::FrameBufferLayout sceneBufferLayout = {
-			{ Graphics::FrameBufferAttachmentType::Color, true }
-		};
-		mViewportFrameBuffer = Graphics::FrameBuffer::Create(spec, sceneBufferLayout);
+		mViewportFrameBuffer = Graphics::FrameBuffer::Create(spec);
 	}
 
 	void EditorViewportWindow::OnUpdate(float deltaTime)
@@ -39,6 +38,7 @@ namespace Renaissance
 
 			mViewportFrameBuffer->Bind();
 			Graphics::RenderCommand::Clear(0);
+			mViewportFrameBuffer->ClearAttachment(1, {0.0f,0.0f,0.0f,0.0f});
 			activeScene->OnRender(mViewportCameraController.GetCamera(), mViewportCameraController.GetTransform());
 			mViewportFrameBuffer->Unbind();
 		}
@@ -48,7 +48,7 @@ namespace Renaissance
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin(mViewportName.c_str(), &mOpen);
-		{
+		{			
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			Vector2 glmPanelSize = { viewportPanelSize.x, viewportPanelSize.y };
 			bool viewportValidForRendering = viewportPanelSize.x > 0 && viewportPanelSize.y > 0;
@@ -62,94 +62,121 @@ namespace Renaissance
 					mViewportCameraController.SetViewportSize(mCachedViewportSize.x, mCachedViewportSize.y);
 				}
 
-				static bool showBuffer = true;
 				// NoMove flag prevents the window from moving unless dragging the titlebar, necessary to allow the use of 
 				// gizmos in an undocked viewport.
 				ImGui::BeginChild("Viewport FrameBuffer", viewportPanelSize, false, ImGuiWindowFlags_NoMove);
 				{
-					bool acceptMouseInput = ImGui::IsWindowHovered();
-					ImVec2 currentMousePos = ImGui::GetMousePos();
+					ImVec2 viewportOffset = ImGui::GetCursorPos();					
 
-					uint32_t sceneBufferColorId = mViewportFrameBuffer->GetAttachmentRendererId(Graphics::FrameBufferAttachmentType::Color);
+					uint32_t sceneBufferColorId = mViewportFrameBuffer->GetColorAttachmentRendererId(0);
 					ImGui::Image((void*)(uint64_t)sceneBufferColorId, { mCachedViewportSize.x, mCachedViewportSize.y }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 
-					DrawViewportSettings();
+					//ImVec2 windowSize = ImGui::GetWindowSize();
+					ImVec2 minBound = ImGui::GetWindowPos();
+					minBound.x -= viewportOffset.x;
+					minBound.y -= viewportOffset.y;
 
-					if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && acceptMouseInput && mButtonFocus == ImGuiMouseButton_COUNT)
-					{
-						ImGui::SetWindowFocus();
-						mButtonFocus = ImGuiMouseButton_Right;
-						InputManager::DisableMouseCursor();
-					}
-					else if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle) && acceptMouseInput && mButtonFocus == ImGuiMouseButton_COUNT)
-					{
-						ImGui::SetWindowFocus();
-						mButtonFocus = ImGuiMouseButton_Middle;
-						InputManager::DisableMouseCursor();
-					}
-					else if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && mButtonFocus == ImGuiMouseButton_Right)
-					{
-						ImVec2 mouseDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right, 0.5f);
-						mViewportCameraController.UpdateFirstPerson({ mouseDelta.x , mouseDelta.y });
-						ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
-					}
-					else if (ImGui::IsMouseDown(ImGuiMouseButton_Middle) && mButtonFocus == ImGuiMouseButton_Middle)
-					{						
-						ImVec2 mouseDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Middle, 0.5f);
-						mViewportCameraController.UpdateDrag({ mouseDelta.x , mouseDelta.y });
-						ImGui::ResetMouseDragDelta(ImGuiMouseButton_Middle);
-					}
-					else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && mButtonFocus == ImGuiMouseButton_Right)
-					{
-						mButtonFocus = ImGuiMouseButton_COUNT;
-						InputManager::EnableMouseCursor();
-					}
-					else if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle) && mButtonFocus == ImGuiMouseButton_Middle)
-					{
-						mButtonFocus = ImGuiMouseButton_COUNT;
-						InputManager::EnableMouseCursor();
-					}
+					ImVec2 maxBound = { minBound.x + viewportPanelSize.x, minBound.y + viewportPanelSize.y };
+					mViewportBounds[0] = { minBound.x, minBound.y };
+					mViewportBounds[1] = { maxBound.x, maxBound.y };
 
-					if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
+					ImVec2 currentMousePos = ImGui::GetMousePos();
+					currentMousePos.x -= mViewportBounds[0].x;
+					currentMousePos.y -= mViewportBounds[0].y;
+					Vector2 viewportSize = mViewportBounds[1] - mViewportBounds[0];
+					
+					const bool areSettingsOpen = DrawViewportSettings();
+					const bool acceptMouseInput = ImGui::IsWindowHovered() && !areSettingsOpen;
+
+					SharedPtr<Scene> activeScene = EditorLayer::GetActiveScene().lock();
+					if (activeScene)
 					{
-						if (ImGui::GetIO().MouseWheel > 0)
+
+						if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && acceptMouseInput && mButtonFocus == ImGuiMouseButton_COUNT)
 						{
-							mViewportCameraController.DecreaseFoV();
+							ImGui::SetWindowFocus();
+							mButtonFocus = ImGuiMouseButton_Right;
+							InputManager::DisableMouseCursor();
 						}
-						else if (ImGui::GetIO().MouseWheel < 0)
+						else if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle) && acceptMouseInput && mButtonFocus == ImGuiMouseButton_COUNT)
 						{
-							mViewportCameraController.IncreaseFoV();
+							ImGui::SetWindowFocus();
+							mButtonFocus = ImGuiMouseButton_Middle;
+							InputManager::DisableMouseCursor();
 						}
-					}
-
-					// Render gizmos
-					Entity selectedEntity = EditorLayer::GetSelectedEntity();
-					if (selectedEntity && mGizmoManipulateOperation != -1)
-					{
-						ImGuizmo::SetOrthographic(mViewportCameraController.GetCamera().IsOrthographic());
-						ImGuizmo::SetDrawlist();
-
-						ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportPanelSize.x, viewportPanelSize.y);
-						
-						Math::Matrix4 projectionMatrix = mViewportCameraController.GetCamera().GetProjectionMatrix();
-						Math::Matrix4 viewMatrix = glm::inverse(mViewportCameraController.GetTransform());
-						TransformComponent& transformComponent = selectedEntity.GetComponent<TransformComponent>();
-						Math::Matrix4 entityTransform = transformComponent.GetTransform();
-
-						float* snappingVar = mGizmoManipulateOperation == 1 ? &mGizmoRotationSnapping : &mGizmoTranslationSnapping;
-						bool wantsSnapping = mGizmoManipulateOperation == 1 ? mGizmoEnableRotationSnapping : mGizmoEnableTranslationSnapping;
-
-						ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix), (ImGuizmo::OPERATION)mGizmoManipulateOperation, (ImGuizmo::MODE)mGizmoManipulateSpace, glm::value_ptr(entityTransform),
-							nullptr, wantsSnapping ? snappingVar : nullptr);
-
-						if (ImGuizmo::IsUsing() && acceptMouseInput)
+						else if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && mButtonFocus == ImGuiMouseButton_Right)
 						{
-							Vector3 translation, rotation, scale;
-							Math::DecomposeTransform(entityTransform, translation, rotation, scale);
-							transformComponent.Location = translation;
-							Math::Vector3 deltaRotation = rotation - transformComponent.Rotation;
-							transformComponent.Rotation += deltaRotation;
-							transformComponent.Scale = scale;
+							ImVec2 mouseDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Right, 0.5f);
+							mViewportCameraController.UpdateFirstPerson({ mouseDelta.x , mouseDelta.y });
+							ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+						}
+						else if (ImGui::IsMouseDown(ImGuiMouseButton_Middle) && mButtonFocus == ImGuiMouseButton_Middle)
+						{
+							ImVec2 mouseDelta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Middle, 0.5f);
+							mViewportCameraController.UpdateDrag({ mouseDelta.x , mouseDelta.y });
+							ImGui::ResetMouseDragDelta(ImGuiMouseButton_Middle);
+						}
+						else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && mButtonFocus == ImGuiMouseButton_Right)
+						{
+							mButtonFocus = ImGuiMouseButton_COUNT;
+							InputManager::EnableMouseCursor();
+						}
+						else if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle) && mButtonFocus == ImGuiMouseButton_Middle)
+						{
+							mButtonFocus = ImGuiMouseButton_COUNT;
+							InputManager::EnableMouseCursor();
+						}
+
+						if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && acceptMouseInput)
+						{
+							if (ImGui::GetIO().MouseWheel > 0)
+							{
+								mViewportCameraController.DecreaseFoV();
+							}
+							else if (ImGui::GetIO().MouseWheel < 0)
+							{
+								mViewportCameraController.IncreaseFoV();
+							}
+						}
+
+						// Render gizmos
+						Entity selectedEntity = EditorLayer::GetSelectedEntity();
+						if (selectedEntity && mGizmoManipulateOperation != -1)
+						{
+							ImGuizmo::SetOrthographic(mViewportCameraController.GetCamera().IsOrthographic());
+							ImGuizmo::SetDrawlist();
+
+							ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportPanelSize.x, viewportPanelSize.y);
+
+							Math::Matrix4 projectionMatrix = mViewportCameraController.GetCamera().GetProjectionMatrix();
+							Math::Matrix4 viewMatrix = glm::inverse(mViewportCameraController.GetTransform());
+							TransformComponent& transformComponent = selectedEntity.GetComponent<TransformComponent>();
+							Math::Matrix4 entityTransform = transformComponent.GetTransform();
+
+							float* snappingVar = mGizmoManipulateOperation == 1 ? &mGizmoRotationSnapping : &mGizmoTranslationSnapping;
+							bool wantsSnapping = mGizmoManipulateOperation == 1 ? mGizmoEnableRotationSnapping : mGizmoEnableTranslationSnapping;
+
+							ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix), (ImGuizmo::OPERATION)mGizmoManipulateOperation, (ImGuizmo::MODE)mGizmoManipulateSpace, glm::value_ptr(entityTransform),
+								nullptr, wantsSnapping ? snappingVar : nullptr);
+
+							if (ImGuizmo::IsUsing() && acceptMouseInput)
+							{
+								Vector3 translation, rotation, scale;
+								Math::DecomposeTransform(entityTransform, translation, rotation, scale);
+								transformComponent.Location = translation;
+								Math::Vector3 deltaRotation = rotation - transformComponent.Rotation;
+								transformComponent.Rotation += deltaRotation;
+								transformComponent.Scale = scale;
+							}
+						}
+
+						if (acceptMouseInput && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGuizmo::IsUsing())
+						{
+							mViewportFrameBuffer->Bind();
+							int entityId = mViewportFrameBuffer->ReadPixel(1, (uint32_t)currentMousePos.x, (uint32_t)(viewportSize.y - currentMousePos.y));
+							mViewportFrameBuffer->Unbind();
+
+							EditorLayer::SetSelectedEntity(Entity((entt::entity)(entityId - 1), activeScene.get()));
 						}
 					}
 				}
@@ -160,17 +187,21 @@ namespace Renaissance
 		ImGui::PopStyleVar();
 	}
 
-	void EditorViewportWindow::DrawViewportSettings()
+	bool EditorViewportWindow::DrawViewportSettings()
 	{
+		bool wasOpened = false;
+
 		ImGui::SameLine(ImGui::GetWindowWidth() - 20.0f);
 
 		if (ImGui::ArrowButton("ViewportSettingsButton", ImGuiDir_Down))
 		{
-			ImGui::OpenPopup("ViewportSettings");
+			wasOpened = true;
+			ImGui::OpenPopup("ViewportSettings");			
 		}
 
 		if (ImGui::BeginPopup("ViewportSettings"))
 		{
+			wasOpened = true;
 			ImGui::TextColored({ 0.5f, 0.5f, 0.5f, 1.0f }, "Gizmo");
 			ImGui::Separator();
 
@@ -209,13 +240,15 @@ namespace Renaissance
 			ImGui::Separator();
 
 			Vector3 cameraLocation = mViewportCameraController.GetLocation();
-			Vector3 cameraRotation = mViewportCameraController.GetRotationVector();
+			Vector3 cameraRotation = glm::degrees(mViewportCameraController.GetRotationVector());
 			PropertyEditor::DrawVector3Control("Location", cameraLocation, 0.0f);
 			PropertyEditor::DrawVector3Control("Rotation", cameraRotation, 0.0f);
 			mViewportCameraController.SetLocation(cameraLocation);
-			mViewportCameraController.SetRotation(cameraRotation);
+			mViewportCameraController.SetRotation(glm::radians(cameraRotation));
 
 			ImGui::EndPopup();
 		}
+
+		return wasOpened;
 	}
 }

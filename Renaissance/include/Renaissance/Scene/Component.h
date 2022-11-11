@@ -136,11 +136,11 @@ namespace Renaissance
 		
 		typedef void(*ScriptableFunctionPointer)(NativeScriptComponent*);
 
-		ScriptableEntity*(*InstantiateScript)();
-		void(*DestroyScript)(NativeScriptComponent*);
-		void(*ScriptableOnCreate)(NativeScriptComponent*);
-		void(*ScriptableOnDestroy)(NativeScriptComponent*);
-		void(*ScriptableOnUpdate)(NativeScriptComponent*, float);
+		ScriptableEntity*(*InstantiateScript)() = nullptr;
+		void(*DestroyScript)(NativeScriptComponent*) = nullptr;
+		void(*ScriptableOnCreate)(NativeScriptComponent*) = nullptr;
+		void(*ScriptableOnDestroy)(NativeScriptComponent*) = nullptr;
+		void(*ScriptableOnUpdate)(NativeScriptComponent*, float) = nullptr;
 
 		ScriptableEntity* mEntity = nullptr;
 	};

@@ -18,10 +18,11 @@ namespace Renaissance::Graphics
 	public:
 		struct VertexData
 		{
-			Vector3 Position;
-			Vector4 Color;
-			Vector2 TexCoord;
+			Vector3 Position = ZeroVector;
+			Vector4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+			Vector2 TexCoord = { 0.0f, 0.0f };
 			uint32_t TexIndex = 0;
+			uint32_t EntityId = 0;
 		};
 
 		SpriteBatch();
@@ -43,9 +44,9 @@ namespace Renaissance::Graphics
 		void Draw(const Vector3& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
 		void Draw(const Matrix4& transform, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
 
-		void Draw(const Vector2& location, const SpriteRendererComponent& spriteComponent);
-		void Draw(const Vector3& location, const SpriteRendererComponent& spriteComponent);
-		void Draw(const Matrix4& transform, const SpriteRendererComponent& spriteComponent);
+		void Draw(const Vector2& location, const SpriteRendererComponent& spriteComponent, uint32_t entityId = 0);
+		void Draw(const Vector3& location, const SpriteRendererComponent& spriteComponent, uint32_t entityId = 0);
+		void Draw(const Matrix4& transform, const SpriteRendererComponent& spriteComponent, uint32_t entityId = 0);
 
 		void End();
 
@@ -65,6 +66,9 @@ namespace Renaissance::Graphics
 		uint32_t mIndexCount = 0;
 		uint32_t mTextureUnitCount = 1;
 		bool mActive = true;
+
+		// #TODO find a better way to add custom vertex data that this.
+		uint32_t mActiveEntityId = 0;
 
 		static SharedPtr<VertexArray> SharedVertexArray;
 		static SharedPtr<VertexBuffer> SharedVertexBuffer;

@@ -77,11 +77,13 @@ namespace Renaissance
 
 			Renderer::Get().BeginScene(camera, transform);
 
-			SpriteBatch spriteBatch;
-			mRegistry.group<TransformComponent, SpriteRendererComponent>().each([this, &spriteBatch](auto handle, TransformComponent& transform, SpriteRendererComponent& spriteRenderer) {
+			{
+				SpriteBatch spriteBatch;
+				mRegistry.group<TransformComponent, SpriteRendererComponent>().each([this, &spriteBatch](entt::entity handle, TransformComponent& transform, SpriteRendererComponent& spriteRenderer) {
 
-				spriteBatch.Draw(transform, spriteRenderer);
-			});
+					spriteBatch.Draw(transform, spriteRenderer, (uint32_t)handle);
+					});
+			}
 
 			Renderer::Get().EndScene();
 		}

@@ -9,11 +9,15 @@
 #include "Faireground/Windows/EditorViewportWindow.h"
 #include "Faireground/Windows/PropertyEditorWindow.h"
 #include "Faireground/Windows/SceneHierarchyWindow.h"
+#include "Faireground/Windows/ContentBrowserWindow.h"
 
 #include "ImGuizmo.h"
+#include "IconsFontAwesome5.h"
 
 namespace Renaissance
 {
+	using namespace Graphics;	
+	
 	SharedPtr<Scene> EditorLayer::sActiveScene;
 	Entity EditorLayer::sSelectedEntity;
 
@@ -40,11 +44,10 @@ namespace Renaissance
 		CreateNewWindow<EditorViewportWindow>(0, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
 		CreateNewWindow<SceneHierarchyWindow>();
 		CreateNewWindow<PropertyEditorWindow>();
-
-		// Set the scene
+		CreateNewWindow<ContentBrowserWindow>(0);
+		
+		//// Set the scene
 		{
-			using namespace Graphics;
-
 			SharedPtr<Texture2D> awesomeFaceTexture = Texture2D::Create("../Renaissance/assets/textures/awesomeface.png");
 			SharedPtr<Texture2D> grassTexture = Texture2D::Create("../Renaissance/assets/textures/grass.png");
 			SharedPtr<Texture2D> containerTexture = Texture2D::Create("../Renaissance/assets/textures/container.jpg");
@@ -172,6 +175,14 @@ namespace Renaissance
 				uint32_t currentViewportCount = GetWindowCount<EditorViewportWindow>();
 				WeakPtr<EditorViewportWindow> viewport = CreateNewWindow<EditorViewportWindow>(currentViewportCount);
 			}			
+
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Add Content Browser", nullptr))
+			{
+				uint32_t currentContentBrowserCount = GetWindowCount<ContentBrowserWindow>();
+				WeakPtr<ContentBrowserWindow> contentBrowser = CreateNewWindow<ContentBrowserWindow>(currentContentBrowserCount);
+			}
 
 			#if REN_DEBUG
 			ImGui::Separator();

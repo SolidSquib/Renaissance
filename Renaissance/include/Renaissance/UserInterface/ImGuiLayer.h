@@ -24,6 +24,8 @@ namespace Renaissance
 
 		void SetBlockEvents(bool block) { mBlockEvents = block; }
 
+		void SetDarkThemeColors();
+
 	private:
 		bool OnKeyPressed(Events::KeyPressedEvent& e);
 		bool OnKeyReleased(Events::KeyReleasedEvent& e);

@@ -21,7 +21,7 @@ namespace Renaissance
 		virtual bool WantsInputFocus() const override { return mButtonFocus != ImGuiMouseButton_COUNT; }
 		virtual bool WantsToClose() const override { return !mOpen; }
 
-		void DrawViewportSettings();
+		bool DrawViewportSettings();
 
 	private:
 		bool mOpen = true;
@@ -35,7 +35,7 @@ namespace Renaissance
 		float mGizmoRotationSnapping = 45.0f;
 
 		Vector2 mCachedViewportSize{ 1280.0f, 720.0f };
-		Vector2 mLastMousePosition{ 0.0f, 0.0f };
+		Vector2 mViewportBounds[2];
 
 		EditorCameraController mViewportCameraController;
 

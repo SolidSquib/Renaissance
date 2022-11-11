@@ -3,30 +3,28 @@
 
 namespace Renaissance::Graphics
 {
-	OpenGLFrameBuffer::OpenGLFrameBuffer(const Specification& specification, const FrameBufferLayout& layout)
-		: mSpecification(specification), mLayout(layout)
+	OpenGLFrameBuffer::OpenGLFrameBuffer(const Specification& specification)
+		: mSpecification(specification)
 	{
+		for (auto& attachment : specification.Attachments.Attachments)
+		{
+			if (Utils::IsDepthFormat(attachment.TextureFormat))
+			{
+				REN_CORE_ASSERT(mDepthAttachmentSpec.TextureFormat == FrameBufferTextureFormat::None, "A framebuffer may only have one depth attachment.");
+				mDepthAttachmentSpec = attachment;
+			}
+			else
+			{
+				mColorAttachmentSpecs.emplace_back(attachment);
+			}
+		}
+
 		Invalidate();
 	}
 
 	OpenGLFrameBuffer::~OpenGLFrameBuffer()
 	{
-		glDeleteFramebuffers(1, &mRendererId);
-
-		for (auto iter = mLayout.begin(); iter != mLayout.end(); ++iter)
-		{
-			if (iter->RendererId)
-			{
-				if (iter->Writeable)
-				{
-					glDeleteTextures(1, &iter->RendererId);
-				}
-				else
-				{
-					glDeleteRenderbuffers(1, &iter->RendererId);
-				}
-			}
-		}
+		Destroy();
 	}
 
 	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
@@ -36,70 +34,63 @@ namespace Renaissance::Graphics
 		Invalidate();
 	}
 
+	void OpenGLFrameBuffer::Destroy()
+	{
+		glDeleteFramebuffers(1, &mRendererId);		
+		glDeleteTextures((GLsizei)mColorAttachments.size(), mColorAttachments.data());		
+		glDeleteTextures(1, &mDepthAttachment);
+
+		mColorAttachments.clear();
+		mRendererId = 0;
+		mDepthAttachment = 0;
+	}
+
 	void OpenGLFrameBuffer::Invalidate()
 	{
 		REN_PROFILE_FUNCTION()
-					
-		if (mRendererId != 0)
-		{
-			glDeleteFramebuffers(1, &mRendererId);
-			mRendererId = 0;
-		}
 
-		for (auto iter = mLayout.begin(); iter != mLayout.end(); ++iter)
-		{
-			if (iter->RendererId)
-			{
-				if (iter->Writeable)
-				{
-					glDeleteTextures(1, &iter->RendererId);
-				}
-				else
-				{
-					glDeleteRenderbuffers(1, &iter->RendererId);
-				}
-			}
-		}
-
-		mComponentCount[FrameBufferAttachmentType::Color] = 0;
-		mComponentCount[FrameBufferAttachmentType::Depth] = 0;
-		mComponentCount[FrameBufferAttachmentType::Stencil] = 0;
-		mComponentCount[FrameBufferAttachmentType::DepthStencil] = 0;
+		Destroy();
 
 		glCreateFramebuffers(1, &mRendererId);
 		glBindFramebuffer(GL_FRAMEBUFFER, mRendererId);
 
-		uint32_t colorCount = 0, depthCount = 0, stencilCount = 0, depthStencilCount= 0;
+		bool multisample = mSpecification.Samples > 1;
 
-		for (auto iter = mLayout.begin(); iter != mLayout.end(); ++iter)
+		if (mColorAttachmentSpecs.size())
 		{
-			if (!ValidateAttachmentOfType(iter->Type))
-			{
-				REN_CORE_WARN("Unable to create framebuffer attachment of type {0}, limit reached.", GetFrameBufferAttachmentTypeName(iter->Type));
-				continue;
-			}
+			mColorAttachments.resize(mColorAttachmentSpecs.size());
+			Utils::GLCreateTextures(multisample, mColorAttachments.data(), (uint32_t)mColorAttachments.size());
 
-			if (iter->Writeable)
+			for (uint32_t i = 0; i < mColorAttachments.size(); ++i)
 			{
-				glCreateTextures(GL_TEXTURE_2D, 1, &iter->RendererId);
-				glTextureStorage2D(iter->RendererId, 1, GetGLAttachmentFormatEnum(iter->Type), mSpecification.Width, mSpecification.Height);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GetGLAttachmentTypeEnum(iter->Type), GL_TEXTURE_2D, iter->RendererId, 0);
+				Utils::GLBindTexture(multisample, mColorAttachments[i]);
+				GLenum internalFormat = Utils::GLAttachmentInternalFormat(mColorAttachmentSpecs[i].TextureFormat);
+				GLenum readFormat = Utils::GLAttachmentFormat(mColorAttachmentSpecs[i].TextureFormat);
+				Utils::GLAttachColorTexture(mColorAttachments[i], mSpecification.Samples, internalFormat, readFormat, mSpecification.Width, mSpecification.Height, i);
 			}
-			else
-			{
-				glCreateRenderbuffers(1, &iter->RendererId);
-				glBindRenderbuffer(GL_RENDERBUFFER, iter->RendererId);
-				glRenderbufferStorage(GL_RENDERBUFFER, GetGLAttachmentFormatEnum(iter->Type), mSpecification.Width, mSpecification.Height);
-				glFramebufferRenderbuffer(GL_FRAMEBUFFER, GetGLAttachmentTypeEnum(iter->Type), GL_RENDERBUFFER, iter->RendererId);
-			}
+		}
 
-			mComponentCount.find(iter->Type)->second++;
+		if (mDepthAttachmentSpec.TextureFormat != FrameBufferTextureFormat::None)
+		{
+			Utils::GLCreateTextures(multisample, &mDepthAttachment, 1);
+			Utils::GLBindTexture(multisample, mDepthAttachment);
+			GLenum internalFormat = Utils::GLAttachmentInternalFormat(mDepthAttachmentSpec.TextureFormat);
+			GLenum attachmentType = Utils::GLAttachmentType(mDepthAttachmentSpec.TextureFormat);
+			Utils::GLAttachDepthTexture(mDepthAttachment, mSpecification.Samples, internalFormat, attachmentType, mSpecification.Width, mSpecification.Height);
+		}
+
+		if (mColorAttachments.size() > 1)
+		{
+			REN_CORE_ASSERT(mColorAttachments.size() <= 4, "Renaissance currently only supports a maximum of 4 color attachments per framebuffer");
+			GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+			glDrawBuffers((GLsizei)mColorAttachments.size(), buffers);
+		}
+		else if (mColorAttachments.empty())
+		{
+			glDrawBuffer(GL_NONE);
 		}
 
 		REN_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -118,72 +109,61 @@ namespace Renaissance::Graphics
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 	
-	uint32_t OpenGLFrameBuffer::GetAttachmentRendererId(FrameBufferAttachmentType type, uint32_t index) const
+	uint32_t OpenGLFrameBuffer::GetColorAttachmentRendererId(uint32_t index) const
 	{
-		uint32_t foundIndex = 0;
-		for (auto iter = mLayout.begin(); iter != mLayout.end(); ++iter)
+		if (index < mColorAttachments.size())
 		{
-			if (iter->Type == type && foundIndex == index)
-			{
-				return iter->RendererId;
-			}
-			foundIndex++;
+			return mColorAttachments[index];
 		}
 
-		REN_CORE_WARN("Unable to find FrameBufferAttachment of type {0}, RendererId will be invalid!", GetFrameBufferAttachmentTypeName(type));
+		REN_CORE_WARN("Unable to find color attachment at index {0}", index);
 		return 0;
 	}
 
-	bool OpenGLFrameBuffer::ValidateAttachmentOfType(FrameBufferAttachmentType type)
+	uint32_t OpenGLFrameBuffer::GetDepthAttachmentRendererId() const
 	{
-		bool returnValue = true;
-		uint32_t currentCount = mComponentCount.find(type)->second;
-
-		switch (type)
-		{
-		case FrameBufferAttachmentType::Color: 
-			returnValue = currentCount < 32; // get the actual max from the GPU
-			break;
-
-		case FrameBufferAttachmentType::Depth: 
-		case FrameBufferAttachmentType::Stencil: 
-			returnValue = currentCount < 1 
-				&& mComponentCount.find(FrameBufferAttachmentType::DepthStencil)->second < 1;
-			break;
-
-		case FrameBufferAttachmentType::DepthStencil: 
-			returnValue = currentCount < 1
-				&& mComponentCount.find(FrameBufferAttachmentType::Depth)->second < 1
-				&& mComponentCount.find(FrameBufferAttachmentType::Stencil)->second < 1;
-			break;
-
-		default: REN_CORE_ASSERT(false, "Unknown attachment type!"); break;
-		}
-
-		return returnValue;
+		return mDepthAttachment;
 	}
 
-	GLenum OpenGLFrameBuffer::GetGLAttachmentFormatEnum(FrameBufferAttachmentType type)
+	int OpenGLFrameBuffer::ReadPixel(uint32_t index, uint32_t x, uint32_t y) const
 	{
-		switch (type)
-		{
-		case FrameBufferAttachmentType::Color: return GL_RGB8;
-		case FrameBufferAttachmentType::Depth: return GL_DEPTH_COMPONENT24;
-		case FrameBufferAttachmentType::Stencil: return GL_STENCIL_INDEX8;
-		case FrameBufferAttachmentType::DepthStencil: return GL_DEPTH24_STENCIL8;
-		default: REN_CORE_ASSERT(false, "Unknown attachment type!"); return 0;
-		}
+		REN_CORE_ASSERT(index < mColorAttachments.size());
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
+
+		int pixelData;
+		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+		return pixelData;
 	}
 
-	GLenum OpenGLFrameBuffer::GetGLAttachmentTypeEnum(FrameBufferAttachmentType type)
+	void OpenGLFrameBuffer::ClearAttachment(uint32_t index, const Math::Vector4& clearColor)
 	{
-		switch (type)
+		REN_CORE_ASSERT(index < mColorAttachments.size());
+
+		switch (mColorAttachmentSpecs[index].TextureFormat)
 		{
-		case FrameBufferAttachmentType::Color: return GL_COLOR_ATTACHMENT0 + mComponentCount.find(type)->second;
-		case FrameBufferAttachmentType::Depth: return GL_DEPTH_ATTACHMENT;
-		case FrameBufferAttachmentType::Stencil: return GL_STENCIL_ATTACHMENT;
-		case FrameBufferAttachmentType::DepthStencil: return GL_DEPTH_STENCIL_ATTACHMENT;
-		default: REN_CORE_ASSERT(false, "Unknown attachment type!"); return 0;
+		case FrameBufferTextureFormat::RGBA8: 
+		case FrameBufferTextureFormat::RGBA16F: 
+		case FrameBufferTextureFormat::RGBA32F:
+		case FrameBufferTextureFormat::RG32F:
+		{
+			float color[] = {clearColor.r, clearColor.g, clearColor.b, clearColor.a};
+			glClearBufferfv(GL_COLOR, index, color);
+		}
+		break;
+		case FrameBufferTextureFormat::RED_INTEGER: 
+		{
+			int color[] = { (int)clearColor.r, (int)clearColor.g, (int)clearColor.b, (int)clearColor.a };
+			glClearBufferiv(GL_COLOR, index, color);
+		}
+		break;
+		case FrameBufferTextureFormat::RED_INTEGER_UNSIGNED: 
+		{
+			uint32_t color[] = { (uint32_t)clearColor.r, (uint32_t)clearColor.g, (uint32_t)clearColor.b, (uint32_t)clearColor.a };
+			glClearBufferuiv(GL_COLOR, index, color);
+		}
+		break;
+		default:
+			REN_CORE_ASSERT(false);
 		}
 	}
 }

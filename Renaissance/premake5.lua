@@ -20,7 +20,8 @@ project "Renaissance"
 		"src/Renaissance/Math/**.cpp",
 		"src/Renaissance/UserInterface/**.cpp",
 		"src/Renaissance/Scene/**.cpp",
-		"externals/stb_image/stb_image.cpp"
+		"externals/stb_image/stb_image.cpp",
+		"externals/IconFontCppHeaders/**.h"
 	}
 
 	includedirs
@@ -33,7 +34,8 @@ project "Renaissance"
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.yamlcpp}"
+		"%{IncludeDir.yamlcpp}",
+		"%{IncludeDir.IconFonts}"
 	}
 	
 	links

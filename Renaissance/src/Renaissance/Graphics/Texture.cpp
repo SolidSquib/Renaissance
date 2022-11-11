@@ -46,4 +46,23 @@ namespace Renaissance::Graphics
 			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
 	}
+
+	UniquePtr<TextureLibrary> TextureLibrary::sInstance = MakeUnique<TextureLibrary>();
+
+	void TextureLibrary::Add(const std::string& name, const SharedPtr<Texture2D>& texture)
+	{
+		REN_CORE_ASSERT(!Exists(name));
+		mTextures[name] = texture;
+	}
+
+	void TextureLibrary::Add(const std::string& name, const SharedPtr<Texture3D>& texture)
+	{
+		REN_CORE_ASSERT(!Exists(name));
+		mTextures[name] = texture;
+	}
+
+	bool TextureLibrary::Exists(const std::string& name) const
+	{
+		return mTextures.find(name) != mTextures.end();
+	}
 }

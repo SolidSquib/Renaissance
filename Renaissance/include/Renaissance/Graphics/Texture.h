@@ -33,4 +33,58 @@ namespace Renaissance::Graphics
 	public:
 		static SharedPtr<Texture3D> Create(const String& path);
 	};
+
+	class TextureLibrary
+	{
+	public:
+		template <typename T>
+		SharedPtr<T> Get(const std::string& name) const
+		{
+			REN_CORE_ASSERT(Exists(name));
+			SharedPtr<T> castPtr = std::static_pointer_cast<T>(mTextures.at(name));
+			REN_CORE_ASSERT(castPtr);
+			return castPtr;
+		}
+
+		template <typename T>
+		SharedPtr<T> Load(const std::string& name, const std::filesystem::path& filePath)
+		{
+			if (!Exists(name))
+			{
+				SharedPtr<T> texture = T::Create(filePath);
+				Add(name, texture);
+				return texture;
+			}
+
+			REN_CORE_INFO("Texture with name \"{0}\" already exists", name);
+			return Get<T>(name);
+		}
+
+		template <typename T>
+		SharedPtr<T> Load(const std::filesystem::path& filePath)
+		{
+			SharedPtr<T> texture = T::Create(filePath);
+
+			if (!Exists(texture->GetName()))
+			{
+				Add(filePath.stem(), texture);
+				return texture;
+			}
+
+			REN_CORE_WARN("Texture with name \"{0}\" already exists. The loaded texture was not added to the library.", shader->GetName());
+			return shader;
+		}
+
+		void Add(const std::string& name, const SharedPtr<Texture2D>& texture);
+		void Add(const std::string& name, const SharedPtr<Texture3D>& texture);
+
+		bool Exists(const std::string& name) const;
+
+		static TextureLibrary& GetGlobal() { return *sInstance; }
+
+	private:
+		std::unordered_map<std::string, SharedPtr<Texture>> mTextures;
+
+		static UniquePtr<TextureLibrary> sInstance;
+	};
 }
