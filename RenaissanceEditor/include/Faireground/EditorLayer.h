@@ -5,14 +5,35 @@
 
 #include "imgui.h"
 
+#define DRAG_CONTEXT_PATH_TEX "DRAG_CONTEXT_PATH_TEXTURE"
+#define DRAG_CONTEXT_PATH_SCENE "DRAG_CONTEXT_PATH_SCENE"
+
 namespace Renaissance
 {
 	class EditorLayer : public Layer
 	{
 	public:
+		enum class EEditorUpdateMode
+		{
+			Editor,
+			Play,
+			Simulate
+		};
+
+	public:
 		static WeakPtr<Scene> GetActiveScene();
 		static Entity GetSelectedEntity();
 		static void SetSelectedEntity(Entity entity);
+		static EEditorUpdateMode GetUpdateState();
+
+		static void NewScene();
+		static void OpenScene();
+		static void OpenScene(const std::filesystem::path& filepath);
+		static void SaveSceneAs();
+
+		static void StartPlayInEditor();
+		static void StopPlayAndSimulate();
+		static void StartSimulate();
 
 	public:
 		template <typename T, typename ... Args>
@@ -58,13 +79,10 @@ namespace Renaissance
 		virtual void OnEvent(Events::Event& e) override;
 
 	private:
-		void NewScene();
-		void OpenScene();
-		void SaveSceneAs();
-
-	private:
 		static SharedPtr<Scene> sActiveScene;
-		static Entity sSelectedEntity;		
+		static Archive sSceneSnapshot;
+		static Entity sSelectedEntity;
+		static EEditorUpdateMode sUpdateState;
 
 		std::vector<SharedPtr<EditorWindow>> mWindows;
 		

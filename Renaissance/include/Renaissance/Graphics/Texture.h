@@ -12,6 +12,7 @@ namespace Renaissance::Graphics
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
 		virtual uint32_t GetRendererId() const = 0;
+		virtual std::filesystem::path GetPath() const = 0;
 
 		virtual void SetData(void* data, uint32_t size) = 0;
 
@@ -49,34 +50,37 @@ namespace Renaissance::Graphics
 		template <typename T>
 		SharedPtr<T> Load(const std::string& name, const std::filesystem::path& filePath)
 		{
-			if (!Exists(name))
-			{
-				SharedPtr<T> texture = T::Create(filePath);
+			REN_CORE_ASSERT(!Exists(name));
+			SharedPtr<T> texture = T::Create(filePath);
+			if (!Exists(name)) // Create already adds to the global library, so this is a required safety check for duplicates.
 				Add(name, texture);
-				return texture;
-			}
-
-			REN_CORE_INFO("Texture with name \"{0}\" already exists", name);
-			return Get<T>(name);
+			return texture;
 		}
 
 		template <typename T>
 		SharedPtr<T> Load(const std::filesystem::path& filePath)
 		{
-			SharedPtr<T> texture = T::Create(filePath);
-
-			if (!Exists(texture->GetName()))
-			{
-				Add(filePath.stem(), texture);
-				return texture;
-			}
-
-			REN_CORE_WARN("Texture with name \"{0}\" already exists. The loaded texture was not added to the library.", shader->GetName());
-			return shader;
+			String name = filePath.string();
+			REN_CORE_ASSERT(!Exists(name));
+			SharedPtr<T> texture = T::Create(name);			
+			if (!Exists(name)) // Create already adds to the global library, so this is a required safety check for duplicates.
+				Add(name, texture);
+			return texture;
 		}
 
 		void Add(const std::string& name, const SharedPtr<Texture2D>& texture);
 		void Add(const std::string& name, const SharedPtr<Texture3D>& texture);
+
+		template<typename T>
+		SharedPtr<T> FindOrLoad(const std::filesystem::path& filepath)
+		{
+			if (Exists(filepath.string()))
+			{
+				return Get<T>(filepath.string());
+			}
+
+			return Load<T>(filepath);
+		}
 
 		bool Exists(const std::string& name) const;
 

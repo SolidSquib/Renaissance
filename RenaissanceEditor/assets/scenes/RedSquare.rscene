@@ -1,8 +1,8 @@
 Scene: Sample_Text
 Entities:
-  - ID: goeiurhgoisdf344235409un34
-    IdentifierComponent:
-      Name: RedSquare
+  - ID: 0
+    TagComponent:
+      Tag: RedSquare
     TransformComponent:
       Location: [0, 0, 0]
       Rotation: [0, 0, 0]
@@ -11,3 +11,6 @@ Entities:
       Tint: [1, 0, 0, 1]
       Size: [1, 1]
       TilingFactor: [1, 1]
+      TexturePath: 
+      MinCoord: [0, 0]
+      MaxCoord: [1, 1]

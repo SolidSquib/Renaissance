@@ -14,6 +14,7 @@ namespace Renaissance
 		virtual ~Entity();
 
 		bool IsValid() const { return mHandle != entt::null && mScene != nullptr; }
+		GUID GetGuid() const { return GetComponent<IdentifierComponent>().Guid; }
 
 		Math::Vector3 GetLocation() const;
 		Math::Vector3 GetRotation() const;

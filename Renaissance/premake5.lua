@@ -52,6 +52,9 @@ project "Renaissance"
 		"YAML_CPP_STATIC_DEFINE"
 	}
 
+	filter "files:%{wks.location}/Renaissance/externals/spdlog/include/**.h"
+		warnings "Off"
+
 	filter "system:windows"
 		systemversion "latest"
 

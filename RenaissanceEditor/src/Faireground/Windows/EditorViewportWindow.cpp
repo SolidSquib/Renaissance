@@ -34,12 +34,20 @@ namespace Renaissance
 	{
 		if (SharedPtr<Scene> activeScene = EditorLayer::GetActiveScene().lock())
 		{
-			activeScene->OnEditorUpdate(deltaTime);
-
 			mViewportFrameBuffer->Bind();
 			Graphics::RenderCommand::Clear(0);
-			mViewportFrameBuffer->ClearAttachment(1, {0.0f,0.0f,0.0f,0.0f});
-			activeScene->OnRender(mViewportCameraController.GetCamera(), mViewportCameraController.GetTransform());
+			mViewportFrameBuffer->ClearAttachment(1, { 0.0f,0.0f,0.0f,0.0f });
+
+			if (EditorLayer::GetUpdateState() == EditorLayer::EEditorUpdateMode::Play)
+			{
+				// default render path will use the scene's main camera
+				activeScene->OnRender();
+			}
+			else
+			{
+				activeScene->OnRender(mViewportCameraController.GetCamera(), mViewportCameraController.GetTransform());
+			}
+
 			mViewportFrameBuffer->Unbind();
 		}
 	}
@@ -70,6 +78,17 @@ namespace Renaissance
 
 					uint32_t sceneBufferColorId = mViewportFrameBuffer->GetColorAttachmentRendererId(0);
 					ImGui::Image((void*)(uint64_t)sceneBufferColorId, { mCachedViewportSize.x, mCachedViewportSize.y }, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
+
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload(DRAG_CONTEXT_PATH_SCENE))
+						{
+							std::filesystem::path* filepath = reinterpret_cast<std::filesystem::path*>(Payload->Data);
+							EditorLayer::OpenScene(*filepath);
+						}
+
+						ImGui::EndDragDropTarget();
+					}
 
 					//ImVec2 windowSize = ImGui::GetWindowSize();
 					ImVec2 minBound = ImGui::GetWindowPos();
@@ -190,10 +209,11 @@ namespace Renaissance
 	bool EditorViewportWindow::DrawViewportSettings()
 	{
 		bool wasOpened = false;
+		
+		ImVec2 textSize = ImGui::CalcTextSize(ICON_FA_ELLIPSIS_H);
+		ImGui::SameLine(ImGui::GetWindowWidth() - textSize.x - (ImGui::GetStyle().FramePadding.x * 2.0f));
 
-		ImGui::SameLine(ImGui::GetWindowWidth() - 20.0f);
-
-		if (ImGui::ArrowButton("ViewportSettingsButton", ImGuiDir_Down))
+		if (ImGui::Button(ICON_FA_ELLIPSIS_H))
 		{
 			wasOpened = true;
 			ImGui::OpenPopup("ViewportSettings");			

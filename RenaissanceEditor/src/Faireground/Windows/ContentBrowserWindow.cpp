@@ -1,6 +1,8 @@
 #include "FairegroundPCH.h"
 #include "Faireground/Windows/ContentBrowserWindow.h"
 
+#include "Faireground/EditorLayer.h"
+
 #include "IconsFontAwesome5.h"
 #include "imgui_internal.h"
 
@@ -17,6 +19,26 @@ namespace Renaissance
 
 	void ContentBrowserWindow::OnUIRender()
 	{
+		if (mRefreshFolders)
+		{
+			mActivePathDirectories.clear();
+			mActivePathFiles.clear();
+
+			for (auto& path : std::filesystem::directory_iterator(mActivePath))
+			{
+				if (path.is_directory())
+				{
+					mActivePathDirectories.emplace_back(path);
+				}
+				else
+				{
+					mActivePathFiles.emplace_back(path);
+				}
+			}
+
+			mRefreshFolders = false;
+		}
+
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin(mContentBrowserName.c_str(), &mOpen);
 		{
@@ -34,8 +56,7 @@ namespace Renaissance
 			ImGui::Spacing();
 			if (ImGui::ButtonEx(ICON_FA_LEVEL_UP_ALT, {0,0}, upDirectoryEnabled ? 0 : ImGuiItemFlags_Disabled))
 			{
-				mActivePath = mActivePath.parent_path();
-				RefreshFolderView();
+				RefreshFolderView(mActivePath.parent_path());
 			} ImGui::SameLine();
 			
 			if (!upDirectoryEnabled)
@@ -67,8 +88,7 @@ namespace Renaissance
 				{
 					if (ImGui::Button(str.c_str()))
 					{
-						mActivePath = path;
-						RefreshFolderView();
+						RefreshFolderView(path);
 						break;
 					} ImGui::SameLine();
 				}
@@ -125,8 +145,6 @@ namespace Renaissance
 
 	void ContentBrowserWindow::Open()
 	{
-		RefreshFolderView();
-
 		if (!IconFontLarge)
 		{
 			ImGuiIO& io = ImGui::GetIO();
@@ -143,22 +161,10 @@ namespace Renaissance
 
 	}
 	
-	void ContentBrowserWindow::RefreshFolderView()
+	void ContentBrowserWindow::RefreshFolderView(const std::filesystem::path& newPath)
 	{
-		mActivePathDirectories.clear();
-		mActivePathFiles.clear();
-
-		for (auto& path : std::filesystem::directory_iterator(mActivePath))
-		{
-			if (path.is_directory())
-			{
-				mActivePathDirectories.emplace_back(path);
-			}
-			else
-			{
-				mActivePathFiles.emplace_back(path);
-			}
-		}
+		mActivePath = newPath;
+		mRefreshFolders = true;
 	}
 
 	bool ContentBrowserWindow::DrawBrowserSettings()
@@ -227,14 +233,22 @@ namespace Renaissance
 
 		ImGui::PushStyleColor(ImGuiCol_Button, { 0,0,0,0 });
 
+		std::string folderName = path.filename().string();
+		ImGui::PushID(folderName.c_str());
 		if (asListItem)
-		{
-			std::string folderName = path.filename().string();
+		{			
 			ImGui::Button(iconString.append(" ").append(folderName).c_str());
+			
+			String dragContext = GetDragContext(path);
+			if (!dragContext.empty() && ImGui::BeginDragDropSource())
+			{
+				ImGui::SetDragDropPayload(dragContext.c_str(), &path, sizeof(std::filesystem::path::value_type) * path.string().size(), ImGuiCond_Once);
+				ImGui::EndDragDropSource();
+			}
+
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && std::filesystem::is_directory(path))
 			{
-				mActivePath = path;
-				RefreshFolderView();
+				RefreshFolderView(path);
 			}
 		}
 		else
@@ -242,12 +256,19 @@ namespace Renaissance
 			ImGui::PushFont(IconFontLarge);
 			ImGui::SetWindowFontScale(mIconSize / IconFontLarge->FontSize);
 			ImGui::Button(iconString.c_str(), {iconSize, iconSize});
+
+			String dragContext = GetDragContext(path);
+			if (!dragContext.empty() && ImGui::BeginDragDropSource())
+			{
+				ImGui::SetDragDropPayload(dragContext.c_str(), &path, sizeof(std::filesystem::path::value_type) * path.string().size(), ImGuiCond_Once);
+				ImGui::EndDragDropSource();
+			}
+
 			ImGui::SetWindowFontScale(1.0f);
 			ImGui::PopFont();
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && std::filesystem::is_directory(path))
 			{
-				mActivePath = path;
-				RefreshFolderView();
+				RefreshFolderView(path);
 			}
 
 			std::string folderName = path.filename().string();
@@ -255,7 +276,31 @@ namespace Renaissance
 			//ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ((iconSize - textWidth) * 0.5f));
 			ImGui::TextWrapped(folderName.c_str());
 		}
+		ImGui::PopID();		
 
 		ImGui::PopStyleColor();
+	}
+
+	String ContentBrowserWindow::GetDragContext(const std::filesystem::path& path)
+	{
+		String dragContext = "";
+		if (path.has_extension())
+		{
+			String extension = path.extension().string();			
+
+			if (extension == ".png"
+				|| extension == ".tga"
+				|| extension == ".jpeg"
+				|| extension == ".jpg"
+				|| extension == ".bmp")
+			{
+				dragContext = DRAG_CONTEXT_PATH_TEX;
+			}
+			else if (extension == ".rscene")
+			{
+				dragContext = DRAG_CONTEXT_PATH_SCENE;
+			}			
+		}
+		return dragContext;
 	}
 }

@@ -41,10 +41,11 @@ namespace Renaissance
 		iconConfig.MergeMode = true;
 		iconConfig.PixelSnapH = true;
 		
-		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/comfortaa/Comfortaa-Regular.ttf", 16.0f);		
-		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/" FONT_ICON_FILE_NAME_FAS, 16.0f, &iconConfig, iconRanges);
-		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/comfortaa/Comfortaa-Bold.ttf", 16.0f);
-		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/" FONT_ICON_FILE_NAME_FAS, 16.0f, &iconConfig, iconRanges);
+		const float defaultFontSize = 14.0f;
+		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/comfortaa/Comfortaa-Regular.ttf", defaultFontSize);
+		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/" FONT_ICON_FILE_NAME_FAS, defaultFontSize, &iconConfig, iconRanges);
+		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/comfortaa/Comfortaa-Bold.ttf", defaultFontSize);
+		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/" FONT_ICON_FILE_NAME_FAS, defaultFontSize, &iconConfig, iconRanges);
 
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

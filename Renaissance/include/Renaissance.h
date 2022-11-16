@@ -4,6 +4,7 @@
 #include "Renaissance/Core/Application.h"
 #include "Renaissance/Core/Core.h"
 #include "Renaissance/Core/Delegates/Delegate.h"
+#include "Renaissance/Core/GUID.h"
 #include "Renaissance/Core/Log.h"
 
 // Input 

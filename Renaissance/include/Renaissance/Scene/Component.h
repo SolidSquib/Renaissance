@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Renaissance/Core/Archive.h"
 #include "Renaissance/Core/Core.h"
+#include "Renaissance/Core/GUID.h"
 #include "Renaissance/Math/Math.h"
 
 #include "Renaissance/Graphics/SubTexture.h"
@@ -11,13 +13,27 @@ namespace Renaissance
 {
 	class ScriptableEntity;
 
+	struct TagComponent
+	{
+		TagComponent() : Tag("None") { }
+		TagComponent(const String& name) : Tag(name) { }
+
+		String Tag;
+
+		void Serialize(Archive& ar) const;
+		void Deserialize(Archive& ar);
+	};
+
 	struct IdentifierComponent
 	{
-		IdentifierComponent(const String& name)
-			: Name(name)
-		{ }
+		IdentifierComponent() : Guid() { }
+		IdentifierComponent(const GUID& id) : Guid(id) { }
+		IdentifierComponent(uint64_t id) : Guid(id) { }
 
-		String Name;
+		GUID Guid;
+
+		void Serialize(Archive& ar) const;
+		void Deserialize(Archive& ar);
 	};
 
 	struct TransformComponent
@@ -39,6 +55,9 @@ namespace Renaissance
 		Math::Vector3 Location{ 0.0f };
 		Math::Vector3 Rotation{ 0.0f }; // Pitch, Yaw, Roll
 		Math::Vector3 Scale{ 1.0f };
+
+		void Serialize(Archive& ar) const;
+		void Deserialize(Archive& ar);
 	};
 
 	struct SpriteRendererComponent 
@@ -49,22 +68,25 @@ namespace Renaissance
 			: Color(color), Size(size)
 		{}
 
-		SpriteRendererComponent(const SharedPtr<Graphics::SubTexture2D>& texture, const Math::Vector2& size = Math::Vector2(1.0f), const Math::Vector2& tilingFactor = Math::Vector2(1.0f), const Math::Vector4& tint = Math::Vector4(1.0f))
+		SpriteRendererComponent(const Graphics::SubTexture2D& texture, const Math::Vector2& size = Math::Vector2(1.0f), const Math::Vector2& tilingFactor = Math::Vector2(1.0f), const Math::Vector4& tint = Math::Vector4(1.0f))
 			: Color(tint), Size(size), TilingFactor(tilingFactor), Texture(texture)
 		{}
 
 		SpriteRendererComponent(const SharedPtr<Graphics::Texture2D>& texture, const Math::Vector2& size = Math::Vector2(1.0f), const Math::Vector2& tilingFactor = Math::Vector2(1.0f), const Math::Vector4& tint = Math::Vector4(1.0f))
-			: Color(tint), Size(size), TilingFactor(tilingFactor), Texture(Graphics::SubTexture2D::Create(texture, { 0.0f, 0.0f }, { 1.0f, 1.0f }))
+			: Color(tint), Size(size), TilingFactor(tilingFactor), Texture({ texture, { 0.0f, 0.0f }, { 1.0f, 1.0f } })
 		{}
 
 		SpriteRendererComponent(const SharedPtr<Graphics::Texture2D>& texture, const Math::Vector2& texMin, const Math::Vector2& texMax, const Math::Vector2& size = Math::Vector2(1.0f), const Math::Vector2& tilingFactor = Math::Vector2(1.0f), const Math::Vector4& tint = Math::Vector4(1.0f))
-			: Color(tint), Size(size), TilingFactor(tilingFactor), Texture(Graphics::SubTexture2D::Create(texture, texMin, texMax))
+			: Color(tint), Size(size), TilingFactor(tilingFactor), Texture({ texture, texMin, texMax })
 		{}
 
 		Math::Vector4 Color{ 1.0f };
 		Math::Vector2 Size{ 1.0f };
 		Math::Vector2 TilingFactor{ 1.0f };
-		SharedPtr<Graphics::SubTexture2D> Texture;
+		Graphics::SubTexture2D Texture;
+
+		void Serialize(Archive& ar) const;
+		void Deserialize(Archive& ar);
 	};
 
 	struct CameraComponent
@@ -98,6 +120,10 @@ namespace Renaissance
 		operator const Graphics::Camera& () const { return GetCamera(); }
 
 		Graphics::Camera Cam;
+		bool MainCamera = true;
+
+		void Serialize(Archive& ar) const;
+		void Deserialize(Archive& ar);
 	};
 
 #define DEFINE_HAS_MEMBER(member_name)                                         \

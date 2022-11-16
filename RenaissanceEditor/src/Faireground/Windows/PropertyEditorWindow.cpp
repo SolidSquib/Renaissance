@@ -28,7 +28,7 @@ namespace Renaissance
 		{
 			if (selectedEntity)
 			{
-				PropertyEditor::DrawComponent(selectedEntity.GetComponent<IdentifierComponent>(), selectedEntity);
+				PropertyEditor::DrawComponent(selectedEntity.GetComponent<TagComponent>(), selectedEntity);
 				PropertyEditor::DrawComponent(selectedEntity.GetComponent<TransformComponent>(), selectedEntity);
 
 				if (selectedEntity.HasComponent<SpriteRendererComponent>())

@@ -28,23 +28,34 @@ namespace Renaissance::Graphics
 
 	SharedPtr<Texture2D> Texture2D::Create(const String& path)
 	{
+		SharedPtr<Texture2D> newTexture;
+		REN_CORE_ASSERT(!TextureLibrary::GetGlobal().Exists(path));
+
 		switch (Renderer::Get().GetAPI())
 		{
 			case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:	return MakeShared<OpenGLTexture2D>(path);
+			case RendererAPI::API::OpenGL:	newTexture = MakeShared<OpenGLTexture2D>(path); break;
 			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
+
+		TextureLibrary::GetGlobal().Add(path, newTexture);
+		return newTexture;
 	}
 
 	SharedPtr<Texture3D> Texture3D::Create(const String& path)
 	{
+		SharedPtr<Texture3D> newTexture;
+		REN_CORE_ASSERT(!TextureLibrary::GetGlobal().Exists(path));
 
 		switch (Renderer::Get().GetAPI())
 		{
 			case RendererAPI::API::None:		REN_CORE_ASSERT(false, "Running without a renderer is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:	return MakeShared<OpenGLTexture3D>(path);
+			case RendererAPI::API::OpenGL:	newTexture = MakeShared<OpenGLTexture3D>(path); break;
 			default: REN_CORE_ASSERT(false, "Unknown rendering API specified!"); return nullptr;
 		}
+
+		TextureLibrary::GetGlobal().Add(path, newTexture);
+		return newTexture;
 	}
 
 	UniquePtr<TextureLibrary> TextureLibrary::sInstance = MakeUnique<TextureLibrary>();

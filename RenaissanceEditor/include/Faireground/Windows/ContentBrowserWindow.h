@@ -18,13 +18,15 @@ namespace Renaissance
 		void Open() override;
 		void Close() override;
 
-		void RefreshFolderView();
+		void RefreshFolderView(const std::filesystem::path& newPath);
 		bool DrawBrowserSettings();
 
 		void DrawIconForPath(const std::filesystem::path& path, bool asListItem);
+		String GetDragContext(const std::filesystem::path& path);
 
 	private:
 		bool mOpen = true;
+		bool mRefreshFolders = true;
 
 		uint32_t mContentBrowserIndex = 0;
 		String mContentBrowserName = "Content Browser";

@@ -10,6 +10,7 @@
 #include "Faireground/Windows/PropertyEditorWindow.h"
 #include "Faireground/Windows/SceneHierarchyWindow.h"
 #include "Faireground/Windows/ContentBrowserWindow.h"
+#include "Faireground/Windows/EditorToolbarWindow.h"
 
 #include "ImGuizmo.h"
 #include "IconsFontAwesome5.h"
@@ -19,7 +20,9 @@ namespace Renaissance
 	using namespace Graphics;	
 	
 	SharedPtr<Scene> EditorLayer::sActiveScene;
+	Archive EditorLayer::sSceneSnapshot;
 	Entity EditorLayer::sSelectedEntity;
+	EditorLayer::EEditorUpdateMode EditorLayer::sUpdateState = EEditorUpdateMode::Editor;
 
 	WeakPtr<Scene> EditorLayer::GetActiveScene()
 	{
@@ -36,45 +39,20 @@ namespace Renaissance
 		sSelectedEntity = entity;
 	}
 
+	EditorLayer::EEditorUpdateMode EditorLayer::GetUpdateState()
+	{
+		return sUpdateState;
+	}
+
 	void EditorLayer::OnAttached()
 	{
-		sActiveScene = MakeShared<Scene>();
 		Window& window = Application::Get().GetWindow();
 
 		CreateNewWindow<EditorViewportWindow>(0, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
 		CreateNewWindow<SceneHierarchyWindow>();
 		CreateNewWindow<PropertyEditorWindow>();
 		CreateNewWindow<ContentBrowserWindow>(0);
-		
-		//// Set the scene
-		{
-			SharedPtr<Texture2D> awesomeFaceTexture = Texture2D::Create("../Renaissance/assets/textures/awesomeface.png");
-			SharedPtr<Texture2D> grassTexture = Texture2D::Create("../Renaissance/assets/textures/grass.png");
-			SharedPtr<Texture2D> containerTexture = Texture2D::Create("../Renaissance/assets/textures/container.jpg");
-
-			Entity awesomeFace = sActiveScene->CreateEntity("Awesome Face");
-			awesomeFace.AddComponent<SpriteRendererComponent>(awesomeFaceTexture);
-
-			Entity container = sActiveScene->CreateEntity("Container");
-			container.AddComponent<SpriteRendererComponent>(containerTexture, Vector2(0.5f));
-			container.AddComponent<CameraComponent>();
-			container.SetLocation(Vector3(1.0f, -0.2f, -2.0f));
-
-			Entity grass = sActiveScene->CreateEntity("Grass");
-			grass.AddComponent<SpriteRendererComponent>(grassTexture);
-			grass.SetLocation(Vector3(-0.5f, -0.2f, -2.0f));
-
-			class TestScriptableEntity : public ScriptableEntity
-			{
-			public:
-				void OnUpdate(float deltaTime)
-				{
-					REN_CORE_WARN("Tick object");
-				}
-			};
-
-			grass.AddComponent<NativeScriptComponent>().Bind<TestScriptableEntity>();
-		}
+		CreateNewWindow<EditorToolbarWindow>();
 	}
 
 	void EditorLayer::OnDetached()
@@ -168,6 +146,11 @@ namespace Renaissance
 				CreateNewWindow<SceneHierarchyWindow>();
 			}
 
+			if (ImGui::MenuItem("Toolbar", nullptr, false, GetWindowCount<EditorToolbarWindow>() == 0))
+			{
+				CreateNewWindow<EditorToolbarWindow>();
+			}
+
 			ImGui::Separator();
 
 			if (ImGui::MenuItem("Add Viewport", nullptr))
@@ -232,6 +215,21 @@ namespace Renaissance
 		}
 
 		Application::Get().GetImGuiLayer().lock()->SetBlockEvents(!wantsInput);
+
+		if (sActiveScene)
+		{
+			switch (sUpdateState)
+			{
+			case EEditorUpdateMode::Editor:
+				sActiveScene->OnEditorUpdate(deltaTime);
+				break;
+
+			case EEditorUpdateMode::Play:
+			case EEditorUpdateMode::Simulate:
+				sActiveScene->OnUpdate(deltaTime);
+				break;
+			}			
+		}
 	}
 	
 	void EditorLayer::OnEvent(Events::Event& e)
@@ -249,12 +247,17 @@ namespace Renaissance
 	void EditorLayer::OpenScene()
 	{
 		String filePath = FileDialogs::OpenFile("Ren Scene (*.rscene)\0*.rscene\0");
-		if (!filePath.empty())
+		OpenScene(filePath);
+	}
+
+	void EditorLayer::OpenScene(const std::filesystem::path& filepath)
+	{
+		if (!filepath.empty())
 		{
 			sActiveScene = MakeShared<Scene>();
 			sSelectedEntity = {};
 			SceneSerializer serializer(sActiveScene);
-			serializer.DeserializeText(filePath);
+			serializer.DeserializeText(filepath.string());
 		}
 	}
 
@@ -273,4 +276,25 @@ namespace Renaissance
 			serializer.SerializeText(filePath);
 		}
 	}
+
+	void EditorLayer::StartPlayInEditor()
+	{
+		if (!sActiveScene)
+			return; 
+
+		sSceneSnapshot = Scene::MakeSceneSnapshot(sActiveScene);		
+		sUpdateState = EEditorUpdateMode::Play;
+	}
+
+	void EditorLayer::StopPlayAndSimulate()
+	{
+		sUpdateState = EEditorUpdateMode::Editor;
+		sActiveScene = Scene::RestoreSceneSnapshot(sSceneSnapshot);
+	}
+
+	void EditorLayer::StartSimulate()
+	{
+		
+	}
+
 }

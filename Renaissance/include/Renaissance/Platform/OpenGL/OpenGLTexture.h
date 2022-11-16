@@ -17,6 +17,7 @@ namespace Renaissance::Graphics
 		virtual uint32_t GetWidth() const final { return mWidth; }
 		virtual uint32_t GetHeight() const final { return mHeight; }
 		virtual uint32_t GetRendererId() const final { return mRendererId; }
+		virtual std::filesystem::path GetPath() const final { return mPath; };
 
 		virtual void SetData(void* data, uint32_t size) final;
 
@@ -44,6 +45,7 @@ namespace Renaissance::Graphics
 		virtual uint32_t GetWidth() const final { return mWidth; }
 		virtual uint32_t GetHeight() const final { return mHeight; }
 		virtual uint32_t GetRendererId() const final { return mRendererId; }
+		virtual std::filesystem::path GetPath() const final { return mPath; };
 
 		virtual void SetData(void* data, uint32_t size) final;
 

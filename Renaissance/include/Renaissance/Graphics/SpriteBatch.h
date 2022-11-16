@@ -36,9 +36,9 @@ namespace Renaissance::Graphics
 		void Draw(const Vector3& location, const Vector2& size, const Vector4& tint);
 		void Draw(const Matrix4& transform, const Vector2& size, const Vector4& tint);
 
-		void Draw(const Vector3& location, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
-		void Draw(const Vector2& location, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
-		void Draw(const Matrix4& transform, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
+		void Draw(const Vector3& location, const Vector2& size, const SubTexture2D& texture, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
+		void Draw(const Vector2& location, const Vector2& size, const SubTexture2D& texture, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
+		void Draw(const Matrix4& transform, const Vector2& size, const SubTexture2D& texture, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
 
 		void Draw(const Vector2& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));
 		void Draw(const Vector3& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint = Vector4(1.0f));

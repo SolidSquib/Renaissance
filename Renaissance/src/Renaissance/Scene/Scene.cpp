@@ -1,17 +1,12 @@
 #include "RenaissancePCH.h"
-#include "Renaissance/Scene/Scene.h"
-#include "Renaissance/Scene/Entity.h"
-#include "Renaissance/Graphics/SpriteBatch.h"
-
 #include "Renaissance/Core/Application.h"
+#include "Renaissance/Graphics/SpriteBatch.h"
+#include "Renaissance/Scene/Scene.h"
+#include "Renaissance/Scene/SceneSerializer.h"
+#include "Renaissance/Scene/Entity.h"
 
 namespace Renaissance
 {
-	Scene::Scene()
-	{
-
-	}
-
 	Scene::~Scene()
 	{
 		mRegistry.view<NativeScriptComponent>().each([](auto handle, NativeScriptComponent& scriptComponent) {
@@ -28,17 +23,26 @@ namespace Renaissance
 		mRegistry.clear();
 	}
 
-	Entity Scene::CreateEntity()
+	Entity Scene::CreateEntity(const GUID* id /*= nullptr*/)
 	{
-		static uint32_t unnamedEntityCount = 0;
-		return CreateEntity("Entity_" + std::to_string(unnamedEntityCount++));
+		return CreateEntity("NewEntity", id);
 	}
 
-	Entity Scene::CreateEntity(const String& name)
+	Entity Scene::CreateEntity(const String& tag, const GUID* id /*= nullptr*/)
 	{
 		Entity entity(mRegistry.create(), this);
-		entity.AddComponent<IdentifierComponent>(name);
+		entity.AddComponent<TagComponent>(tag);
 		entity.AddComponent<TransformComponent>();
+
+		if (id)
+		{
+			entity.AddComponent<IdentifierComponent>(*id);
+		}
+		else
+		{
+			entity.AddComponent<IdentifierComponent>();
+		}
+
 		return entity;
 	}
 
@@ -70,6 +74,20 @@ namespace Renaissance
 		});		
 	}
 
+	void Scene::OnRender()
+	{
+		mRegistry.view<CameraComponent, TransformComponent>().each([this](auto handle, CameraComponent& cameraComponent, TransformComponent& transformComponent) {
+
+			if (cameraComponent.MainCamera)
+			{
+				OnRender(cameraComponent.Cam, transformComponent.GetTransform());
+				return;
+			}
+		});
+
+		//REN_CORE_WARN("No main camera found in scene, render aborted!");
+	}
+
 	void Scene::OnRender(const Graphics::Camera& camera, const Math::Matrix4& transform)
 	{
 		{
@@ -87,7 +105,7 @@ namespace Renaissance
 
 			Renderer::Get().EndScene();
 		}
-	}
+	}	
 
 	void Scene::IterateEntities(IteratorFunction function, Entity selectionContext)
 	{
@@ -98,5 +116,30 @@ namespace Renaissance
 				function(*this, Entity(handle, this), selectionContext);
 			});
 		}
+	}
+
+	Archive Scene::MakeSceneSnapshot(const SharedPtr<Scene>& scene)
+	{
+		Archive ar;
+		SceneWriter writer(scene, ar);
+
+		entt::snapshot{ scene->mRegistry }
+			.entities(writer)
+			.component<IdentifierComponent, TagComponent, TransformComponent, SpriteRendererComponent, CameraComponent>(writer);
+
+		return std::move(ar);
+	}
+
+	SharedPtr<Scene> Scene::RestoreSceneSnapshot(const Archive& ar)
+	{
+		SharedPtr<Scene> scene = MakeShared<Scene>();
+		SceneReader reader(scene, ar);
+
+		entt::snapshot_loader{ scene->mRegistry }
+			.entities(reader)
+			.component<IdentifierComponent, TagComponent, TransformComponent, SpriteRendererComponent, CameraComponent>(reader)
+			.orphans();
+
+		return scene;
 	}
 }

@@ -32,6 +32,9 @@ project "Sandbox"
 		"Renaissance"
 	}
 	
+	filter "files:%{wks.location}/Renaissance/externals/spdlog/include/**.h"
+		warnings "Off"
+
 	filter "system:windows"
 		systemversion "latest"
 	

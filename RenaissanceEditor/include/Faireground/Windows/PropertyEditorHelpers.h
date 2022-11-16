@@ -2,6 +2,9 @@
 
 #include "PropertyEditorWindow.h"
 
+#include "Faireground/EditorLayer.h"
+#include "IconsFontAwesome5.h"
+
 #include <glm/gtc/type_ptr.hpp>
 
 // for InputText that uses std::string
@@ -49,7 +52,7 @@ namespace Renaissance
 		}
 
 		template<>
-		static void DrawComponent<IdentifierComponent>(IdentifierComponent& component, Entity& entity)
+		static void DrawComponent<TagComponent>(TagComponent& component, Entity& entity)
 		{
 			if (ImGui::CollapsingHeader("Identifier Component", sComponentTreeNodeFlags))
 			{
@@ -58,7 +61,7 @@ namespace Renaissance
 				ImGui::Columns(2, "Columns");
 				ImGui::Text("Name");
 				ImGui::NextColumn();
-				ImGui::InputText("##Name", &component.Name);
+				ImGui::InputText("##Name", &component.Tag);
 				ImGui::NextColumn();
 
 				ImGui::Columns(1);
@@ -101,6 +104,48 @@ namespace Renaissance
 				ImGui::Text("Tint");
 				ImGui::NextColumn();
 				ImGui::ColorEdit4("##Tint", glm::value_ptr(component.Color));
+				ImGui::NextColumn();
+
+				ImGui::Text("Sprite");
+				ImGui::NextColumn();
+				ImVec2 uv[2] = { { component.Texture.MinCoord.x, component.Texture.MaxCoord.y }, { component.Texture.MaxCoord.x, component.Texture.MinCoord.y } };
+				ImVec4 color = { component.Color.r, component.Color.g, component.Color.b, component.Color.a };
+			
+				SharedPtr<Graphics::Texture2D> useTexture = component.Texture.Texture ? component.Texture.Texture : Graphics::TextureLibrary::GetGlobal().Get<Graphics::Texture2D>("DEFAULT");
+				ImGui::Image((ImTextureID)(uint64_t)useTexture->GetRendererId(), { 64.0f, 64.0f }, uv[0], uv[1], color);
+				
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload(DRAG_CONTEXT_PATH_TEX))
+					{
+						std::filesystem::path* filepath = reinterpret_cast<std::filesystem::path*>(Payload->Data);
+						component.Texture.Texture = Graphics::TextureLibrary::GetGlobal().FindOrLoad<Graphics::Texture2D>(*filepath);
+					}
+
+					ImGui::EndDragDropTarget();
+				}
+
+				if (component.Texture.Texture)
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, { 0,0,0,0 });
+					ImGui::SameLine();
+					if (ImGui::Button(ICON_FA_TIMES))
+					{
+						component.Texture.Texture = nullptr;
+					}
+					ImGui::PopStyleColor();
+				}
+
+				ImGui::NextColumn();
+
+				ImGui::Text("MinCoord");
+				ImGui::NextColumn();
+				DrawVector2Control("##MinCoord", component.Texture.MinCoord);
+				ImGui::NextColumn();
+
+				ImGui::Text("MaxCoord");
+				ImGui::NextColumn();
+				DrawVector2Control("##MaxCoord", component.Texture.MaxCoord, 1.0f);
 				ImGui::NextColumn();
 
 				ImGui::Text("Size");
@@ -182,6 +227,14 @@ namespace Renaissance
 					ImGui::DragFloat("##FieldOfView", &fov, 1.0f, 0.0f, 360.f, "%.0f", ImGuiSliderFlags_Logarithmic);
 					ImGui::NextColumn();
 				}
+
+				ImGui::Text("Main Camera?");
+				ImGui::NextColumn();
+				if (ImGui::Checkbox("##MainCamera", &component.MainCamera))
+				{
+					REN_CORE_INFO("clicked checkbox");
+				}
+				ImGui::NextColumn();
 
 				ImGui::Columns(1);
 

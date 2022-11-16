@@ -50,6 +50,7 @@ namespace Renaissance::Graphics
 		
 		uint32_t white = 0xffffffff;
 		WhiteTexture = Texture2D::Create(1, 1, &white);
+		TextureLibrary::GetGlobal().Add("DEFAULT", WhiteTexture);
 
 		SharedVertexPtr = new VertexData[MaxVertices];
 		SharedTextureUnitPtr = new SharedPtr<Texture2D>[MaxTextureUnits];
@@ -121,7 +122,7 @@ namespace Renaissance::Graphics
 	{
 		mActiveEntityId = entityId + 1;
 
-		if (spriteComponent.Texture)
+		if (spriteComponent.Texture.Texture)
 		{
 			Draw(transform, spriteComponent.Size, spriteComponent.Texture, spriteComponent.TilingFactor, spriteComponent.Color);
 		}
@@ -149,20 +150,20 @@ namespace Renaissance::Graphics
 		Draw(transform, size, WhiteTexture, Vector2(0.0f), Vector2(1.0f), Vector2(1.0), tint);
 	}
 
-	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
+	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const SubTexture2D& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
 		Draw(Vector3(location, 1.0f), size, texture, tilingFactor, tint);
 	}
 
-	void SpriteBatch::Draw(const Vector3& location, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
+	void SpriteBatch::Draw(const Vector3& location, const Vector2& size, const SubTexture2D& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
 		Matrix4 transform = glm::translate(IdentityMatrix, location);
 		Draw(transform, size, texture, tilingFactor, tint);
 	}
 
-	void SpriteBatch::Draw(const Matrix4& transform, const Vector2& size, const SharedPtr<SubTexture2D>& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
+	void SpriteBatch::Draw(const Matrix4& transform, const Vector2& size, const SubTexture2D& texture, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
 	{
-		Draw(transform, size, texture->GetTexture(), texture->GetMinCoord(), texture->GetMaxCoord(), tilingFactor, tint);
+		Draw(transform, size, texture.Texture, texture.MinCoord, texture.MaxCoord, tilingFactor, tint);
 	}
 
 	void SpriteBatch::Draw(const Vector2& location, const Vector2& size, const SharedPtr<Texture2D>& texture, const Vector2& textureCoordMin, const Vector2& textureCoordMax, const Vector2& tilingFactor, const Vector4& tint /*= Vector4(1.0f)*/)
@@ -261,7 +262,7 @@ namespace Renaissance::Graphics
 		if (mIndexCount == 0)
 		{
 			// nothing to draw.
-			REN_CORE_INFO("SpriteBatch flushed with 0 added elements.");
+			//REN_CORE_INFO("SpriteBatch flushed with 0 added elements.");
 			return;
 		}
 

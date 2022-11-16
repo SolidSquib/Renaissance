@@ -107,15 +107,17 @@ namespace Renaissance
 
 	static void SerializeEntityText(YAML::Emitter& out, const Entity& entity)
 	{
-		out << YAML::BeginMap;
-		out << YAML::Key << "ID" << YAML::Value << "12837192831273"; // #TODO: entity unique id goes here.
+		REN_CORE_ASSERT(entity.HasComponent<IdentifierComponent>() && entity.HasComponent<TransformComponent>());
 
-		const IdentifierComponent& identifierComponent = entity.GetComponent<IdentifierComponent>();
+		out << YAML::BeginMap;
+		out << YAML::Key << "ID" << YAML::Value << (uint64_t)entity.GetGuid(); // #TODO: entity unique id goes here.
+
+		const TagComponent& identifierComponent = entity.GetComponent<TagComponent>();
 		const TransformComponent& transformComponent = entity.GetComponent<TransformComponent>();
 
-		out << YAML::Key << "IdentifierComponent" << YAML::Value << YAML::BeginMap;
+		out << YAML::Key << "TagComponent" << YAML::Value << YAML::BeginMap;
 		{
-			out << YAML::Key << "Name" << YAML::Value << identifierComponent.Name;
+			out << YAML::Key << "Tag" << YAML::Value << identifierComponent.Tag;
 		}
 		out << YAML::EndMap;
 
@@ -136,7 +138,9 @@ namespace Renaissance
 				out << YAML::Key << "Tint" << YAML::Value << spriteComponent.Color;
 				out << YAML::Key << "Size" << YAML::Value << spriteComponent.Size;
 				out << YAML::Key << "TilingFactor" << YAML::Value << spriteComponent.TilingFactor;
-				// #TODO: texture/material reference
+				out << YAML::Key << "TexturePath" << YAML::Value << (spriteComponent.Texture.Texture ? spriteComponent.Texture.Texture->GetPath().string() : "");
+				out << YAML::Key << "MinCoord" << YAML::Value << spriteComponent.Texture.MinCoord;
+				out << YAML::Key << "MaxCoord" << YAML::Value << spriteComponent.Texture.MaxCoord;
 			}
 			out << YAML::EndMap;
 		}
@@ -204,13 +208,13 @@ namespace Renaissance
 		{
 			for (auto& entity : entities)
 			{
-				uint64_t uuid = entity["ID"].as<uint64_t>(); // #TODO: uuid
+				GUID guid = entity["ID"].as<uint64_t>();
 
-				// IdentifierComponent
-				auto identifierComponent = entity["IdentifierComponent"];
-				String entityName = identifierComponent["Name"].as<String>();
+				// TagComponent
+				auto tagComponent = entity["TagComponent"];
+				String tag = tagComponent["Tag"].as<String>();
 				
-				Entity& deserializedEntity = mScene->CreateEntity(entityName);
+				Entity& deserializedEntity = mScene->CreateEntity(tag, &guid);
 
 				// TransformComponent
 				auto transformComponentNode = entity["TransformComponent"];				
@@ -226,7 +230,13 @@ namespace Renaissance
 					spriteComponent.Color = spriteComponentNode["Tint"].as<Math::Vector4>();
 					spriteComponent.Size = spriteComponentNode["Size"].as<Math::Vector2>();
 					spriteComponent.TilingFactor = spriteComponentNode["TilingFactor"].as<Math::Vector2>();
-					// #TODO: texture/material reference
+					String filepath = spriteComponentNode["TexturePath"].as<String>();
+					if (!filepath.empty() && !spriteComponentNode["TexturePath"].IsNull())
+					{
+						spriteComponent.Texture.Texture = Graphics::TextureLibrary::GetGlobal().FindOrLoad<Graphics::Texture2D>(filepath);
+					}					
+					spriteComponent.Texture.MinCoord = spriteComponentNode["MinCoord"].as<Math::Vector2>();
+					spriteComponent.Texture.MaxCoord = spriteComponentNode["MaxCoord"].as<Math::Vector2>();
 				}
 
 				// CameraComponent
@@ -263,5 +273,30 @@ namespace Renaissance
 	bool SceneSerializer::DeserializeBinary(const String& filepath)
 	{
 		return false;
+	}
+
+	// serialization
+	void SceneWriter::operator()(entt::entity entity)
+	{
+		REN_CORE_TRACE("Serialize ENTITY");
+		mArchive << entity;
+	}
+	
+	void SceneWriter::operator()(std::underlying_type_t<entt::entity> entity)
+	{
+		REN_CORE_TRACE("Serialize ENTITY INNER");
+		mArchive << entity;
+	}
+
+	void SceneReader::operator()(entt::entity& entity)
+	{
+		REN_CORE_TRACE("Deserialize ENTITY");
+		mArchive >> entity;
+	}
+
+	void SceneReader::operator()(std::underlying_type_t<entt::entity>& entity)
+	{
+		REN_CORE_TRACE("Deserialize ENTITY INNER");
+		mArchive >> entity;
 	}
 }

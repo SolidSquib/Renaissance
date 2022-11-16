@@ -16,9 +16,9 @@ namespace Renaissance
 			{
 				sceneLock->IterateEntities([](Scene& scene, Entity entity, Entity selectedEntity) {
 										
-					const IdentifierComponent& id = entity.GetComponent<IdentifierComponent>();
+					const TagComponent& id = entity.GetComponent<TagComponent>();
 					
-					bool isOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, (selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick, id.Name.c_str());
+					bool isOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, (selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick, id.Tag.c_str());
 					if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 					{
 						EditorLayer::SetSelectedEntity(entity);

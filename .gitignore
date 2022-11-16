@@ -39,3 +39,7 @@ intermediates
 /Renaissance/*.vcxproj
 /Renaissance/Renaissance.vcxproj.filters
 /Sandbox/*.user
+*.user
+*.vcxproj
+*.filters
+/JSON/Schemas/Catalog

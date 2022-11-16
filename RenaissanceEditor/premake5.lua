@@ -43,6 +43,9 @@ project "Faireground"
 		"YAML_CPP_STATIC_DEFINE"
 	}
 	
+	filter "files:%{wks.location}/Renaissance/externals/spdlog/include/**.h"
+		warnings "Off"
+
 	filter "files:externals/ImGuizmo/**.cpp"
 		flags { "NoPCH" }
 
