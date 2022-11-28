@@ -14,13 +14,15 @@
 
 #include "ImGuizmo.h"
 #include "IconsFontAwesome5.h"
+#include "cereal/archives/json.hpp"
+#include "cereal/types/vector.hpp"
 
 namespace Renaissance
 {
 	using namespace Graphics;	
 	
 	SharedPtr<Scene> EditorLayer::sActiveScene;
-	Archive EditorLayer::sSceneSnapshot;
+	String EditorLayer::sSceneSnapshot;
 	Entity EditorLayer::sSelectedEntity;
 	EditorLayer::EEditorUpdateMode EditorLayer::sUpdateState = EEditorUpdateMode::Editor;
 
@@ -47,16 +49,76 @@ namespace Renaissance
 	void EditorLayer::OnAttached()
 	{
 		Window& window = Application::Get().GetWindow();
+		
+		// Register known component types 
+		TagComponent::DefineEntityMetaType();
+		IdentifierComponent::DefineEntityMetaType();
+		TransformComponent::DefineEntityMetaType();
+		SpriteRendererComponent::DefineEntityMetaType();
+		CameraComponent::DefineEntityMetaType();
 
-		CreateNewWindow<EditorViewportWindow>(0, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
-		CreateNewWindow<SceneHierarchyWindow>();
-		CreateNewWindow<PropertyEditorWindow>();
-		CreateNewWindow<ContentBrowserWindow>(0);
-		CreateNewWindow<EditorToolbarWindow>();
+ 		TagComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+ 		IdentifierComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+ 		TransformComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+ 		SpriteRendererComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+ 		CameraComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+
+		std::ifstream input("config/editor.json");
+		if (input.fail())
+		{
+			CreateNewWindow<EditorViewportWindow>(0, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
+			CreateNewWindow<SceneHierarchyWindow>();
+			CreateNewWindow<PropertyEditorWindow>();
+			CreateNewWindow<ContentBrowserWindow>(0);
+			CreateNewWindow<EditorToolbarWindow>();
+		}
+		else
+		{
+			std::vector<String> windows;
+			{
+				cereal::JSONInputArchive archive(input);
+				archive(windows);
+			}
+
+			uint32_t numViewports = 0;
+			uint32_t numContentBrowsers = 0;
+			for (auto& windowData : windows)
+			{
+				if (windowData == EditorToolbarWindow::GetWindowClassNameStatic() && GetWindowCount<EditorToolbarWindow>() == 0)
+				{
+					CreateNewWindow<EditorToolbarWindow>();
+				}
+				else if (windowData == SceneHierarchyWindow::GetWindowClassNameStatic() && GetWindowCount<SceneHierarchyWindow>() == 0)
+				{
+					CreateNewWindow<SceneHierarchyWindow>();
+				}
+				else if (windowData == PropertyEditorWindow::GetWindowClassNameStatic() && GetWindowCount<PropertyEditorWindow>() == 0)
+				{
+					CreateNewWindow<PropertyEditorWindow>();
+				}
+				else if (windowData == EditorViewportWindow::GetWindowClassNameStatic())
+				{
+					CreateNewWindow<EditorViewportWindow>(numViewports++, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
+				}
+				else if (windowData == ContentBrowserWindow::GetWindowClassNameStatic())
+				{
+					CreateNewWindow<ContentBrowserWindow>(numContentBrowsers++);
+				}
+			}
+		}
 	}
 
 	void EditorLayer::OnDetached()
 	{
+		std::ofstream output("config/editor.json");
+		cereal::JSONOutputArchive archive(output);
+		std::vector<String> windows;
+		for (const SharedPtr<EditorWindow>& window : mWindows)
+		{
+			windows.push_back(window->GetWindowClassName());
+		}
+		archive(cereal::make_nvp("Windows", windows));
+
 		mWindows.clear();
 	}
 
@@ -71,8 +133,8 @@ namespace Renaissance
 		// because it would be confusing to have two docking targets within each others.
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 		ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(viewport->GetWorkPos());
-		ImGui::SetNextWindowSize(viewport->GetWorkSize());
+		ImGui::SetNextWindowPos(viewport->WorkPos);
+		ImGui::SetNextWindowSize(viewport->WorkSize);
 		ImGui::SetNextWindowViewport(viewport->ID);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -282,14 +344,16 @@ namespace Renaissance
 		if (!sActiveScene)
 			return; 
 
-		sSceneSnapshot = Scene::MakeSceneSnapshot(sActiveScene);		
+		sSceneSnapshot = sActiveScene->MakeSnapshot();
 		sUpdateState = EEditorUpdateMode::Play;
 	}
 
 	void EditorLayer::StopPlayAndSimulate()
 	{
+		sActiveScene->RestoreSnapshot(sSceneSnapshot);
+		sSceneSnapshot = "";
+
 		sUpdateState = EEditorUpdateMode::Editor;
-		sActiveScene = Scene::RestoreSceneSnapshot(sSceneSnapshot);
 	}
 
 	void EditorLayer::StartSimulate()

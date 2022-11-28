@@ -27,15 +27,16 @@ project "Renaissance"
 	includedirs
 	{
 		"include",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.cereal}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.yamlcpp}",
-		"%{IncludeDir.IconFonts}"
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.IconFonts}",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.yamlcpp}"
 	}
 	
 	links

@@ -17,10 +17,10 @@ namespace Renaissance
 	{ }
 
 	EditorViewportWindow::EditorViewportWindow(uint32_t viewportIndex, const Graphics::Camera& camera)
-		: mViewportCameraController(camera)
+		: EditorWindow(viewportIndex == 0 ? "Viewport" : "Viewport " + std::to_string(viewportIndex + 1)),
+		mIndex(viewportIndex),
+		mViewportCameraController(camera)
 	{
-		mViewportName = viewportIndex == 0 ? "Viewport" : "Viewport " + std::to_string(viewportIndex + 1);
-
 		Graphics::FrameBuffer::Specification spec;
 		spec.Width = (uint32_t)mCachedViewportSize.x;
 		spec.Height = (uint32_t)mCachedViewportSize.y;
@@ -55,7 +55,7 @@ namespace Renaissance
 	void EditorViewportWindow::OnUIRender()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin(mViewportName.c_str(), &mOpen);
+		ImGui::Begin(mName.c_str(), &mOpen);
 		{			
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			Vector2 glmPanelSize = { viewportPanelSize.x, viewportPanelSize.y };

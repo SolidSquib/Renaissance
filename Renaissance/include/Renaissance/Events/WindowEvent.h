@@ -12,14 +12,18 @@ namespace Renaissance::Events
 	public:		
 		DEFINE_REN_EVENT_CATEGORY(EventCategoryWindow)
 
+		uint32_t GetWindowIndex() const { return mIndex; }
+
 	protected:
-		WindowEvent() {}
+		WindowEvent(uint32_t index) : mIndex(index) {}
+
+		uint32_t mIndex;
 	};
 
 	class WindowClosedEvent : public WindowEvent
 	{
 	public:
-		WindowClosedEvent() : WindowEvent() {}
+		WindowClosedEvent(uint32_t index) : WindowEvent(index) {}
 
 		DEFINE_REN_EVENT_TYPE(WindowClose)
 	};
@@ -27,12 +31,13 @@ namespace Renaissance::Events
 	class WindowResizeEvent : public WindowEvent
 	{
 	public:
-		WindowResizeEvent(uint32_t width, uint32_t height)
-			: WindowEvent(), mWidth(width), mHeight(height)
+		WindowResizeEvent(uint32_t index, uint32_t width, uint32_t height, bool maximized)
+			: WindowEvent(index), mWidth(width), mHeight(height), mIsMaximized(maximized)
 		{}
 
 		inline uint32_t GetWidth() const { return mWidth; }
 		inline uint32_t GetHeight() const { return mHeight; }
+		inline bool IsMaximized() const { return mIsMaximized; }
 
 		std::string ToString() const override
 		{
@@ -45,12 +50,13 @@ namespace Renaissance::Events
 
 	private:
 		uint32_t mWidth, mHeight;
+		bool mIsMaximized;
 	};
 
 	class WindowFocusEvent : public WindowEvent
 	{
 	public:
-		WindowFocusEvent() : WindowEvent() {}
+		WindowFocusEvent(uint32_t index) : WindowEvent(index) {}
 
 		DEFINE_REN_EVENT_TYPE(WindowFocus)
 	};
@@ -58,7 +64,7 @@ namespace Renaissance::Events
 	class WindowLostFocusEvent : public WindowEvent
 	{
 	public:
-		WindowLostFocusEvent() : WindowEvent() {}
+		WindowLostFocusEvent(uint32_t index) : WindowEvent(index) {}
 
 		DEFINE_REN_EVENT_TYPE(WindowLostFocus)
 	};
@@ -66,8 +72,8 @@ namespace Renaissance::Events
 	class WindowMovedEvent: public WindowEvent
 	{
 	public:
-		WindowMovedEvent(int xpos, int ypos)
-			: WindowEvent(), mX(xpos), mY(ypos)
+		WindowMovedEvent(uint32_t index, int xpos, int ypos)
+			: WindowEvent(index), mX(xpos), mY(ypos)
 		{}
 
 		inline int GetXPos() const { return mX; }

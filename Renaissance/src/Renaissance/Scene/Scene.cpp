@@ -1,5 +1,6 @@
 #include "RenaissancePCH.h"
 #include "Renaissance/Core/Application.h"
+#include "Renaissance/Core/Archive.h"
 #include "Renaissance/Graphics/SpriteBatch.h"
 #include "Renaissance/Scene/Scene.h"
 #include "Renaissance/Scene/SceneSerializer.h"
@@ -84,8 +85,6 @@ namespace Renaissance
 				return;
 			}
 		});
-
-		//REN_CORE_WARN("No main camera found in scene, render aborted!");
 	}
 
 	void Scene::OnRender(const Graphics::Camera& camera, const Math::Matrix4& transform)
@@ -118,28 +117,22 @@ namespace Renaissance
 		}
 	}
 
-	Archive Scene::MakeSceneSnapshot(const SharedPtr<Scene>& scene)
+	Renaissance::String Scene::MakeSnapshot()
 	{
-		Archive ar;
-		SceneWriter writer(scene, ar);
-
-		entt::snapshot{ scene->mRegistry }
-			.entities(writer)
-			.component<IdentifierComponent, TagComponent, TransformComponent, SpriteRendererComponent, CameraComponent>(writer);
-
-		return std::move(ar);
+		std::ostringstream output(std::ios::binary);
+		cereal::BinaryOutputArchive writer(output);
+		writer(*this);
+		return output.str();
 	}
 
-	SharedPtr<Scene> Scene::RestoreSceneSnapshot(const Archive& ar)
+	void Scene::RestoreSnapshot(const String& binaryString)
 	{
-		SharedPtr<Scene> scene = MakeShared<Scene>();
-		SceneReader reader(scene, ar);
-
-		entt::snapshot_loader{ scene->mRegistry }
-			.entities(reader)
-			.component<IdentifierComponent, TagComponent, TransformComponent, SpriteRendererComponent, CameraComponent>(reader)
-			.orphans();
-
-		return scene;
+		std::istringstream input(binaryString, std::ios::binary);
+		if (input.good())
+		{
+			mRegistry.clear();
+			cereal::BinaryInputArchive reader(input);
+			reader(*this);
+		}
 	}
 }

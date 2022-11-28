@@ -110,7 +110,7 @@ namespace Renaissance
 		REN_CORE_ASSERT(entity.HasComponent<IdentifierComponent>() && entity.HasComponent<TransformComponent>());
 
 		out << YAML::BeginMap;
-		out << YAML::Key << "ID" << YAML::Value << (uint64_t)entity.GetGuid(); // #TODO: entity unique id goes here.
+		out << YAML::Key << "ID" << YAML::Value << (uint64_t)entity.GetGuid(); 
 
 		const TagComponent& identifierComponent = entity.GetComponent<TagComponent>();
 		const TransformComponent& transformComponent = entity.GetComponent<TransformComponent>();
@@ -276,27 +276,27 @@ namespace Renaissance
 	}
 
 	// serialization
-	void SceneWriter::operator()(entt::entity entity)
-	{
-		REN_CORE_TRACE("Serialize ENTITY");
-		mArchive << entity;
-	}
-	
-	void SceneWriter::operator()(std::underlying_type_t<entt::entity> entity)
-	{
-		REN_CORE_TRACE("Serialize ENTITY INNER");
-		mArchive << entity;
-	}
-
-	void SceneReader::operator()(entt::entity& entity)
-	{
-		REN_CORE_TRACE("Deserialize ENTITY");
-		mArchive >> entity;
-	}
-
-	void SceneReader::operator()(std::underlying_type_t<entt::entity>& entity)
-	{
-		REN_CORE_TRACE("Deserialize ENTITY INNER");
-		mArchive >> entity;
-	}
+// 	void SceneWriter::operator()(entt::entity entity)
+// 	{
+// 		REN_CORE_TRACE("Serialize ENTITY");
+// 		/*mArchive << entity;*/
+// 	}
+// 	
+// 	void SceneWriter::operator()(std::underlying_type_t<entt::entity> entity)
+// 	{
+// 		REN_CORE_TRACE("Serialize ENTITY INNER");
+// 	/*	mArchive << entity;*/
+// 	}
+// 
+// 	void SceneReader::operator()(entt::entity& entity)
+// 	{
+// 		REN_CORE_TRACE("Deserialize ENTITY");
+// 	/*	mArchive >> entity;*/
+// 	}
+// 
+// 	void SceneReader::operator()(std::underlying_type_t<entt::entity>& entity)
+// 	{
+// 		REN_CORE_TRACE("Deserialize ENTITY INNER");
+// 		/*mArchive >> entity;*/
+// 	}
 }

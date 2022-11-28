@@ -21,3 +21,6 @@
 [submodule "Renaissance/externals/IconFontCppHeaders"]
 	path = Renaissance/externals/IconFontCppHeaders
 	url = https://github.com/juliettef/IconFontCppHeaders.git
+[submodule "Renaissance/externals/cereal"]
+	path = Renaissance/externals/cereal
+	url = https://github.com/SolidSquib/cereal.git

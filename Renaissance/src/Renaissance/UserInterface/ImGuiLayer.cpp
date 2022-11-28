@@ -5,15 +5,17 @@
 #include "imgui.h"
 #include "IconsFontAwesome5.h"
 
-#include "examples/imgui_impl_glfw.h"
-#include "examples/imgui_impl_opengl3.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 #include "GLFW/glfw3.h"
 
 namespace Renaissance
 {
 	ImGuiLayer::ImGuiLayer()
 		: Layer("ImGui")
-	{
+	{		
+		std::filesystem::path absoluteIniPath = std::filesystem::absolute(std::filesystem::path("config/layout.ini"));
+		mLayoutIni = absoluteIniPath.string();
 	}
 
 	ImGuiLayer::~ImGuiLayer()
@@ -53,6 +55,9 @@ namespace Renaissance
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
+
+		// load window data	
+		io.IniFilename = mLayoutIni.c_str();
 
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());

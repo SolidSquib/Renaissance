@@ -1,11 +1,13 @@
 #pragma once
 
-#include "Renaissance/Core/Archive.h"
 #include "Renaissance/Core/Core.h"
 #include "Renaissance/Core/GUID.h"
 #include "Renaissance/Graphics/Camera.h"
 
 #include "entt.hpp"
+
+#include <cereal/types/vector.hpp>
+#include <cereal/types/unordered_map.hpp>
 
 namespace Renaissance
 {
@@ -33,8 +35,30 @@ namespace Renaissance
 		typedef void(*IteratorFunction)(Scene&, Entity, Entity);
 		void IterateEntities(IteratorFunction function, Entity selectionContext);
 
-		static Archive MakeSceneSnapshot(const SharedPtr<Scene>& scene);
-		static SharedPtr<Scene> RestoreSceneSnapshot(const Archive& ar);
+		String MakeSnapshot();
+		void RestoreSnapshot(const String& binaryString);
+
+		template<class Archive>
+		void save(Archive& ar) const
+		{
+			std::vector<Entity> entities;
+			mRegistry.each([this, &entities](entt::entity entityId) {
+
+				Entity entity(entityId, const_cast<Scene*>(this));
+				if (!entity.IsValid())
+					return;
+				
+				entities.push_back(entity);
+			});
+			ar(cereal::make_nvp("Entities", entities));
+		}		
+
+		template<class Archive>
+		void load(Archive& ar)
+		{
+			EntityLoader loader(this);
+			ar(loader);
+		}
 
 	private:
 		entt::registry mRegistry;

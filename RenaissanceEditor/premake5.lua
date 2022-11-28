@@ -24,13 +24,14 @@ project "Faireground"
 	{
 		"include",
 		"%{wks.location}/Renaissance/include",
-		"%{wks.location}/Renaissance/externals/spdlog/include",
-		"%{IncludeDir.glm}",
-		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.cereal}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.yamlcpp}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.IconFonts}",
+		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.IconFonts}"
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.yamlcpp}"
 	}
 	
 	links

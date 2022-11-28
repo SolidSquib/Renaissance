@@ -23,10 +23,20 @@ namespace Renaissance
 
 		bool DrawViewportSettings();
 
+		static String GetWindowClassNameStatic() { return "EditorViewport"; }
+		virtual String GetWindowClassName() const final { return EditorViewportWindow::GetWindowClassNameStatic(); }
+
+		template<class Archive>
+		void serialize(Archive& ar)
+		{
+			ar(cereal::make_nvp("Index", mIndex));
+		}
+
 	private:
 		bool mOpen = true;
 		ImGuiMouseButton mButtonFocus = ImGuiMouseButton_COUNT;
-		String mViewportName = "Viewport";
+		uint32_t mIndex;
+
 		int mGizmoManipulateOperation = 0;
 		uint32_t mGizmoManipulateSpace = 0;
 		bool mGizmoEnableTranslationSnapping = false;

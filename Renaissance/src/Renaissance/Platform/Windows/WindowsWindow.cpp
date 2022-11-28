@@ -6,7 +6,9 @@
 #include "Renaissance/Events/KeyEvent.h"
 #include "Renaissance/Events/MouseEvent.h"
 
+#define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
 namespace Renaissance
 {
@@ -15,11 +17,12 @@ namespace Renaissance
 	static void GLFWErrorCallback(int error, const char* desc)
 	{
 		REN_CORE_ERROR("GLFW error {0}: {1}", error, desc);
+		REN_CORE_ASSERT(false);
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProperties& properties)
+	WindowsWindow::WindowsWindow(const WindowProperties& properties, int xPos, int yPos)
 	{
-		Init(properties);
+		Init(properties, xPos, yPos);
 	}
 
 	WindowsWindow::~WindowsWindow()
@@ -29,8 +32,8 @@ namespace Renaissance
 
 	void WindowsWindow::OnUpdate()
 	{
-		glfwPollEvents();
 		mRenderContext->SwapBuffers();
+		glfwPollEvents();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
@@ -47,11 +50,26 @@ namespace Renaissance
 		mData.VSyncEnabled = enabled;
 	}
 
-	void WindowsWindow::Init(const WindowProperties& properties)
+	void WindowsWindow::SetPosition(uint32_t x, uint32_t y)
+	{
+		HWND windowHandle = glfwGetWin32Window(mWindow);
+	
+		if (IsZoomed(windowHandle))
+		{
+			glfwRestoreWindow(mWindow);
+		}
+
+		int left, top, right, bottom;
+		glfwGetWindowFrameSize(mWindow, &left, &top, &right, &bottom);
+		glfwSetWindowPos(mWindow, x, y + top);
+	}
+
+	void WindowsWindow::Init(const WindowProperties& properties, int x, int y)
 	{
 		mData.Properties = properties;
+		mData.Index = sGLFWWindowCount;
 
-		REN_CORE_INFO("Creating window \"{0}\" with dimensions:  {1}, {2}", properties.Title, properties.Width, properties.Height);
+		REN_CORE_INFO("Creating window \"{0}\" with dimensions:  {1}, {2}", mData.Properties.Title, mData.Properties.Width, mData.Properties.Height);
 		if (sGLFWWindowCount == 0)
 		{
 			int success = glfwInit();
@@ -59,8 +77,15 @@ namespace Renaissance
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
-		mWindow = glfwCreateWindow((int)properties.Width, (int)properties.Height, properties.Title.c_str(), nullptr, nullptr);
-		sGLFWWindowCount++;
+		glfwWindowHint(GLFW_MAXIMIZED, mData.Properties.Maximized ? GLFW_TRUE : GLFW_FALSE);
+		mWindow = glfwCreateWindow((int)mData.Properties.Width, (int)mData.Properties.Height, mData.Properties.Title.c_str(), nullptr, nullptr);
+		
+		if (!mData.Properties.Maximized)
+		{
+			SetPosition(x, y);
+		}
+
+		sGLFWWindowCount += 1;
 
 		mRenderContext = new Graphics::OpenGLContext(mWindow);
 		mRenderContext->Init();
@@ -73,25 +98,28 @@ namespace Renaissance
 		// GLFW event callbacks:
 		glfwSetWindowCloseCallback(mWindow, [](GLFWwindow* window) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-			data.EventCallback(Events::WindowClosedEvent());
+			data.EventCallback(Events::WindowClosedEvent(data.Index));
 		});
 
 		glfwSetWindowSizeCallback(mWindow, [](GLFWwindow* window, int width, int height) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			data.Properties.Width = width;
 			data.Properties.Height = height;
-			data.EventCallback(Events::WindowResizeEvent(static_cast<uint32_t>(width), static_cast<uint32_t>(height)));
+			HWND nativeWindow = glfwGetWin32Window(window);
+			data.Properties.Maximized = IsZoomed(nativeWindow);
+
+			data.EventCallback(Events::WindowResizeEvent(data.Index, static_cast<uint32_t>(width), static_cast<uint32_t>(height), data.Properties.Maximized));
 		});
 
 		glfwSetWindowFocusCallback(mWindow, [](GLFWwindow* window, int focused) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			if (focused == GLFW_TRUE)
 			{
-				data.EventCallback(Events::WindowFocusEvent());
+				data.EventCallback(Events::WindowFocusEvent(data.Index));
 			}
 			else
 			{
-				data.EventCallback(Events::WindowLostFocusEvent());
+				data.EventCallback(Events::WindowLostFocusEvent(data.Index));
 			}			
 		});
 
@@ -101,9 +129,13 @@ namespace Renaissance
 
 		glfwSetWindowPosCallback(mWindow, [](GLFWwindow* window, int xpos, int ypos) {
 			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+			int left, top, right, bottom;
+			glfwGetWindowFrameSize(window, &left, &top, &right, &bottom);
+
 			data.Xpos = xpos;
-			data.Ypos = ypos;
-			data.EventCallback(Events::WindowMovedEvent(xpos, ypos));
+			data.Ypos = ypos - top;
+			data.EventCallback(Events::WindowMovedEvent(data.Index, xpos, ypos));
 		});
 
 		glfwSetKeyCallback(mWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -158,6 +190,12 @@ namespace Renaissance
 
 	void WindowsWindow::Shutdown()
 	{
-		
+		delete mRenderContext;
+		mRenderContext = nullptr;
+
+		glfwDestroyWindow(mWindow);
+		mWindow = nullptr;
+
+		sGLFWWindowCount -= 1;
 	}
 }

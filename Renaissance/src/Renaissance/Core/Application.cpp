@@ -14,8 +14,35 @@ namespace Renaissance
 	{
 		REN_CORE_ASSERT(sInstance == nullptr, "An instance of application already exists!");
 		sInstance = this;
-		mWindow = Window::Create(WindowProperties(name));
-		mWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
+		if constexpr (cereal::JSONOutputArchive::is_loading::value)
+		{
+
+		}
+		WindowProperties windowProps(name);
+		std::ifstream input("config/engine.json");		
+		if (!input.good())
+		{
+			Config::SavedWindowData defaultWindow;
+			defaultWindow.Width = windowProps.Width;
+			defaultWindow.Height = windowProps.Height;
+			defaultWindow.X = 0;
+			defaultWindow.Y = 0;
+			defaultWindow.Maximized = windowProps.Maximized;
+			mAppSettings.Windows.push_back(defaultWindow);
+		}
+		else
+		{
+			cereal::JSONInputArchive reader(input);
+			reader(mAppSettings);
+		}
+
+		windowProps.Width = mAppSettings.Windows[0].Width;
+		windowProps.Height = mAppSettings.Windows[0].Height;
+		windowProps.Maximized = mAppSettings.Windows[0].Maximized;
+		int x = mAppSettings.Windows[0].X;
+		int y = mAppSettings.Windows[0].Y;
+		
+		AddWindow(windowProps, x, y);
 
 		Graphics::Renderer::Get().Init();
 		Graphics::SpriteBatch::Init();
@@ -36,14 +63,27 @@ namespace Renaissance
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowClosedEvent>(REN_BIND_EVENT(Application::OnWindowClosed));
 		dispatcher.Dispatch<WindowResizeEvent>(REN_BIND_EVENT(Application::OnWindowResized));
+		dispatcher.Dispatch<WindowMovedEvent>(REN_BIND_EVENT(Application::OnWindowMoved));
 
 		// propogate events to other layers
 		mLayerStack.OnEvent(e);
 	}
 
+	Renaissance::Window& Application::AddWindow(const WindowProperties& properties, int x /*= 0*/, int y /*= 0*/)
+	{
+		UniquePtr<Window>& newWindow = mWindows.emplace_back(Window::Create(properties, x, y));
+		newWindow->SetEventCallback(REN_BIND_EVENT(Application::OnEvent));
+
+		return *newWindow;
+	}
+
 	void Application::Close()
 	{
 		mRunning = false;
+
+		std::ofstream output("config/engine.json");
+		cereal::JSONOutputArchive writer(output);
+		writer(cereal::make_nvp("EngineSettings", mAppSettings));
 	}
 
 	void Application::Run()
@@ -67,13 +107,28 @@ namespace Renaissance
 				mImGuiLayer.lock()->EndDraw();
 			}
 
-			mWindow->OnUpdate();
+			for (auto& window : mWindows)
+			{
+				window->OnUpdate();
+			}			
 		}
 	}
 
 	bool Application::OnWindowClosed(WindowClosedEvent& e)
 	{
-		mRunning = false;
+		uint32_t index = e.GetWindowIndex();
+		mWindows.erase(mWindows.begin() + index);
+
+		for (uint32_t i = index; index < mWindows.size(); ++i)
+		{
+			mWindows[i]->SetIndex(mWindows[i]->GetIndex() - 1);
+		}
+
+		if (mWindows.size() <= 0)
+		{
+			Close();
+		}
+
 		return true;
 	}
 
@@ -86,8 +141,24 @@ namespace Renaissance
 		}
 
 		mMinimized = false;
-		
+
+		REN_CORE_ASSERT(e.GetWindowIndex() < mAppSettings.Windows.size());
+		Config::SavedWindowData& windowConfig = mAppSettings.Windows[e.GetWindowIndex()];
+		windowConfig.Width = e.GetWidth();
+		windowConfig.Height = e.GetHeight();
+		windowConfig.Maximized = e.IsMaximized();
+
 		Graphics::Renderer::Get().OnWindowResize(e.GetWidth(), e.GetHeight());
+
+		return false;
+	}
+
+	bool Application::OnWindowMoved(WindowMovedEvent& e)
+	{
+		REN_CORE_ASSERT(e.GetWindowIndex() < mAppSettings.Windows.size());
+		Config::SavedWindowData& windowConfig = mAppSettings.Windows[e.GetWindowIndex()];
+		windowConfig.X = e.GetXPos();
+		windowConfig.Y = e.GetYPos();
 
 		return false;
 	}

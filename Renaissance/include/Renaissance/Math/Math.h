@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Renaissance/Core/Archive.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -30,5 +32,26 @@ namespace Renaissance
 		static inline const Matrix4 IdentityMatrix = Matrix4(1.0f);
 
 		bool DecomposeTransform(const Matrix4& transform, Vector3& translation, Vector3& rotation, Vector3& scale);
+	}
+}
+
+namespace glm
+{
+	template<class Ar>
+	void serialize(Ar& archive, vec2& vector)
+	{
+		archive(cereal::make_nvp("X", vector.x), cereal::make_nvp("Y", vector.y));
+	}
+
+	template<class Ar>
+	void serialize(Ar& archive, vec3& vector)
+	{
+		archive(cereal::make_nvp("X", vector.x), cereal::make_nvp("Y", vector.y), cereal::make_nvp("Z", vector.z));
+	}
+
+	template<class Ar>
+	void serialize(Ar& archive, vec4& vector)
+	{
+		archive(cereal::make_nvp("X", vector.x), cereal::make_nvp("Y", vector.y), cereal::make_nvp("Z", vector.z), cereal::make_nvp("W", vector.w));
 	}
 }

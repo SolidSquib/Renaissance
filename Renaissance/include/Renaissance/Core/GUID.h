@@ -2,8 +2,14 @@
 
 #include <xhash>
 
+namespace cereal
+{
+	class access;
+}
+
 namespace Renaissance
 {
+
 	class GUID
 	{
 	public:
@@ -12,6 +18,21 @@ namespace Renaissance
 		GUID(const GUID&) = default;
 
 		explicit operator uint64_t() const { return mGuid; }
+
+	private:
+		friend class cereal::access;
+
+		template <class Archive>
+		uint64_t save_minimal(Archive const&) const
+		{
+			return mGuid;
+		}
+
+		template <class Archive>
+		void load_minimal(Archive const&, uint64_t const& value)
+		{
+			mGuid = value;
+		}
 
 	private:
 		uint64_t mGuid;

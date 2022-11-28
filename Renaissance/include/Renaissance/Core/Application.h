@@ -11,6 +11,10 @@
 
 #include "Renaissance/UserInterface/ImGuiLayer.h"
 
+#include "Renaissance/Config/Config.h"
+#include "Renaissance/Core/Archive.h"
+#include "Renaissance/Core/Delegates/Delegate.h"
+
 int main(int argc, char** argv);
 
 namespace Renaissance 
@@ -35,7 +39,8 @@ namespace Renaissance
 
 		void OnEvent(Event& e);
 
-		Window& GetWindow() const { return *mWindow; }
+		Window& GetWindow(uint32_t index = 0) const { REN_CORE_ASSERT(index < mWindows.size());  return *mWindows[index]; }
+		Window& AddWindow(const WindowProperties& properties, int x = 0, int y = 0);
 
 		void Close();
 		
@@ -63,11 +68,12 @@ namespace Renaissance
 		void Run();
 		bool OnWindowClosed(WindowClosedEvent& e);
 		bool OnWindowResized(WindowResizeEvent& e);
+		bool OnWindowMoved(WindowMovedEvent& e);
 
 	private:
 		ApplicationCommandLineArgs mArgs;
 		LayerStack mLayerStack;
-		UniquePtr<Window> mWindow;
+		std::vector<UniquePtr<Window>> mWindows;
 		bool mRunning = true;
 		bool mMinimized = false;
 		float mLastFrameTime = 0.0f;
@@ -75,6 +81,11 @@ namespace Renaissance
 
 		static Application* sInstance;
 		friend int ::main(int argc, char** argv);
+
+		Config::EngineConfig mAppSettings;
+
+		MulticastDelegate<void(const cereal::JSONOutputArchive&)> OnSaveApplicationData;
+		MulticastDelegate<void(const cereal::JSONInputArchive&)> OnLoadApplicationData;
 	};
 
 	// Define this function in the client app:

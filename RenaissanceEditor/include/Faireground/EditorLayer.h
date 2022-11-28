@@ -80,7 +80,7 @@ namespace Renaissance
 
 	private:
 		static SharedPtr<Scene> sActiveScene;
-		static Archive sSceneSnapshot;
+		static String sSceneSnapshot;
 		static Entity sSelectedEntity;
 		static EEditorUpdateMode sUpdateState;
 

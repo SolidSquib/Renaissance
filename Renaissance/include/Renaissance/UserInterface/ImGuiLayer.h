@@ -32,5 +32,7 @@ namespace Renaissance
 
 	private:
 		bool mBlockEvents = true;
+		
+		String mLayoutIni;
 	};
 }

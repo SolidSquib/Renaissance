@@ -1,5 +1,6 @@
 #include "RenaissancePCH.h"
 #include "Renaissance/Scene/Entity.h"
+#include "Renaissance/Scene/Component.h"
 
 namespace Renaissance
 {
@@ -12,6 +13,11 @@ namespace Renaissance
 	Entity::~Entity()
 	{
 
+	}
+
+	GUID Entity::GetGuid() const
+	{
+		return GetComponent<IdentifierComponent>().Guid;
 	}
 
 	Math::Vector3 Entity::GetLocation() const

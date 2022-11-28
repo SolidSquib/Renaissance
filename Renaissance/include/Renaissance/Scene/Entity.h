@@ -2,7 +2,15 @@
 
 #include "Renaissance/Core/Core.h"
 #include "Renaissance/Scene/Scene.h"
-#include "Renaissance/Scene/Component.h"
+
+namespace entt
+{
+	template<class Archive>
+	void serialize(Archive& archive, meta_any& any)
+	{
+		any.invoke("serialize"_hs, &archive);
+	}
+}
 
 namespace Renaissance
 {
@@ -14,7 +22,7 @@ namespace Renaissance
 		virtual ~Entity();
 
 		bool IsValid() const { return mHandle != entt::null && mScene != nullptr; }
-		GUID GetGuid() const { return GetComponent<IdentifierComponent>().Guid; }
+		GUID GetGuid() const;
 
 		Math::Vector3 GetLocation() const;
 		Math::Vector3 GetRotation() const;
@@ -73,10 +81,66 @@ namespace Renaissance
 			return !(*this != other);
 		}
 
+		template<class Archive>
+		void save(Archive& ar) const
+		{
+			std::vector<entt::id_type> componentTypes;
+			for (auto&& curr : mScene->mRegistry.storage())
+			{
+				if (auto& storage = curr.second; storage.contains(mHandle))
+				{
+					componentTypes.push_back(curr.first);					
+				}
+			}
+
+			ar(cereal::make_nvp("ComponentTypes", componentTypes));
+
+			for (auto& type : componentTypes)
+			{
+				const auto metaType = entt::resolve(type);
+				const auto any = metaType.func("get"_hs).invoke({}, &mScene->mRegistry, mHandle);
+				const auto componentName = metaType.prop("name"_hs).value().cast<String>();
+				ar(cereal::make_nvp(componentName, any));
+			}
+		}
+
+		template<class Archive>
+		void load(Archive& ar)
+		{
+			std::vector<entt::id_type> componentTypes;
+			ar(componentTypes);
+			
+			REN_CORE_ASSERT(IsValid());
+			
+			for (auto& type : componentTypes)
+			{
+				const auto metaType = entt::resolve(type);
+				entt::hashed_string id = metaType.prop("id"_hs).value().cast<entt::hashed_string>();
+				entt::meta_any component;
+
+				if (id == "TagComponent"_hs || id == "IdentifierComponent"_hs || id == "TransformComponent"_hs)
+				{
+					component = metaType.func("get"_hs).invoke({}, &mScene->mRegistry, mHandle);
+				}
+				else
+				{
+					component = metaType.func("add"_hs).invoke({}, &mScene->mRegistry, mHandle);
+				}
+
+				ar(component);
+			}
+		}
+
 	private:
 		entt::entity mHandle = entt::null;
 		Scene* mScene = nullptr;
 	};
+
+	template<class Ar>
+	void serialize(Ar& archive, entt::entity& entity)
+	{
+		archive((uint32_t)entity);
+	}
 
 	class ScriptableEntity
 	{
@@ -111,5 +175,35 @@ namespace Renaissance
 
 		friend class Scene;
 		friend class SceneSerializer;
+	};
+
+	class EntityLoader
+	{
+	public:
+		EntityLoader(Scene* scene) : mScene(scene) {}
+
+		template<class Archive>
+		void save(Archive& ar) const
+		{
+			REN_CORE_ASSERT(false, "We should be saving using the provided vector serializer!");
+		}
+
+		template<class Archive>
+		void load(Archive& ar)
+		{
+			cereal::size_type vectorSize;
+			ar(cereal::make_size_tag(vectorSize));
+
+			mEntities.resize(static_cast<std::size_t>(vectorSize));
+			size_t numElements = static_cast<std::size_t>(vectorSize);
+ 			for (size_t i = 0; i < numElements; ++i)
+ 			{
+ 				ar(mScene->CreateEntity());
+ 			}
+		}
+
+	private:
+		Scene* mScene;
+		std::vector<Entity> mEntities;
 	};
 }

@@ -12,9 +12,10 @@ namespace Renaissance
 	ImFont* ContentBrowserWindow::IconFontLarge = nullptr;
 
 	ContentBrowserWindow::ContentBrowserWindow(uint32_t index)
-		: mContentBrowserIndex(index), mActivePath(sAssetsDirectory)
+		: EditorWindow(index == 0 ? "Content Browser" : "Content Browser " + std::to_string(mContentBrowserIndex + 1)), 
+		mContentBrowserIndex(index), mActivePath(sAssetsDirectory)
 	{
-		mContentBrowserName = index == 0 ? "Content Browser" : "Content Browser " + std::to_string(mContentBrowserIndex + 1);
+		
 	}
 
 	void ContentBrowserWindow::OnUIRender()
@@ -40,7 +41,7 @@ namespace Renaissance
 		}
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin(mContentBrowserName.c_str(), &mOpen);
+		ImGui::Begin(mName.c_str(), &mOpen);
 		{
 			const bool upDirectoryEnabled = mActivePath != sAssetsDirectory;
 
@@ -109,7 +110,7 @@ namespace Renaissance
 					if (!shouldDrawAsList)
 					{
 						float cellSize = (float)(mIconSize + (mIconPadding * 2));
-						float panelWidth = ImGui::GetContentRegionAvailWidth();
+						float panelWidth = ImGui::GetContentRegionAvail().x;
 						int columnsCount = (int)(panelWidth / cellSize);
 						if (columnsCount < 1)
 							columnsCount = 1;

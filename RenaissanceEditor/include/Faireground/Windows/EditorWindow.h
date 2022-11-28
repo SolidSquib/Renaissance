@@ -11,6 +11,7 @@ namespace Renaissance
 	class EditorWindow
 	{
 	public:
+		EditorWindow(const String& name) : mName(name) { }
 		virtual ~EditorWindow() = default;
 
 		virtual void Open() { }
@@ -21,5 +22,12 @@ namespace Renaissance
 
 		virtual bool WantsInputFocus() const { return false; }
 		virtual bool WantsToClose() const = 0;
-	};
+
+		// For serialization
+		virtual String GetWindowClassName() const = 0;
+		String GetWindowName() const { return mName; };
+
+	protected:
+		String mName;
+	};	
 }

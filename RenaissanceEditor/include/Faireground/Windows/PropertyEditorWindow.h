@@ -9,7 +9,7 @@ namespace Renaissance
 	class PropertyEditorWindow : public EditorWindow
 	{
 	public:
-		PropertyEditorWindow() = default;
+		PropertyEditorWindow() : EditorWindow("Property Editor") {}
 
 		virtual void Open() override;
 		virtual void Close() override;
@@ -17,6 +17,9 @@ namespace Renaissance
 		virtual void OnUpdate(float deltaTime) override;
 
 		virtual bool WantsToClose() const override { return !mOpen; }
+
+		static String GetWindowClassNameStatic() { return "PropertyEditor"; }
+		virtual String GetWindowClassName() const final { return PropertyEditorWindow::GetWindowClassNameStatic(); }
 
 	private:
 		bool mOpen = true;
