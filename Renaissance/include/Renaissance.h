@@ -6,6 +6,7 @@
 #include "Renaissance/Core/Delegates/Delegate.h"
 #include "Renaissance/Core/GUID.h"
 #include "Renaissance/Core/Log.h"
+#include "Renaissance/Core/FileSystem.h"
 
 // Input 
 #include "Renaissance/Core/InputManager.h"

@@ -7,6 +7,7 @@
 #include "Renaissance/Graphics/VertexArray.h"
 #include "Renaissance/Graphics/Renderer.h"
 #include "Renaissance/Core/Application.h"
+#include "Renaissance/Core/FileSystem.h"
 
 namespace Renaissance::Graphics
 {
@@ -89,7 +90,7 @@ namespace Renaissance::Graphics
 		SharedVertexArray->AddVertexBuffer(SharedVertexBuffer);
 		SharedVertexArray->SetIndexBuffer(SharedIndexBuffer);
 
-		DefaultShader = ShaderLibrary::GetGlobal().Load("../Renaissance/assets/shaders/Texture.glsl");
+		DefaultShader = ShaderLibrary::GetGlobal().Load("shaders/Texture.glsl"_sengine);
 	}
 
 	void SpriteBatch::Shutdown()

@@ -4,6 +4,7 @@
 #include "Renaissance/Graphics/Renderer.h"
 #include "Renaissance/Graphics/SpriteBatch.h"
 #include "Renaissance/Platform/Platform.h"
+#include "Renaissance/Core/FileSystem.h"
 
 namespace Renaissance
 {

@@ -44,10 +44,10 @@ namespace Renaissance
 		iconConfig.PixelSnapH = true;
 		
 		const float defaultFontSize = 14.0f;
-		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/comfortaa/Comfortaa-Regular.ttf", defaultFontSize);
-		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/" FONT_ICON_FILE_NAME_FAS, defaultFontSize, &iconConfig, iconRanges);
-		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/comfortaa/Comfortaa-Bold.ttf", defaultFontSize);
-		io.Fonts->AddFontFromFileTTF("../Renaissance/assets/fonts/" FONT_ICON_FILE_NAME_FAS, defaultFontSize, &iconConfig, iconRanges);
+		io.Fonts->AddFontFromFileTTF(FileSystem::GetPathStringRelativeToEngineContent("fonts/comfortaa/Comfortaa-Regular.ttf").c_str(), defaultFontSize);
+		io.Fonts->AddFontFromFileTTF(FileSystem::GetPathStringRelativeToEngineContent("fonts/" FONT_ICON_FILE_NAME_FAS).c_str(), defaultFontSize, &iconConfig, iconRanges);
+		io.Fonts->AddFontFromFileTTF(FileSystem::GetPathStringRelativeToEngineContent("fonts/comfortaa/Comfortaa-Bold.ttf").c_str(), defaultFontSize);
+		io.Fonts->AddFontFromFileTTF(FileSystem::GetPathStringRelativeToEngineContent("fonts/" FONT_ICON_FILE_NAME_FAS).c_str(), defaultFontSize, &iconConfig, iconRanges);
 
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

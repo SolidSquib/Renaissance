@@ -19,6 +19,7 @@
 // Renaissance Core
 #include "Renaissance/Core/Core.h"
 #include "Renaissance/Core/Log.h"
+#include "Renaissance/Core/FileSystem.h"
 
 #ifdef REN_PLATFORM_WINDOWS
 	#include <Windows.h>
