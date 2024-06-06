@@ -4,6 +4,7 @@
         "SceneHeirarchy",
         "PropertyEditor",
         "ContentBrowser",
-        "EditorToolbar"
+        "EditorToolbar",
+        "EditorViewport"
     ]
 }

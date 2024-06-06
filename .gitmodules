@@ -23,4 +23,4 @@
 	url = https://github.com/SolidSquib/cereal.git
 [submodule "RenaissanceEditor/externals/ImGuizmo"]
 	path = RenaissanceEditor/externals/ImGuizmo
-	url = https://github.com/CedricGuillemet/ImGuizmo.git
+	url = https://github.com/SolidSquib/ImGuizmo
