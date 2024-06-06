@@ -173,32 +173,29 @@ namespace Renaissance
 							float* snappingVar = mGizmoManipulateOperation == 1 ? &mGizmoRotationSnapping : &mGizmoTranslationSnapping;
 							bool wantsSnapping = mGizmoManipulateOperation == 1 ? mGizmoEnableRotationSnapping : mGizmoEnableTranslationSnapping;
 
-							static bool sFirstFrame = true;
-							static Vector3 sCachedDelta_Translation, sCachedDelta_Rotation, sCachedDelta_Scale;
-
 							Matrix4 delta;
 							if (ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix), (ImGuizmo::OPERATION)mGizmoManipulateOperation, (ImGuizmo::MODE)mGizmoManipulateSpace, glm::value_ptr(entityTransform),
 								glm::value_ptr(delta), wantsSnapping ? snappingVar : nullptr))
 							{
 								// Something's up with how the delta computes in ortho projection mode, so I gotta take the numerical anomaly into account before applying
 								// any transformations.
-								if (sFirstFrame)
+								if (mFirstFrame)
 								{
-									Math::DecomposeTransform(delta, sCachedDelta_Translation, sCachedDelta_Rotation, sCachedDelta_Scale);
-									sFirstFrame = false;
+									Math::DecomposeTransform(delta, mCachedDelta_Translation, mCachedDelta_Rotation, mCachedDelta_Scale);
+									mFirstFrame = false;
 								}
 								else if (ImGuizmo::IsUsing() && acceptMouseInput)
 								{
 									Vector3 translation, rotation, scale;
 									Math::DecomposeTransform(delta, translation, rotation, scale);
-									transformComponent.Location += (translation - sCachedDelta_Translation);
-									transformComponent.Rotation += (rotation - sCachedDelta_Rotation);
-									transformComponent.Scale += (scale - sCachedDelta_Scale);
+									transformComponent.Location += (translation - mCachedDelta_Translation);
+									transformComponent.Rotation += (rotation - mCachedDelta_Rotation);
+									transformComponent.Scale += (scale - mCachedDelta_Scale);
 								}								
 							}
 							else if (!ImGuizmo::IsUsing())
 							{
-								sFirstFrame = true;
+								mFirstFrame = true;
 							}
 						}
 

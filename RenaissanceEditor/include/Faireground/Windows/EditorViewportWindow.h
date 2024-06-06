@@ -50,5 +50,8 @@ namespace Renaissance
 		EditorCameraController mViewportCameraController;
 
 		SharedPtr<Graphics::FrameBuffer> mViewportFrameBuffer;
+
+		bool mFirstFrame = true;
+		Vector3 mCachedDelta_Translation, mCachedDelta_Rotation, mCachedDelta_Scale;
 	};
 }
