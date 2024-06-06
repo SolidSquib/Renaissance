@@ -37,8 +37,8 @@ namespace Renaissance
 		ImGuiMouseButton mButtonFocus = ImGuiMouseButton_COUNT;
 		uint32_t mIndex;
 
-		int mGizmoManipulateOperation = 0;
-		uint32_t mGizmoManipulateSpace = 0;
+		int mGizmoManipulateOperation;
+		uint32_t mGizmoManipulateSpace;
 		bool mGizmoEnableTranslationSnapping = false;
 		bool mGizmoEnableRotationSnapping = false;
 		float mGizmoTranslationSnapping = 0.5f;

@@ -19,6 +19,8 @@ namespace Renaissance
 	EditorViewportWindow::EditorViewportWindow(uint32_t viewportIndex, const Graphics::Camera& camera)
 		: EditorWindow(viewportIndex == 0 ? "Viewport" : "Viewport " + std::to_string(viewportIndex + 1)),
 		mIndex(viewportIndex),
+		mGizmoManipulateOperation(ImGuizmo::OPERATION::TRANSLATE),
+		mGizmoManipulateSpace(ImGuizmo::MODE::LOCAL),
 		mViewportCameraController(camera)
 	{
 		Graphics::FrameBuffer::Specification spec;
@@ -170,8 +172,8 @@ namespace Renaissance
 							TransformComponent& transformComponent = selectedEntity.GetComponent<TransformComponent>();
 							Math::Matrix4 entityTransform = transformComponent.GetTransform();
 
-							float* snappingVar = mGizmoManipulateOperation == 1 ? &mGizmoRotationSnapping : &mGizmoTranslationSnapping;
-							bool wantsSnapping = mGizmoManipulateOperation == 1 ? mGizmoEnableRotationSnapping : mGizmoEnableTranslationSnapping;
+							float* snappingVar = mGizmoManipulateOperation == ImGuizmo::OPERATION::ROTATE ? &mGizmoRotationSnapping : &mGizmoTranslationSnapping;
+							bool wantsSnapping = mGizmoManipulateOperation == ImGuizmo::OPERATION::ROTATE ? mGizmoEnableRotationSnapping : mGizmoEnableTranslationSnapping;
 
 							Matrix4 delta;
 							if (ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix), (ImGuizmo::OPERATION)mGizmoManipulateOperation, (ImGuizmo::MODE)mGizmoManipulateSpace, glm::value_ptr(entityTransform),
@@ -241,19 +243,19 @@ namespace Renaissance
 
 			if (ImGui::Selectable("Disable Gizmo", mGizmoManipulateOperation == -1, ImGuiSelectableFlags_DontClosePopups))
 				mGizmoManipulateOperation = -1;
-			if (ImGui::Selectable("Translate", mGizmoManipulateOperation == 0, ImGuiSelectableFlags_DontClosePopups))
-				mGizmoManipulateOperation = 0;
-			if (ImGui::Selectable("Rotate", mGizmoManipulateOperation == 1, ImGuiSelectableFlags_DontClosePopups))
-				mGizmoManipulateOperation = 1;
-			if (ImGui::Selectable("Scale", mGizmoManipulateOperation == 2, ImGuiSelectableFlags_DontClosePopups))
-				mGizmoManipulateOperation = 2;
+			if (ImGui::Selectable("Translate", mGizmoManipulateOperation == ImGuizmo::OPERATION::TRANSLATE, ImGuiSelectableFlags_DontClosePopups))
+				mGizmoManipulateOperation = ImGuizmo::OPERATION::TRANSLATE;
+			if (ImGui::Selectable("Rotate", mGizmoManipulateOperation == ImGuizmo::OPERATION::ROTATE, ImGuiSelectableFlags_DontClosePopups))
+				mGizmoManipulateOperation = ImGuizmo::OPERATION::ROTATE;
+			if (ImGui::Selectable("Scale", mGizmoManipulateOperation == ImGuizmo::OPERATION::SCALE, ImGuiSelectableFlags_DontClosePopups))
+				mGizmoManipulateOperation = ImGuizmo::OPERATION::SCALE;
 
 			ImGui::Separator();
 
-			if (ImGui::Selectable("Transform Local", mGizmoManipulateSpace == 0, ImGuiSelectableFlags_DontClosePopups))
-				mGizmoManipulateSpace = 0;
-			if (ImGui::Selectable("Transform World", mGizmoManipulateSpace == 1, ImGuiSelectableFlags_DontClosePopups))
-				mGizmoManipulateSpace = 1;
+			if (ImGui::Selectable("Transform Local", mGizmoManipulateSpace == ImGuizmo::MODE::LOCAL, ImGuiSelectableFlags_DontClosePopups))
+				mGizmoManipulateSpace = ImGuizmo::MODE::LOCAL;
+			if (ImGui::Selectable("Transform World", mGizmoManipulateSpace == ImGuizmo::MODE::WORLD, ImGuiSelectableFlags_DontClosePopups))
+				mGizmoManipulateSpace = ImGuizmo::MODE::WORLD;
 
 			ImGui::Separator();			
 

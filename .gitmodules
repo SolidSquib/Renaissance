@@ -24,3 +24,4 @@
 [submodule "RenaissanceEditor/externals/ImGuizmo"]
 	path = RenaissanceEditor/externals/ImGuizmo
 	url = https://github.com/SolidSquib/ImGuizmo
+	branch = master
