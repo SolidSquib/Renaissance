@@ -37,6 +37,7 @@ namespace Renaissance
 		Vector3 GetUpVector() const { return glm::rotate(GetOrientation(), WorldUp); }
 		Vector3 GetRightVector() const { return glm::rotate(GetOrientation(), WorldRight); }
 		Vector3 GetForwardVector() const { return glm::rotate(GetOrientation(), WorldForward); }
+		void SetTransform(const Matrix4& Transform);
 		void SetLocation(const Vector3& location) { mLocation = location; }
 		void SetRotation(const Vector3& rotation) { mPitch = rotation.x, mYaw = rotation.y, mRoll = rotation.z; };
 		void SetViewportSize(float width, float height) { mCamera.SetViewportSize(width, height); }

@@ -87,8 +87,26 @@ namespace Renaissance
 		writer(cereal::make_nvp("EngineSettings", mAppSettings));
 	}
 
+	void Application::RegisterComponentTypes()
+	{
+		// Register known component types 
+		TagComponent::DefineEntityMetaType();
+		IdentifierComponent::DefineEntityMetaType();
+		TransformComponent::DefineEntityMetaType();
+		SpriteRendererComponent::DefineEntityMetaType();
+		CameraComponent::DefineEntityMetaType();
+
+		TagComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+		IdentifierComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+		TransformComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+		SpriteRendererComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+		CameraComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
+	}
+
 	void Application::Run()
 	{
+		RegisterComponentTypes();
+
 		Graphics::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 
 		while (mRunning)

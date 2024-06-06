@@ -1,0 +1,9 @@
+{
+    "Windows": [
+        "EditorViewport",
+        "SceneHeirarchy",
+        "PropertyEditor",
+        "ContentBrowser",
+        "EditorToolbar"
+    ]
+}

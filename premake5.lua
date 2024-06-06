@@ -32,6 +32,9 @@ workspace "Renaissance"
 	group("Engine")
 		include "Renaissance"
 		include "RenaissanceEditor"
+		
+	group("Programs")
+		include "Renaissance/programs/ProjectLauncher"
 
 	group("Externals")
 		include "Renaissance/externals/GLFW"

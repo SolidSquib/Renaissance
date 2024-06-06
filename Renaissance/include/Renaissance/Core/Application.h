@@ -62,6 +62,9 @@ namespace Renaissance
 		static Application& Get() { return *sInstance; }
 
 	protected:
+		virtual void RegisterComponentTypes();
+
+	protected:
 		WeakPtr<ImGuiLayer> mImGuiLayer;
 
 	private:

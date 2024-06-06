@@ -49,19 +49,6 @@ namespace Renaissance
 	void EditorLayer::OnAttached()
 	{
 		Window& window = Application::Get().GetWindow();
-		
-		// Register known component types 
-		TagComponent::DefineEntityMetaType();
-		IdentifierComponent::DefineEntityMetaType();
-		TransformComponent::DefineEntityMetaType();
-		SpriteRendererComponent::DefineEntityMetaType();
-		CameraComponent::DefineEntityMetaType();
-
- 		TagComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
- 		IdentifierComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
- 		TransformComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
- 		SpriteRendererComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
- 		CameraComponent::RegisterComponentSerializeFunctions<cereal::JSONInputArchive, cereal::JSONOutputArchive, cereal::BinaryInputArchive, cereal::BinaryOutputArchive>();
 
 		std::ifstream input("config/editor.json");
 		if (input.fail())
@@ -98,7 +85,7 @@ namespace Renaissance
 				}
 				else if (windowData == EditorViewportWindow::GetWindowClassNameStatic())
 				{
-					CreateNewWindow<EditorViewportWindow>(numViewports++, Graphics::Camera::MakeOrthographic((float)window.GetWidth(), (float)window.GetHeight(), 2.0f, 0.1f, 500.0f));
+					CreateNewWindow<EditorViewportWindow>(numViewports++, Graphics::Camera::MakePerspective((float)window.GetWidth(), (float)window.GetHeight(), 75.0f, 0.1f, 1000.0f));
 				}
 				else if (windowData == ContentBrowserWindow::GetWindowClassNameStatic())
 				{

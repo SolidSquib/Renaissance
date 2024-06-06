@@ -50,10 +50,7 @@ namespace Renaissance
 				
 				if (ImGui::ButtonEx(ICON_FA_SAVE, { useButtonSize,useButtonSize }, isSceneLoaded ? 0 : ImGuiItemFlags_Disabled))
 				{
-					std::ofstream output("assets/cerealTestScene.json");
-					cereal::JSONOutputArchive writer(output);
-					Scene& sceneRef = *(activeScene.get());
-					writer(cereal::make_nvp("Scene", sceneRef));
+					EditorLayer::SaveSceneAs();
 				}
 			});
 			
@@ -61,11 +58,7 @@ namespace Renaissance
 				
 				if (ImGui::ButtonEx(ICON_FA_FOLDER_OPEN, { useButtonSize, useButtonSize }))
 				{
-					std::ifstream input("assets/cerealTestScene.json");
-					cereal::JSONInputArchive writer(input);
-					SharedPtr<Scene> newScene = MakeShared<Scene>();
-					Scene& sceneRef = *(newScene.get());
-					writer(cereal::make_nvp("Scene", sceneRef));
+					EditorLayer::OpenScene();
 				}
 			});
 

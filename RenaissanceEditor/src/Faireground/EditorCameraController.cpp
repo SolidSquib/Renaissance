@@ -122,4 +122,10 @@ namespace Renaissance
 
 		return true;
 	}
+	void EditorCameraController::SetTransform(const Matrix4& Transform)
+	{
+		Vector3 rotation, scale;
+		Math::DecomposeTransform(Transform, mLocation, rotation, scale);
+		SetRotation(rotation);
+	}
 }

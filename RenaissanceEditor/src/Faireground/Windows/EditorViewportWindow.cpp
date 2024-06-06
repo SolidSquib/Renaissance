@@ -90,7 +90,6 @@ namespace Renaissance
 						ImGui::EndDragDropTarget();
 					}
 
-					//ImVec2 windowSize = ImGui::GetWindowSize();
 					ImVec2 minBound = ImGui::GetWindowPos();
 					minBound.x -= viewportOffset.x;
 					minBound.y -= viewportOffset.y;
@@ -110,7 +109,6 @@ namespace Renaissance
 					SharedPtr<Scene> activeScene = EditorLayer::GetActiveScene().lock();
 					if (activeScene)
 					{
-
 						if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && acceptMouseInput && mButtonFocus == ImGuiMouseButton_COUNT)
 						{
 							ImGui::SetWindowFocus();
@@ -158,34 +156,49 @@ namespace Renaissance
 							}
 						}
 
+						ImGuizmo::SetOrthographic(mViewportCameraController.GetCamera().IsOrthographic());
+						ImGuizmo::SetDrawlist();
+						ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportPanelSize.x, viewportPanelSize.y);
+
+						Math::Matrix4 projectionMatrix = mViewportCameraController.GetCamera().GetProjectionMatrix();
+						Math::Matrix4 viewMatrix = glm::inverse(mViewportCameraController.GetTransform());
+
 						// Render gizmos
 						Entity selectedEntity = EditorLayer::GetSelectedEntity();
 						if (selectedEntity && mGizmoManipulateOperation != -1)
 						{
-							ImGuizmo::SetOrthographic(mViewportCameraController.GetCamera().IsOrthographic());
-							ImGuizmo::SetDrawlist();
-
-							ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportPanelSize.x, viewportPanelSize.y);
-
-							Math::Matrix4 projectionMatrix = mViewportCameraController.GetCamera().GetProjectionMatrix();
-							Math::Matrix4 viewMatrix = glm::inverse(mViewportCameraController.GetTransform());
 							TransformComponent& transformComponent = selectedEntity.GetComponent<TransformComponent>();
 							Math::Matrix4 entityTransform = transformComponent.GetTransform();
 
 							float* snappingVar = mGizmoManipulateOperation == 1 ? &mGizmoRotationSnapping : &mGizmoTranslationSnapping;
 							bool wantsSnapping = mGizmoManipulateOperation == 1 ? mGizmoEnableRotationSnapping : mGizmoEnableTranslationSnapping;
 
-							ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix), (ImGuizmo::OPERATION)mGizmoManipulateOperation, (ImGuizmo::MODE)mGizmoManipulateSpace, glm::value_ptr(entityTransform),
-								nullptr, wantsSnapping ? snappingVar : nullptr);
+							static bool sFirstFrame = true;
+							static Vector3 sCachedDelta_Translation, sCachedDelta_Rotation, sCachedDelta_Scale;
 
-							if (ImGuizmo::IsUsing() && acceptMouseInput)
+							Matrix4 delta;
+							if (ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix), (ImGuizmo::OPERATION)mGizmoManipulateOperation, (ImGuizmo::MODE)mGizmoManipulateSpace, glm::value_ptr(entityTransform),
+								glm::value_ptr(delta), wantsSnapping ? snappingVar : nullptr))
 							{
-								Vector3 translation, rotation, scale;
-								Math::DecomposeTransform(entityTransform, translation, rotation, scale);
-								transformComponent.Location = translation;
-								Math::Vector3 deltaRotation = rotation - transformComponent.Rotation;
-								transformComponent.Rotation += deltaRotation;
-								transformComponent.Scale = scale;
+								// Something's up with how the delta computes in ortho projection mode, so I gotta take the numerical anomaly into account before applying
+								// any transformations.
+								if (sFirstFrame)
+								{
+									Math::DecomposeTransform(delta, sCachedDelta_Translation, sCachedDelta_Rotation, sCachedDelta_Scale);
+									sFirstFrame = false;
+								}
+								else if (ImGuizmo::IsUsing() && acceptMouseInput)
+								{
+									Vector3 translation, rotation, scale;
+									Math::DecomposeTransform(delta, translation, rotation, scale);
+									transformComponent.Location += (translation - sCachedDelta_Translation);
+									transformComponent.Rotation += (rotation - sCachedDelta_Rotation);
+									transformComponent.Scale += (scale - sCachedDelta_Scale);
+								}								
+							}
+							else if (!ImGuizmo::IsUsing())
+							{
+								sFirstFrame = true;
 							}
 						}
 
@@ -197,7 +210,11 @@ namespace Renaissance
 
 							EditorLayer::SetSelectedEntity(Entity((entt::entity)(entityId - 1), activeScene.get()));
 						}
-					}
+
+						// view rotation widget and camera update
+						ImVec2 widgetLocation = ImVec2(ImGui::GetWindowPos().x + viewportPanelSize.x - 100.f, ImGui::GetWindowPos().y);
+						ImGuizmo::ViewManipulate(glm::value_ptr(viewMatrix), -100, widgetLocation, ImVec2(100.f, 100.f), 0);
+					}					
 				}
 				ImGui::EndChild();
 			}
