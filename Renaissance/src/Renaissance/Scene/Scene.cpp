@@ -3,7 +3,6 @@
 #include "Renaissance/Core/Archive.h"
 #include "Renaissance/Graphics/SpriteBatch.h"
 #include "Renaissance/Scene/Scene.h"
-#include "Renaissance/Scene/SceneSerializer.h"
 #include "Renaissance/Scene/Entity.h"
 
 namespace Renaissance
@@ -135,4 +134,7 @@ namespace Renaissance
 			reader(*this);
 		}
 	}
+
+	/*void prologue(cereal::JSONOutputArchive& ar, Scene const& scene) {}
+	void epilogue(cereal::JSONOutputArchive& ar, Scene const& scene) {}*/
 }

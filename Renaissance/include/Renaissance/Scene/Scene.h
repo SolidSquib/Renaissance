@@ -2,12 +2,10 @@
 
 #include "Renaissance/Core/Core.h"
 #include "Renaissance/Core/GUID.h"
+#include "Renaissance/Core/Serialization.h"
 #include "Renaissance/Graphics/Camera.h"
 
 #include "entt.hpp"
-
-#include <cereal/types/vector.hpp>
-#include <cereal/types/unordered_map.hpp>
 
 namespace Renaissance
 {
@@ -66,4 +64,13 @@ namespace Renaissance
 		friend class Entity;
 		friend class SceneSerializer;
 	};
+
+	inline void prologue(cereal::JSONOutputArchive& ar, Scene const& scene) {}
+	inline void epilogue(cereal::JSONOutputArchive& ar, Scene const& scene) {}
+	inline void prologue(cereal::JSONInputArchive& ar, Scene const& scene) {}
+	inline void epilogue(cereal::JSONInputArchive& ar, Scene const& scene) {}
+	inline void prologue(cereal::BinaryOutputArchive& ar, Scene const& scene) {}
+	inline void epilogue(cereal::BinaryOutputArchive& ar, Scene const& scene) {}
+	inline void prologue(cereal::BinaryInputArchive& ar, Scene const& scene) {}
+	inline void epilogue(cereal::BinaryInputArchive& ar, Scene const& scene) {}
 }

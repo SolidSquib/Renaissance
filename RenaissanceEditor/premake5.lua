@@ -30,8 +30,7 @@ project "Faireground"
 		"%{IncludeDir.IconFonts}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.yamlcpp}"
+		"%{IncludeDir.spdlog}"
 	}
 	
 	links

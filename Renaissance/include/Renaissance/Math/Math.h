@@ -39,19 +39,31 @@ namespace glm
 {
 	template<class Ar>
 	void serialize(Ar& archive, vec2& vector)
-	{
-		archive(cereal::make_nvp("X", vector.x), cereal::make_nvp("Y", vector.y));
+	{	
+		cereal::size_type s = 2;
+		archive(cereal::make_size_tag(s));
+		archive(vector.x);
+		archive(vector.y);
 	}
 
 	template<class Ar>
 	void serialize(Ar& archive, vec3& vector)
 	{
-		archive(cereal::make_nvp("X", vector.x), cereal::make_nvp("Y", vector.y), cereal::make_nvp("Z", vector.z));
+		cereal::size_type s = 3;
+		archive(cereal::make_size_tag(s));
+		archive(vector.x);
+		archive(vector.y);
+		archive(vector.z);
 	}
 
 	template<class Ar>
 	void serialize(Ar& archive, vec4& vector)
 	{
-		archive(cereal::make_nvp("X", vector.x), cereal::make_nvp("Y", vector.y), cereal::make_nvp("Z", vector.z), cereal::make_nvp("W", vector.w));
+		cereal::size_type s = 4;
+		archive(cereal::make_size_tag(s));
+		archive(vector.x);
+		archive(vector.y);
+		archive(vector.z);
+		archive(vector.w);
 	}
 }

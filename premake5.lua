@@ -9,7 +9,6 @@ IncludeDir["ImGui"] = "%{wks.location}/Renaissance/externals/ImGui/"
 IncludeDir["ImGuizmo"] = "%{wks.location}/RenaissanceEditor/externals/ImGuizmo"
 IncludeDir["spdlog"] = "%{wks.location}/Renaissance/externals/spdlog/include"
 IncludeDir["stb_image"] = "%{wks.location}/Renaissance/externals/stb_image"
-IncludeDir["yamlcpp"] = "%{wks.location}/Renaissance/externals/yaml-cpp/include"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -32,13 +31,9 @@ workspace "Renaissance"
 	group("Engine")
 		include "Renaissance"
 		include "RenaissanceEditor"
-		
-	group("Programs")
-		include "Renaissance/programs/ProjectLauncher"
 
 	group("Externals")
 		include "Renaissance/externals/GLFW"
 		include "Renaissance/externals/Glad"
 		include "Renaissance/externals/ImGui"
-		include "Renaissance/externals/yaml-cpp"
 		include "Renaissance/externals/cereal"

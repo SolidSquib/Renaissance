@@ -7,10 +7,4 @@ namespace Renaissance
 	{
 		Location += translation;
 	}
-
-	//DEFINE_COMPONENT_META(TagComponent);
-	//DEFINE_COMPONENT_META(IdentifierComponent);
-	//DEFINE_COMPONENT_META(TransformComponent);
-	//DEFINE_COMPONENT_META(SpriteRendererComponent);
-	//DEFINE_COMPONENT_META(CameraComponent);
 }

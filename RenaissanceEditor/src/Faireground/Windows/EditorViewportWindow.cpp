@@ -210,9 +210,8 @@ namespace Renaissance
 							EditorLayer::SetSelectedEntity(Entity((entt::entity)(entityId - 1), activeScene.get()));
 						}
 
-						// view rotation widget and camera update
 						ImVec2 widgetLocation = ImVec2(ImGui::GetWindowPos().x + viewportPanelSize.x - 100.f, ImGui::GetWindowPos().y);
-						ImGuizmo::ViewManipulate(glm::value_ptr(viewMatrix), -100, widgetLocation, ImVec2(100.f, 100.f), 0);
+						ImGuizmo::ViewManipulate(glm::value_ptr(viewMatrix), 100, widgetLocation, ImVec2(100.f, 100.f), 0);
 					}					
 				}
 				ImGui::EndChild();

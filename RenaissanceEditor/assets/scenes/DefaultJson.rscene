@@ -1,0 +1,174 @@
+{
+    "Entities": [
+        {
+            "ComponentTypes": [
+                1272846681,
+                341444041,
+                4284001660,
+                3942060043
+            ],
+            "TagComponent": {
+                "Tag": "Awesome Face"
+            },
+            "TransformComponent": {
+                "Location": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "IdentifierComponent": {
+                "Guid": 0
+            },
+            "SpriteRendererComponent": {
+                "Color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Size": [
+                    1.0,
+                    1.0
+                ],
+                "TilingFactor": [
+                    1.0,
+                    1.0
+                ],
+                "MinCoord": [
+                    0.0,
+                    0.0
+                ],
+                "MaxCoord": [
+                    1.0,
+                    1.0
+                ],
+                "Texture": "../Renaissance/assets/textures/awesomeface.png"
+            }
+        },
+        {
+            "ComponentTypes": [
+                1272846681,
+                341444041,
+                4284001660,
+                3942060043,
+                279123388
+            ],
+            "TagComponent": {
+                "Tag": "Container"
+            },
+            "TransformComponent": {
+                "Location": [
+                    1.0,
+                    -0.20000000298023225,
+                    -2.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "IdentifierComponent": {
+                "Guid": 1
+            },
+            "SpriteRendererComponent": {
+                "Color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Size": [
+                    0.5,
+                    0.5
+                ],
+                "TilingFactor": [
+                    1.0,
+                    1.0
+                ],
+                "MinCoord": [
+                    0.0,
+                    0.0
+                ],
+                "MaxCoord": [
+                    1.0,
+                    1.0
+                ],
+                "Texture": "../Renaissance/assets/textures/container.jpg"
+            },
+            "CameraComponent": {}
+        },
+        {
+            "ComponentTypes": [
+                1272846681,
+                341444041,
+                4284001660,
+                3942060043
+            ],
+            "TagComponent": {
+                "Tag": "Grass"
+            },
+            "TransformComponent": {
+                "Location": [
+                    -0.5,
+                    -0.20000000298023225,
+                    -2.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "IdentifierComponent": {
+                "Guid": 2
+            },
+            "SpriteRendererComponent": {
+                "Color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Size": [
+                    1.0,
+                    1.0
+                ],
+                "TilingFactor": [
+                    1.0,
+                    1.0
+                ],
+                "MinCoord": [
+                    0.0,
+                    0.0
+                ],
+                "MaxCoord": [
+                    1.0,
+                    1.0
+                ],
+                "Texture": "../Renaissance/assets/textures/grass.png"
+            }
+        }
+    ]
+}

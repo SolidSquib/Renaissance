@@ -1,9 +1,9 @@
 #include "FairegroundPCH.h"
 #include "Faireground/EditorLayer.h"
 
+#include "Renaissance/Core/Serialization.h"
 #include "Renaissance/Graphics/Texture.h"
 #include "Renaissance/Scene/Entity.h"
-#include "Renaissance/Scene/SceneSerializer.h"
 #include "Renaissance/Utilities/PlatformUtilities.h"
 
 #include "Faireground/Windows/EditorViewportWindow.h"
@@ -14,8 +14,6 @@
 
 #include "ImGuizmo.h"
 #include "IconsFontAwesome5.h"
-#include "cereal/archives/json.hpp"
-#include "cereal/types/vector.hpp"
 
 namespace Renaissance
 {
@@ -305,8 +303,10 @@ namespace Renaissance
 		{
 			sActiveScene = MakeShared<Scene>();
 			sSelectedEntity = {};
-			SceneSerializer serializer(sActiveScene);
-			serializer.DeserializeText(filepath.string());
+
+			std::ifstream fin(filepath);
+			cereal::JSONInputArchive ar(fin);
+			ar(*sActiveScene);
 		}
 	}
 
@@ -321,8 +321,9 @@ namespace Renaissance
 				filePath.append(".rscene");
 			}
 
-			SceneSerializer serializer(sActiveScene);
-			serializer.SerializeText(filePath);
+			std::ofstream fout(filePath);
+			cereal::JSONOutputArchive ar(fout);
+			ar(*sActiveScene);
 		}
 	}
 

@@ -35,16 +35,14 @@ project "Renaissance"
 		"%{IncludeDir.IconFonts}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.stb_image}",
-		"%{IncludeDir.yamlcpp}"
+		"%{IncludeDir.stb_image}"
 	}
 	
 	links
 	{
 		"GLFW",
 		"Glad",
-		"ImGui",
-		"yaml-cpp"
+		"ImGui"
 	}
 
 	defines
